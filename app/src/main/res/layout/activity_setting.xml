@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+    
+    <include layout="@layout/title_layout"/>
+    
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/tv1"
+                style="@style/text_2_next"
+                android:text="绑定手机"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+
+            <TextView
+                android:id="@+id/tv2"
+                style="@style/text_2_next"
+                android:text="绑定支付宝账号"/>
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+
+            <TextView
+                android:id="@+id/tv12"
+                style="@style/text_2_next"
+                android:text="绑定银行卡"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv3"
+                style="@style/text_2_next"
+                android:text="登录密码"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv4"
+                style="@style/text_2_next"
+                android:text="我要反馈"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv5"
+                style="@style/text_2_next"
+                android:text="黑名单管理"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv6"
+                style="@style/text_2_next"
+                android:text="社区规范"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv7"
+                style="@style/text_2_next"
+                android:text="联系官方"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv8"
+                style="@style/text_2_next"
+                android:text="帮助"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv9"
+                style="@style/text_2_next"
+                android:text="关于平台"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <RelativeLayout
+                android:id="@+id/rl10"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <TextView
+                    style="@style/text_2_next"
+                    android:text="检查版本"/>
+
+                <TextView
+                    android:id="@+id/tv_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:layout_alignParentRight="true"
+                    android:paddingRight="17dp"
+                    android:paddingLeft="10dp"
+                    android:background="@color/white"
+                    android:text="V1.0"/>
+            </RelativeLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+            <TextView
+                android:id="@+id/tv11"
+                style="@style/text_2_next"
+                android:text="退出登录"/>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp"/>
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <include layout="@layout/title_layout2" />
+
+    <include layout="@layout/include_my_top" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv1"
+                style="@style/text_my"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@mipmap/my_qb"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="我的钱包" />
+
+            <TextView
+                android:id="@+id/tv2"
+                style="@style/text_my"
+                android:drawableLeft="@mipmap/my_sc"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="装扮商城" />
+
+            <TextView
+                android:id="@+id/tv3"
+                style="@style/text_my"
+                android:drawableLeft="@mipmap/my_rz"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="实名认证" />
+
+            <TextView
+                android:id="@+id/tv4"
+                style="@style/text_my"
+                android:drawableLeft="@mipmap/my_jz"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="我的家族" />
+
+            <TextView
+                android:id="@+id/tv5"
+                style="@style/text_my"
+                android:drawableLeft="@mipmap/my_dj"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="我的等级" />
+
+            <TextView
+                android:id="@+id/tv6"
+                style="@style/text_my"
+                android:drawableLeft="@mipmap/my_yq"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="我的邀请" />
+
+            <TextView
+                android:id="@+id/tv7"
+                style="@style/text_my"
+                android:layout_marginBottom="50dp"
+                android:drawableLeft="@mipmap/my_sz"
+                android:drawableRight="@mipmap/right_gray"
+                android:text="设置" />
+
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>

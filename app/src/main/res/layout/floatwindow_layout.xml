@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fl"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:layout_gravity="center"
+    android:background="@mipmap/img_room_float">
+
+    <com.ysxsoft.imtalk.widget.CircleImageView
+        android:id="@+id/img_head"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="2dp"
+        android:src="@mipmap/img_normal_head" />
+
+</FrameLayout>

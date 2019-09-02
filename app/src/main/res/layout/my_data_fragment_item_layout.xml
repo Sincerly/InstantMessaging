@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="10dp">
+
+    <com.ysxsoft.imtalk.widget.CircleImageView
+        android:id="@+id/img_head"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@mipmap/img_normal_head" />
+
+    <TextView
+        android:id="@+id/tv_familly_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="家族名称"
+        app:layout_constraintLeft_toRightOf="@id/img_head" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="家族ID:666    "
+        android:textColor="@color/hint_text_color"
+        app:layout_constraintLeft_toRightOf="@id/img_head"
+        app:layout_constraintTop_toBottomOf="@id/tv_familly_name" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/right_gray"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.youth.banner.Banner
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="115dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            app:indicator_drawable_selected="@color/btn_color"
+            app:indicator_drawable_unselected="@color/white" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="10dp"
+            android:text="家族广场"
+            android:textColor="#ff282828"
+            android:textSize="18dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
+
+        <View
+            style="@style/gray_line_style"
+            android:layout_height="10dp" />
+
+        <LinearLayout
+            android:id="@+id/ll_jz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="10dp"
+                android:text="我的家族"
+                android:textColor="#ff282828"
+                android:textSize="18dp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:id="@+id/rl_jz"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp">
+
+                <ImageView
+                    android:id="@+id/iv_jz_tx"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@mipmap/jz_jxb" />
+
+                <TextView
+                    android:id="@+id/tv_jz_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/iv_jz_tx"
+                    android:singleLine="true"
+                    android:text="家族名称"
+                    android:textColor="#ff282828"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/tv_jz_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_jz_name"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toRightOf="@id/iv_jz_tx"
+                    android:text="家族ID:666"
+                    android:textColor="#ff989898"
+                    android:textSize="13dp" />
+
+                <TextView
+                    android:id="@+id/tv_jz_cy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_jz_name"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toRightOf="@id/tv_jz_id"
+                    android:text="成员：9658"
+                    android:textColor="#ff989898"
+                    android:textSize="13dp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@mipmap/right_gray" />
+            </RelativeLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+
+            <RelativeLayout
+                android:id="@+id/rl_jz_kf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp">
+
+                <ImageView
+                    android:id="@+id/iv_jz_kf"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@mipmap/jz_jxb" />
+
+                <TextView
+                    android:id="@+id/tv_jz_kf_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/iv_jz_kf"
+                    android:singleLine="true"
+                    android:text="家族客服"
+                    android:textColor="#ff282828"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/tv_jz_kf_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_jz_kf_name"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toRightOf="@id/iv_jz_kf"
+                    android:text="ID:666"
+                    android:textColor="#ff989898"
+                    android:textSize="13dp" />
+
+                <TextView
+                    android:id="@+id/tv_jz_kf_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_jz_kf_name"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toRightOf="@id/tv_jz_kf_id"
+                    android:text="合作洽谈 活动答疑"
+                    android:textColor="#ff989898"
+                    android:textSize="13dp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@mipmap/right_gray" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_jz_zn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp">
+
+                <ImageView
+                    android:id="@+id/iv_jz_zn"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@mipmap/jz_jxb" />
+
+                <TextView
+                    android:id="@+id/tv_jz_zn_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/iv_jz_zn"
+                    android:singleLine="true"
+                    android:text="家族指南"
+                    android:textColor="#ff282828"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/tv_jz_zn_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_jz_zn_name"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_toRightOf="@id/iv_jz_zn"
+                    android:text="快速上手教程"
+                    android:textColor="#ff989898"
+                    android:textSize="13dp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@mipmap/right_gray" />
+            </RelativeLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_height="10dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

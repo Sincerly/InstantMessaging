@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="345dp"
+    android:layout_height="370dp"
+    android:layout_gravity="center"
+    android:background="@drawable/za_shape"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="345dp"
+        android:layout_height="370dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_activity_rules"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="活动规则>"
+                android:textColor="@color/white" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/img_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:src="@mipmap/img_w_cancle" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_winning_record"
+                android:layout_width="75dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="30dp"
+                android:background="@drawable/ffc320_shape"
+                android:gravity="center"
+                android:text="中奖记录"
+                android:textColor="@color/white" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="20dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom">
+
+                        <ImageView
+                            android:id="@+id/img_stage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/img_stage" />
+
+                        <TextView
+                            android:id="@+id/tv_1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal|bottom"
+                            android:layout_marginBottom="5dp"
+                            android:text="1次消耗10金币"
+                            android:textColor="#FFCF11" />
+                    </FrameLayout>
+
+                    <pl.droidsonroids.gif.GifImageView
+                        android:id="@+id/img_egg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+
+                        android:src="@mipmap/egg"
+                        android:layout_marginBottom="10dp"
+                       />
+
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/img_T"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/img_chui"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+
+            <TextView
+                android:id="@+id/tv_award_pool"
+                android:layout_width="75dp"
+                android:layout_height="28dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/ffc320_shape"
+                android:gravity="center"
+                android:text="本期奖池"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp" />
+
+        <ImageView
+            android:id="@+id/img_break"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:src="@mipmap/img_break" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/w50_shape"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:gravity="center_vertical"
+            android:text="金币："
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/tv_jb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="666"
+            android:textColor="@color/btn_color"
+            android:textSize="23sp" />
+
+        <TextView
+            android:id="@+id/tv_withdraw"
+            style="@style/btn_style"
+            android:layout_width="75dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dp"
+            android:text="充值" />
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

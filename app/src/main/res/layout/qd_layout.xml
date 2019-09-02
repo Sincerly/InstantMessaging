@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/img_bg"
+            android:orientation="vertical">
+
+            <include layout="@layout/w_translation_title_layout" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="已坚持"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_bai"
+                    android:layout_width="45dp"
+                    android:layout_height="62dp"
+                    android:background="@drawable/w_gk_shape"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@color/btn_color"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:id="@+id/tv_shi"
+                    android:layout_width="45dp"
+                    android:layout_height="62dp"
+                    android:background="@drawable/w_gk_shape"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@color/btn_color"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:id="@+id/tv_ge"
+                    android:layout_width="45dp"
+                    android:layout_height="62dp"
+                    android:background="@drawable/w_gk_shape"
+                    android:gravity="center"
+                    tools:text="6"
+                    android:textColor="@color/btn_color"
+                    android:textSize="48sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="天签到"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_is_qd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal"
+                tools:text="今天还没有签到哦~"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="306dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="35dp"
+                android:background="@drawable/qd_theme_shape"
+                android:drawableLeft="@mipmap/img_qd_jb"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:text="连续签到7天  即可获得礼物哦~"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="345dp"
+            android:layout_height="225dp"
+            android:layout_gravity="center|bottom"
+            android:layout_marginTop="250dp"
+            android:background="@drawable/w_gk_shape"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ll_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+                            <ImageView
+                                android:id="@+id/img_tupian1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq1"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show1"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+                            <ImageView
+                                android:id="@+id/img_tupian2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq2"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="2"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show2"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+                            <ImageView
+                                android:id="@+id/img_tupian3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq3"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="3"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show3"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ll_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+                            <ImageView
+                                android:id="@+id/img_tupian4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq4"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="4"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show4"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+
+                            <ImageView
+                                android:id="@+id/img_tupian5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq5"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="5"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show5"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="15dp"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+                            <ImageView
+                                android:id="@+id/img_tupian6"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq6"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="6"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show6"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb6"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <FrameLayout
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/gray_shape">
+
+                            <ImageView
+                                android:id="@+id/img_tupian7"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_jb" />
+
+                            <TextView
+                                android:id="@+id/tv_go_bq7"
+                                android:layout_width="match_parent"
+                                android:layout_height="18dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/gradient_qd_shape"
+                                android:gravity="center"
+                                android:text="去补签"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/circle_gray_shape"
+                                android:gravity="center"
+                                android:text="7"
+                                android:textColor="@color/white"
+                                android:textSize="10sp" />
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/fl_show7"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/qd_shape"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/img_qd" />
+
+                        </FrameLayout>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/tv_jb7"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="6金币"
+                        android:textColor="@color/btn_color" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+    <TextView
+        android:id="@+id/tv_ok"
+        style="@style/btn_style_selector"
+        android:layout_marginTop="20dp"
+        android:text="签到"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tv_qd_gz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text="签到规则>>" />
+
+</LinearLayout>

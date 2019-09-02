@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <com.ysxsoft.imtalk.widget.CircleImageView
+        android:id="@+id/img_head"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@mipmap/img_normal_head" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_nikeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                app:layout_constraintLeft_toRightOf="@id/img_head"
+                tools:text="蹦蹦蹦蹦" />
+
+            <ImageView
+                android:id="@+id/img_sex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:src="@mipmap/img_boy"
+                app:layout_constraintLeft_toRightOf="@id/tv_nikeName" />
+
+            <TextView
+                android:id="@+id/tv_zs_num"
+                android:layout_width="40dp"
+                android:layout_height="16dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/gray_ccc_shape"
+                android:drawableLeft="@mipmap/img_wzs"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintLeft_toRightOf="@id/img_sex"
+                tools:text="12" />
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:text="09:20" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:id="@+id/tv_last_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:singleLine="true"
+                tools:text="消息消息消息消息" />
+
+            <TextView
+                android:id="@+id/tv_point"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="right" />
+        </FrameLayout>
+
+    </LinearLayout>
+</LinearLayout>

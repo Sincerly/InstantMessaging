@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cb_box"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:paddingLeft="10dp"
+    android:background="@null"
+    android:button="@drawable/d_selector"
+    android:checked="true"
+    android:text="人身攻击、地域歧视、言论不雅，严重者">
+
+</CheckBox>

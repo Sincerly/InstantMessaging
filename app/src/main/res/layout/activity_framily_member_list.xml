@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <include layout="@layout/title_layout"/>
+
+    <TextView
+        android:id="@+id/tv_all_num"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        tools:text="全部成员（999人）"
+        android:textColor="#ff989898"
+        android:textSize="15dp"
+        android:gravity="center_vertical"
+        android:background="#F2F2F2"
+        android:paddingLeft="15dp"
+        />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/mSwipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.github.jdsjlzx.recyclerview.LuRecyclerView
+            android:id="@+id/mRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</LinearLayout>

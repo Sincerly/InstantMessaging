@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.ysxsoft.imtalk.widget.MyViewPager
+        android:id="@+id/vp_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <View style="@style/gray_line_style" />
+
+
+    <RadioGroup
+        android:id="@+id/rg_home"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_home"
+            style="@style/rb_selector"
+            android:drawableTop="@drawable/home_selector" />
+
+        <RadioButton
+            android:id="@+id/rb_house"
+            style="@style/rb_selector"
+            android:drawableTop="@drawable/house_selector" />
+
+        <RadioButton
+            android:id="@+id/rb_msg"
+            style="@style/rb_selector"
+            android:drawableTop="@drawable/msg_selector" />
+
+        <RadioButton
+            android:id="@+id/rb_family"
+            style="@style/rb_selector"
+            android:drawableTop="@drawable/family_selector" />
+
+
+        <RadioButton
+            android:id="@+id/rb_my"
+            style="@style/rb_selector"
+            android:drawableTop="@drawable/my_selector" />
+
+    </RadioGroup>
+
+
+</LinearLayout>

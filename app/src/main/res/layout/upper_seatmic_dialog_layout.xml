@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/t_l_r_shape"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_sm"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="上麦"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tv_btsm"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="抱TA上麦"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tv_close_mic"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="锁麦"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tv_bm"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="闭麦"
+        android:textSize="15sp" />
+
+    <View style="@style/gray_line_style" />
+
+    <TextView
+        android:id="@+id/tv_cancle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="取消"
+        android:textSize="15sp" />
+
+
+</LinearLayout>

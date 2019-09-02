@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="450dp"
+    android:background="@color/white"
+    android:layout_gravity="bottom">
+
+    <ImageView
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/img_room_level_bg" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_bg"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingTop="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/tv1"
+            style="@style/room_tab_selector"
+            android:text="魅力榜" />
+
+        <TextView
+            android:id="@+id/tv2"
+            style="@style/room_tab_selector"
+            android:text="土豪榜" />
+
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_top1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@mipmap/img_top1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_bg">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_top1"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="10dp"
+            android:src="@mipmap/img_normal_head" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_top2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="65dp"
+        android:background="@mipmap/img_top2"
+        app:layout_constraintBottom_toTopOf="@id/ll_top2"
+        app:layout_constraintRight_toLeftOf="@id/fl_top1"
+        app:layout_constraintTop_toBottomOf="@+id/ll_bg">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_top2"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/img_normal_head" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_top3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="72dp"
+        android:background="@mipmap/img_top3"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_bg">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_top3"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/img_normal_head" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_top1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fl_top1">
+
+        <TextView
+            android:id="@+id/tv_top1_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            tools:text="大猪的房间" />
+
+        <TextView
+            android:id="@+id/tv_top1_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white50"
+            android:textSize="12sp"
+            tools:text="ID：58954875" />
+
+        <TextView
+            android:id="@+id/tv_top1_NO"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NO.1"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_top2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintRight_toLeftOf="@id/ll_top1"
+        app:layout_constraintTop_toBottomOf="@+id/fl_top2">
+
+        <TextView
+            android:id="@+id/tv_top2_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            tools:text="大猪的房间" />
+
+        <TextView
+            android:id="@+id/tv_top2_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white50"
+            android:textSize="10sp"
+            tools:text="ID：58954875" />
+
+        <TextView
+            android:id="@+id/tv_top2_NO"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            tools:text="距前一名4589" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_top3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="45dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fl_top3"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/tv_top3_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            tools:text="大猪的房间" />
+
+        <TextView
+            android:id="@+id/tv_top3_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white50"
+            android:textSize="10sp"
+            tools:text="ID：58954875" />
+
+        <TextView
+            android:id="@+id/tv_top3_NO"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            tools:text="距前一名4589" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/bg" />
+
+
+</android.support.constraint.ConstraintLayout>

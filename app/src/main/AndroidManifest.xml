@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ysxsoft.imtalk">
+    <!-- 窗口权限 -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- unavailable in API 23 -->
+    <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- 硬件加速对X5视频播放非常重要，建议开启 -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" /> <!-- 获取CUID，用于鉴权，请求签名等 -->
+    <uses-permission android:name="com.android.launcher.permission.WRITE_SETTINGS" /> <!-- 这个权限用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 这个权限用于访问GPS定位 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 访问网络，网络定位需要上网 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application
+        android:name=".utils.BaseApplication"
+        android:allowBackup="true"
+        android:appComponentFactory="whateverString"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:appComponentFactory">
+
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="360" />
+        <meta-data
+            android:name="design_height_in_dp"
+            android:value="640" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.ysxsoft.imtalk.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/rc_file_path" />
+        </provider>
+
+        <!-- 主页 -->
+        <activity android:name=".view.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="com.ysxsoft.imtalk"
+                    android:pathPrefix="/conversationlist"
+                    android:scheme="rong" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".view.AddRoomActivity" /> <!-- 新建房间 --> <!-- 登录 -->
+        <activity android:name=".view.LoginActivity" /> <!-- 忘记密码 -->
+        <activity android:name=".view.ForgetPswActivity" /> <!-- 注册 -->
+        <activity android:name=".view.RegisterActivity" /> <!-- 设置 -->
+        <activity android:name=".view.SettingActivity" /> <!-- 帮助 -->
+        <activity android:name=".view.HelpActivity" /> <!-- 绑定手机 -->
+        <activity android:name=".view.BindPhoneActivity" /> <!-- 绑定支付宝账号 -->
+        <activity android:name=".view.BindZfbActivity" /> <!-- 黑名单 -->
+        <activity android:name=".view.BlackListActivity" /> <!-- 我要反馈 -->
+        <activity android:name=".view.WyfkActivity" /> <!-- 实名认证 -->
+        <activity android:name=".view.SmrzActivity" /> <!-- 邀请好友 -->
+        <activity android:name=".view.InviteFriendActivity" /> <!-- 我的邀请列表 -->
+        <activity android:name=".view.InviteListActivity" /> <!-- 我的等级 -->
+        <activity android:name=".view.MyDjActivity" /> <!-- 我的钱包 -->
+        <activity android:name=".view.MoneyBagActivity" /> <!-- 我的家族-家族成员列表 -->
+        <activity android:name=".view.FramilyMemberListActivity" /> <!-- 我的家族 -->
+        <activity android:name=".view.MyFamilyActivity" /> <!-- 我的银行卡-编辑 -->
+        <activity android:name=".view.BankCardEditActivity" /> <!-- 我的银行卡-列表 -->
+        <activity android:name=".view.BankCardListActivity" />
+        <activity android:name=".view.CommunityNormsActivity" />
+        <activity android:name=".view.ContactOfficialsActivity" />
+        <activity android:name=".view.WebHelpActivity" />
+        <activity android:name=".view.AboutPlatformActivity" />
+        <activity android:name=".view.ImprovingDataActivity" />
+        <activity android:name=".view.SearchActivity" />
+        <activity android:name=".view.ManagerActivity" />
+        <activity android:name=".view.RoomTagActivity" />
+        <activity android:name=".view.DressMallActivity" />
+        <activity android:name=".view.MyDressActivity" />
+        <activity android:name=".view.MyDataActivity" />
+        <activity android:name=".view.PersonDataActivity" />
+        <activity android:name=".view.MyPhotoActivity" />
+        <activity android:name=".view.PersonIntroduceActivity" />
+        <activity android:name=".view.ExchangeZSActivity" />
+        <activity android:name=".view.ZsWithDrawActivity" />
+        <activity android:name=".view.ExchangeJBActivity" />
+        <activity android:name=".view.JbWithDrawActivity" />
+        <activity android:name=".view.QDActivity" />
+        <activity android:name=".view.ReportActivity" />
+        <activity android:name=".view.SignRulesActivity" />
+        <activity android:name=".view.BannerDetailActivity" />
+        <activity
+            android:name=".view.ChatRoomActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustUnspecified" />
+
+        <activity android:name=".view.WebViewActivity" />
+        <activity android:name=".view.OnlineListActivity" />
+        <activity android:name=".view.MySongBookActivity" />
+        <activity android:name=".fragment.LocalTyrantListActivity" />
+        <activity android:name=".view.MyFamilyGuideActivity" />
+        <activity android:name=".view.NoticeActivity" />
+        <activity android:name=".view.RoomBackGroundActivity" />
+        <activity android:name=".view.OnLineActivity" />
+        <activity android:name=".view.ComWebViewActivity" />
+        <activity android:name=".view.RoomNoticeActivity" />
+        <activity android:name=".view.UserLevelsActivity" />
+        <activity android:name=".view.PaymentCompletionActivity" />
+
+        <service android:name=".appservice.MyService" />
+        <service android:name=".appservice.FloatingDisplayService" />
+
+        <!-- 融云广播接收器 -->
+        <receiver
+            android:name=".im.SealNotificationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="io.rong.push.intent.MESSAGE_ARRIVED" />
+                <action android:name="io.rong.push.intent.MESSAGE_CLICKED" />
+                <action android:name="io.rong.push.intent.THIRD_PARTY_PUSH_STATE" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".im.ui.ConversationActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="com.ysxsoft.imtalk"
+                    android:pathPrefix="/conversation/"
+                    android:scheme="rong" />
+            </intent-filter>
+
+        </activity>
+        <!--QQ分享-->
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent101762831" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <!--微信分享-->
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".view.WithDrawRecodeActivity" />
+    </application>
+
+</manifest>

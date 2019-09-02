@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="User" />
+    <version value="5" />
+    <list>
+        <!--<mapping class="com.ysxsoft.imtalk.bean.Song" />-->
+        <mapping class="com.ysxsoft.imtalk.bean.UserInfo" />
+        <mapping class="com.ysxsoft.imtalk.bean.KeywordBean" />
+    </list>
+</litepal>

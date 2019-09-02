@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:layout_marginLeft="14dp"
+    android:layout_marginRight="14dp"
+    android:layout_marginTop="10dp"
+    android:background="@mipmap/card_bg">
+
+    <ImageView
+        android:id="@+id/img_ed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="11dp"
+        android:src="@mipmap/bank_edit" />
+
+    <TextView
+        android:id="@+id/tv_bank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:text="中国银行"
+        android:textColor="#ffffffff"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_bank"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:drawableLeft="@mipmap/bank_tx"
+        android:drawablePadding="6dp"
+        android:text="昵称"
+        android:textColor="#ffffffff"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tv_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_name"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:text="9784563214747896541"
+        android:textColor="#ffffffff"
+        android:singleLine="true"
+        android:textStyle="bold"
+        android:textSize="20dp" />
+
+</RelativeLayout>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/topView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="290dp"
+            android:layout_height="34dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:background="@drawable/shape_solid_coloreb_oval"
+            android:drawableLeft="@mipmap/search_right"
+            android:drawablePadding="8dp"
+            android:drawableStart="@mipmap/search_right"
+            android:gravity="center_vertical"
+            android:lines="1"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:text="搜索昵称/ID/房间标题"
+            android:textColor="@color/color989898"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/img_right"
+            android:layout_width="22dp"
+            android:layout_height="21dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/icon_addhouse" />
+
+    </RelativeLayout>
+
+
+    <com.ysxsoft.imtalk.widget.IndicatorTabLayout
+        android:id="@+id/tabLayoutHouse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabIndicatorHeight="2dp"
+        app:tabIndicatorWidth="20dp"
+        app:tabSelectTextColor="@color/colorAccent"
+        app:tabTextColor="@color/color989898" />
+
+    <com.ysxsoft.imtalk.widget.MyViewPager
+        android:id="@+id/viewPagerHouse"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

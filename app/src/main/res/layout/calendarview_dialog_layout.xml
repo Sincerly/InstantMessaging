@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="345dp"
+    android:layout_height="400dp"
+    android:layout_gravity="center"
+    android:background="@drawable/w_gk_shape"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <ImageView
+            android:id="@+id/img_cancle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@mipmap/img_cancle" />
+    </FrameLayout>
+
+
+    <TextView
+        android:id="@+id/tv_ok"
+        style="@style/btn_style"
+        android:text="确定" />
+
+</LinearLayout>

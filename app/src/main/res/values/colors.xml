@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FF38C9</color>
+    <color name="colorPrimaryDark">#FF38C9</color>
+    <color name="colorAccent">#FF38C9</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="white50">#50ffffff</color>
+    <color name="gray">#F7F7F7</color>
+    <color name="line_gray">#ebebeb</color>
+
+    <color name="background">#F2F2F2</color>
+
+    <color name="hint_text_color">#999999</color>
+    <color name="text_color">#666666</color>
+    <color name="toast_bg">#cf000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="btn_color">#FF38C9</color>
+    <color name="flow_item_color">#E6E6E6</color>
+
+    <color name="red_color">#DC4D4D</color>
+    <color name="color999999">#999999</color>
+    <color name="color989898">#989898</color>
+    <color name="color333333">#333333</color>
+    <color name="green_color">#13B572</color>
+    <color name="money_color">#FE8A0D</color>
+    <color name="colorF1F1F1">#F1F1F1</color>
+    <color name="colorEBEBEB">#EBEBEB</color>
+    <color name="endColor">#FF38C9</color>
+    <color name="startColor">#B463FF</color>
+    <color name="colorff000000">#ff000000</color>
+    <color name="colorff282828">#CCCCCC</color>
+    <color name="colorFFC320">#FFC320</color>
+    <color name="textColor28">#282828</color>
+    <color name="colorSilver">#B2B5CA</color>
+    <color name="colorAF3600">#40AF3600</color>
+</resources>

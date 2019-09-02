@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_bg"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:background="@drawable/theme_shape" />
+
+        <include
+            android:id="@+id/ll_title"
+            layout="@layout/w_translation_title_layout" />
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/w50_rad_shape"
+            android:gravity="center_vertical"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_title">
+
+            <TextView
+                android:id="@+id/tv1"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/w_selector"
+                android:gravity="center"
+                android:text="用户等级"
+                android:textColor="@color/text_w_theme_selecctor" />
+
+            <TextView
+                android:id="@+id/tv2"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/w_selector"
+                android:gravity="center"
+                android:text="魅力等级"
+                android:textColor="@color/text_w_theme_selecctor" />
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/img_user_zs"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/img_head_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:src="@mipmap/img_user_head_bg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_head"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@mipmap/img_normal_head"
+            app:layout_constraintBottom_toBottomOf="@id/img_head_img"
+            app:layout_constraintLeft_toLeftOf="@id/img_head_img"
+            app:layout_constraintRight_toRightOf="@id/img_head_img" />
+
+
+        <ImageView
+            android:id="@+id/img_bg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/img_user_levels"
+            app:layout_constraintBottom_toBottomOf="@id/img_head_img"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tv_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LV.80"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@id/img_bg"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tv_level">
+
+            <TextView
+                android:id="@+id/tv_user_level_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="当前用户等级："
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/tv_user_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/img_wzs"
+                android:drawablePadding="5dp"
+                android:text="80"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/tv_cjb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="差666金币升级"
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/white" />
+
+
+        </LinearLayout>
+
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <WebView
+        android:id="@+id/web_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+</LinearLayout>

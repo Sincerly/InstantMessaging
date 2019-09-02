@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/title_layout" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="198dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/w_gk_shape"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="金币兑换钻石" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_margin="10dp"
+                android:src="@mipmap/img_jb" />
+
+            <EditText
+                android:id="@+id/ed_num"
+                style="@style/edittext_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:digits="0123456789"
+                android:hint="请输入金币数量" />
+
+            <TextView
+                android:id="@+id/tv_all_exchange"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:text="全部兑换"
+                android:textColor="@color/btn_color" />
+
+        </LinearLayout>
+
+        <View style="@style/gray_line_style" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="当前金币：" />
+
+            <TextView
+                android:id="@+id/tv_current_jb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="9999" />
+
+            <TextView
+                android:id="@+id/tv_ratio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="，兑换比率:10金币=1钻石"
+                android:textColor="@color/hint_text_color" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="可兑换钻石："
+                android:textColor="@color/btn_color" />
+
+            <TextView
+                android:id="@+id/tv_zs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/img_zs"
+                android:text="0"
+                android:textColor="@color/btn_color" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_ok"
+        style="@style/btn_style_selector"
+        android:layout_marginTop="60dp"
+        android:enabled="false"
+        android:text="确定兑换" />
+
+
+</LinearLayout>

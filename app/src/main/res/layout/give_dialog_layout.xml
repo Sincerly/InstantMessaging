@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/w_gk_shape"
+    android:orientation="vertical">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="115dp"
+        android:background="@mipmap/img_give_gb"
+        android:padding="10dp">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_head"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@mipmap/img_normal_head" />
+
+        <TextView
+            android:id="@+id/tv_nikeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="额头上"
+            android:textColor="@color/white"
+            app:layout_constraintLeft_toRightOf="@id/img_head" />
+
+        <ImageView
+            android:id="@+id/img_sex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/img_boy"
+            app:layout_constraintLeft_toRightOf="@id/tv_nikeName" />
+
+        <TextView
+            android:id="@+id/tv_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:text="ID:1324654654"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintLeft_toRightOf="@id/img_head"
+            app:layout_constraintTop_toBottomOf="@id/tv_nikeName" />
+
+        <TextView
+            android:id="@+id/tv_familly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:text="所在家族：顶级娱乐"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintLeft_toRightOf="@id/img_head"
+            app:layout_constraintTop_toBottomOf="@id/tv_id" />
+
+
+        <TextView
+            android:id="@+id/tv_tuhao"
+            android:layout_width="40dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/cccccc_shape"
+            android:gravity="center"
+            android:text="豪 12"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            app:layout_constraintLeft_toRightOf="@id/img_head"
+            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+
+        <TextView
+            android:id="@+id/tv_mei"
+            android:layout_width="40dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/cccccc_shape"
+            android:gravity="center"
+            android:text="魅 12"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_tuhao"
+            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+
+
+        <TextView
+            android:id="@+id/tv_zs"
+            android:layout_width="40dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/cccccc_shape"
+            android:drawableLeft="@mipmap/img_w_masonry"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:text="12"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_mei"
+            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+
+
+        <ImageView
+            android:id="@+id/img_cancle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/img_w_cancle"
+            app:layout_constraintRight_toRightOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_give_gift"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_give_gift"
+            android:gravity="center"
+            android:text="送礼物"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_private_chat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_private_chat"
+            android:gravity="center"
+            android:text="私聊"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_give_zb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_give_zb"
+            android:gravity="center"
+            android:text="送装扮"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_foucs_on"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_foucs_on"
+            android:gravity="center"
+            android:text="关注TA"
+            android:textSize="11sp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_isShow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_give_out_room"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_out_room"
+            android:gravity="center"
+            android:text="踢出房间"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_setting_manager"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_setting_manager"
+            android:gravity="center"
+            android:text="设置管理员"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tv_move_manager"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_remove_manager"
+            android:gravity="center"
+            android:text="移除管理员"
+            android:textSize="11sp" />
+
+
+        <TextView
+            android:id="@+id/tv_black_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_black_list"
+            android:gravity="center"
+            android:text="拉入黑名单"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/zw"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_black_list"
+            android:gravity="center"
+            android:visibility="gone"
+            android:textSize="11sp" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

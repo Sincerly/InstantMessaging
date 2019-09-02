@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/chatroom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/chatroom_bg_01"
+        android:scaleType="centerCrop" />
+
+    <!-- 标题栏 -->
+
+    <LinearLayout
+        android:id="@+id/chatroom_title_rl_titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/topView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
+
+            <ImageView
+                android:id="@+id/img_back"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingLeft="17dp"
+                android:paddingRight="4dp"
+                android:src="@mipmap/w_img_left_arrow" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:textColor="@color/white"
+                    tools:text="这是哈哈哈的房间" />
+
+                <TextView
+                    android:id="@+id/tv_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="ID:89458965   666人在线"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/img_share"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/img_right_img"
+                android:padding="13dp"
+                android:src="@mipmap/share_white"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/img_right_img"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:padding="13dp"
+                android:src="@mipmap/img_tui_room" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- 房主发言时背景动画 -->
+    <com.ysxsoft.imtalk.chatroom.widget.RoomManagerRippleView
+        android:id="@+id/chatroom_rv_room_manager_ripple"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_below="@id/chatroom_title_rl_titlebar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="-17dp"
+        app:duration="1000"
+        app:firstColor="#aaffffff"
+        app:maxRadius="70dp"
+        app:secondColor="#66ffffff"
+        app:startRadius="45dp" />
+
+    <TextView
+        android:id="@+id/tv_music"
+        android:layout_width="75dp"
+        android:layout_height="33dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/chatroom_title_rl_titlebar"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/l_translation50_shape"
+        android:drawableLeft="@mipmap/img_music"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:text="音乐"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/tv_room_level"
+        android:layout_width="85dp"
+        android:layout_height="33dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/chatroom_title_rl_titlebar"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/r_translation50_shape"
+        android:drawableLeft="@mipmap/img_room_level"
+        android:gravity="center"
+        android:paddingLeft="5dp"
+        android:text="房内榜"
+        android:textColor="@color/white" />
+
+    <ImageView
+        android:id="@+id/img_gold_egg"
+        android:layout_width="53dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/tv_room_level"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/img_gold_egg" />
+    <!-- 房主头像 -->
+
+    <FrameLayout
+        android:id="@+id/chatroom_iv_room_manager_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chatroom_title_rl_titlebar"
+        android:layout_centerHorizontal="true">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_head"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/chatroom_bg_room_manager_avatar"
+            android:padding="4dp"
+            tools:src="@drawable/chatroom_user_avatar_02" />
+
+        <TextView
+            android:id="@+id/tv_room_manager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/heart_shape"
+            android:drawableLeft="@mipmap/img_heart"
+            android:drawablePadding="5dp"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="0"
+            android:textColor="@color/white"
+            android:textSize="10sp" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/chatroom_tv_room_manager_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chatroom_iv_room_manager_avatar"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/img_sex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="10dp"
+            tools:src="@mipmap/img_girl" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            tools:text="NS.千百度" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_ed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chatroom_tv_room_manager_nickname"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_lable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#相亲交友"
+            android:textColor="@color/btn_color"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tv_room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="点击编辑房间话题"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <!-- 麦位 -->
+    <LinearLayout
+        android:id="@+id/chatroom_ll_mic_seat"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/ll_ed"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:clipChildren="false"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_1"
+                style="@style/MicSeatViewStyle" />
+
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_2"
+                style="@style/MicSeatViewStyle" />
+
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_3"
+                style="@style/MicSeatViewStyle" />
+
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_4"
+                style="@style/MicSeatViewStyle" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_5"
+                style="@style/MicSeatViewStyle" />
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_6"
+                style="@style/MicSeatViewStyle" />
+
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_7"
+                style="@style/MicSeatViewStyle" />
+
+            <com.ysxsoft.imtalk.chatroom.widget.MicSeatView
+                android:id="@+id/chatroom_mp_mic_8"
+                style="@style/MicSeatViewStyle" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_sys_notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chatroom_ll_mic_seat"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        tools:text="哈哈哈"/>
+
+    <!-- 聊天列表 -->
+    <ListView
+        android:id="@+id/chatroom_list_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/chatroom_ll_input_container"
+        android:layout_below="@id/tv_sys_notice"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
+        android:divider="@null"
+        android:dividerHeight="8dp"
+        android:listSelector="@android:color/transparent"
+        android:overScrollMode="never"
+        android:scrollbarThumbVertical="@android:color/transparent"
+        tools:listitem="@layout/chatroom_item_chatlist_chat" />
+
+    <!-- 底部输入栏 -->
+    <LinearLayout
+        android:id="@+id/chatroom_ll_input_container"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/chatroom_et_chat_input"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/translation50_shape"
+            android:hint="一起聊天吧～"
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/ll_isShow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/img_send_msg"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:src="@mipmap/img_send_msg" />
+
+            <ImageView
+                android:id="@+id/img_img_yy"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:src="@mipmap/img_yy" />
+
+            <ImageView
+                android:id="@+id/chatroom_iv_mic_control"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:src="@mipmap/img_volume" />
+
+            <ImageView
+                android:id="@+id/img_simle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:src="@mipmap/img_simle" />
+
+            <ImageView
+                android:id="@+id/chatroom_iv_sound_control"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginRight="8dp"
+                android:src="@mipmap/img_msg" />
+
+            <ImageView
+                android:id="@+id/chatroom_setting"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginRight="8dp"
+                android:src="@mipmap/img_setting" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/chatroom_gift"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginRight="8dp"
+                    android:src="@mipmap/img_gift" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

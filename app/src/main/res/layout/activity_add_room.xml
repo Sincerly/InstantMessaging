@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <include layout="@layout/title_layout" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_fj_name"
+                style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:text="房间名" />
+
+                <TextView
+                    android:id="@+id/tv_fj_name"
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:drawableRight="@mipmap/right_gray"
+                    android:gravity="center_vertical|right"
+                    android:text="...的房间"
+                    android:textColor="@color/color999999" />
+
+            </LinearLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+            <LinearLayout style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:text="房间上锁" />
+
+                <Switch
+                    android:id="@+id/switch_ss"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumb="@drawable/switch_custom_thumb_selector"
+                    android:track="@drawable/switch_custom_track_selector" />
+            </LinearLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_height="10dp" />
+
+            <LinearLayout
+                android:id="@+id/ll_fj_bq"
+                style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:text="房间标签" />
+
+                <TextView
+                    android:id="@+id/tv_fj_bq"
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:drawableRight="@mipmap/right_gray"
+                    android:gravity="center_vertical|right"
+                    android:text="聊天"
+                    android:textColor="#FF38C9" />
+
+            </LinearLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+            <LinearLayout
+                android:id="@+id/ll_fj_gly"
+                style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:text="管理员" />
+
+                <TextView
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:drawableRight="@mipmap/right_gray"
+                    android:gravity="center_vertical|right"
+                    android:text="" />
+            </LinearLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+            <TextView
+                android:id="@+id/tv_black_list"
+                style="@style/text_2_next"
+                android:text="黑名单" />
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_height="10dp" />
+
+
+            <TextView
+                android:id="@+id/tv_background"
+                style="@style/text_2_next"
+                android:text="房屋背景" />
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+            <LinearLayout style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:text="房间礼物特效" />
+
+                <Switch
+                    android:id="@+id/switch_tx"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumb="@drawable/switch_custom_thumb_selector"
+                    android:track="@drawable/switch_custom_track_selector" />
+            </LinearLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+            <LinearLayout style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:text="房间公屏" />
+
+                <Switch
+                    android:id="@+id/switch_gp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumb="@drawable/switch_custom_thumb_selector"
+                    android:track="@drawable/switch_custom_track_selector" />
+            </LinearLayout>
+
+            <View
+                style="@style/gray_line_style"
+                android:layout_marginLeft="15dp" />
+
+            <LinearLayout style="@style/ll_50">
+
+                <TextView
+                    style="@style/text_15"
+                    android:layout_weight="1"
+                    android:text="纯净模式" />
+
+                <Switch
+                    android:id="@+id/switch_ms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumb="@drawable/switch_custom_thumb_selector"
+                    android:track="@drawable/switch_custom_track_selector" />
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>

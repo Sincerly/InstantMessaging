@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="93dp"
+    android:layout_height="36dp"
+    android:background="@drawable/room_tag_selector"
+    android:layout_margin="5dp"
+    android:gravity="center"
+    android:padding="5dp"
+    android:textColor="@color/white"
+    android:text="你好">
+
+</TextView>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="19dp"
+    android:paddingRight="20dp">
+
+    <com.ysxsoft.imtalk.widget.CircleImageView
+        android:id="@+id/iv_tx"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@mipmap/img_normal_head"/>
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="某某"
+        android:textColor="#ff282828"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tv_right"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:singleLine="true"
+        android:text="0"
+        android:textColor="#ffff38c9"
+        android:textSize="15dp" />
+
+</LinearLayout>

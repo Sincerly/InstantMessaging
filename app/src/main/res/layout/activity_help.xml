@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/title_layout"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/tv1"
+            style="@style/text_2_next"
+            android:text="常见问题"/>
+
+        <View
+            style="@style/gray_line_style"
+            android:layout_marginLeft="15dp"/>
+
+
+        <TextView
+            android:id="@+id/tv2"
+            style="@style/text_2_next"
+            android:text="账号申诉"/>
+
+        <View
+            style="@style/gray_line_style"
+            android:layout_marginLeft="15dp"/>
+
+    </LinearLayout>
+</LinearLayout>

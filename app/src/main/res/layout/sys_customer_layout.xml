@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="10dp">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_head"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@mipmap/img_normal_head" />
+
+        <TextView
+            android:id="@+id/tv_custome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textSize="15sp"
+            app:layout_constraintLeft_toRightOf="@id/img_head"
+            tools:text="客服" />
+
+
+        <TextView
+            android:id="@+id/tv_last_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/hint_text_color"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/img_head"
+            tools:text="消息" />
+
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/hint_text_color"
+            android:textSize="12sp"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="9:00" />
+
+        <TextView
+            android:id="@+id/tv_point"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="right" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="10dp">
+
+        <com.ysxsoft.imtalk.widget.CircleImageView
+            android:id="@+id/img_sys_head"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@mipmap/img_normal_head" />
+
+        <TextView
+            android:id="@+id/tv_sys"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textSize="15sp"
+            app:layout_constraintLeft_toRightOf="@id/img_sys_head"
+            tools:text="系统" />
+
+
+        <TextView
+            android:id="@+id/tv_sys_last_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/hint_text_color"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/img_sys_head"
+            tools:text="消息" />
+
+
+        <TextView
+            android:id="@+id/tv_sys_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/hint_text_color"
+            android:textSize="12sp"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="9:00" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View style="@style/gray_line_style" />
+
+</LinearLayout>
