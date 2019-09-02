@@ -16,6 +16,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.youth.banner.listener.OnBannerListener
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.*
+import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
@@ -24,6 +25,10 @@ import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.BannerDetailActivity
 import com.ysxsoft.imtalk.view.ChatRoomActivity
 import com.ysxsoft.imtalk.widget.banner.GlideImageLoader
+import io.rong.imlib.IRongCallback
+import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.fragment_house_item.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -129,11 +134,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
     }
 
     private fun init1Adapter() {
-        if (roomLists!!.size>3) {
+        if (roomLists!!.size > 3) {
             adapterRecommend1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_recommend, roomLists!!.subList(0, 3)) {
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name+"==="+item.room_id
+                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name + "===" + item.room_id
                     helper.itemView.setOnClickListener {
                         //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                         joinChatRoom(item.room_id.toString())
@@ -142,11 +147,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             }
             recyclerView.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL)
             recyclerView.adapter = adapterRecommend1
-        }else{
+        } else {
             adapterRecommend1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_recommend, roomLists) {
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name+"==="+item.room_id
+                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name + "===" + item.room_id
                     helper.itemView.setOnClickListener {
                         //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                         joinChatRoom(item.room_id.toString())
@@ -161,11 +166,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
 //                helper.getView<ImageView>(R.id.ivAvatar).displayRes(R.mipmap.icon_def)
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                helper.getView<TextView>(R.id.tv_name).text = item.room_name+"==="+item.room_id
-                helper.getView<TextView>(R.id.tv_Tag).text = "#"+item.label_name
-                helper.getView<TextView>(R.id.tv_Online).text =item.memCount+"人在线"
+                helper.getView<TextView>(R.id.tv_name).text = item.room_name + "===" + item.room_id
+                helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                 helper.itemView.setOnClickListener {
-//                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
+                    //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                     joinChatRoom(item.room_id.toString())
                 }
             }
@@ -225,7 +230,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                 helper.getView<TextView>(R.id.tv_Content).text = item.room_name
                 helper.itemView.setOnClickListener {
-//                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
+                    //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                     joinChatRoom(item.room_id.toString())
                 }
             }
@@ -237,10 +242,10 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeRoomBean.DataBean.RoomListBean) {
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                 helper.getView<TextView>(R.id.tv_name).text = item.room_name
-                helper.getView<TextView>(R.id.tv_Tag).text = "#"+item.label_name
-                helper.getView<TextView>(R.id.tv_Online).text = item.memCount+"人在线"
+                helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                 helper.itemView.setOnClickListener {
-//                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
+                    //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                     joinChatRoom(item.room_id.toString())
                 }
             }
@@ -257,14 +262,33 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
         }
     }
 
-    fun joinChatRoom(roomId:String){
+    fun joinChatRoom(roomId: String) {
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 ChatRoomActivity.starChatRoomActivity(mContext, roomId)
+                val message = RoomMemberChangedMessage()
+                message.setCmd(1)
+                message.targetUserId = SpUtils.getSp(mContext, "uid")
+                message.targetPosition = -1
+                val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
+
+                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                    override fun onAttached(p0: Message?) {
+
+                    }
+
+                    override fun onSuccess(p0: Message?) {
+                        showToastMessage("发送成功=="+p0)
+                    }
+
+                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                    }
+                });
             }
 
             override fun onFail(errorCode: Int) {
-                showToastMessage("HouseItemFragment==加入房间=="+errorCode)
+                showToastMessage("HouseItemFragment==加入房间==" + errorCode)
             }
         })
     }
