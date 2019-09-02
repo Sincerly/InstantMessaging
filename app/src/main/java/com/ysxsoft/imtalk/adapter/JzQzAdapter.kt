@@ -16,6 +16,8 @@ import com.ysxsoft.imtalk.widget.CircleImageView
  *on 2019/7/23 0023
  */
 class JzQzAdapter(mContext: Context) : ListBaseAdapter<GroupListBean.DataBean.GroupInfoBean>(mContext) {
+    private var onItemClickListener: OnItemClickListener? = null
+
     override val layoutId: Int
         get() = R.layout.activity_my_family_item
 
@@ -47,10 +49,14 @@ class JzQzAdapter(mContext: Context) : ListBaseAdapter<GroupListBean.DataBean.Gr
             }
         }
         holder.getView<TextView>(R.id.tv_join)!!.setOnClickListener {
-            if (onJoinListener!=null){
+            if (onJoinListener != null) {
                 onJoinListener!!.onClick(position)
             }
-
+        }
+        holder.itemView.setOnClickListener{
+            if(onItemClickListener!=null){
+                onItemClickListener!!.onItemClick(position,bean.group_name,bean.id);
+            }
         }
     }
 
@@ -61,6 +67,14 @@ class JzQzAdapter(mContext: Context) : ListBaseAdapter<GroupListBean.DataBean.Gr
     private var onJoinListener: OnJoinListener? = null
     fun setOnJoinListener(onJoinListener: OnJoinListener) {
         this.onJoinListener = onJoinListener
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int, title: String,groupId:String)
+    }
+
+    fun setOnItemClickListener(onItemClickListener:OnItemClickListener){
+        this.onItemClickListener=onItemClickListener;
     }
 
 }

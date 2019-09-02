@@ -82,8 +82,12 @@ class BaseApplication : MyApplication() {
         RongIM.setUserInfoProvider({ userId ->
             //   //根据 userId 去你的用户系统里查询对应的用户信息返回给融云 SDK。
             val beans = LitePal.where("uid=?", userId).find<com.ysxsoft.imtalk.bean.UserInfo>()
-            val bean = beans.get(0)
-            UserInfo(bean!!.uid, bean.nikeName, Uri.parse(bean.icon))
+            if(beans!!.size>0){
+                val bean = beans.get(0)
+                UserInfo(bean!!.uid, bean.nikeName, Uri.parse(bean.icon))
+            }else{
+                UserInfo(userId, "", Uri.parse(""))
+            }
         }, true)
     }
 

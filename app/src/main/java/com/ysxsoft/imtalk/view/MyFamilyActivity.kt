@@ -19,6 +19,7 @@ import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.dialog.ShareFriendDialog
+import io.rong.imkit.RongIM
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -127,6 +128,11 @@ class MyFamilyActivity : BaseActivity() {
                                                 })
                                     }
                                 })
+                                adapter!!.setOnItemClickListener(object : JzQzAdapter.OnItemClickListener{
+                                    override fun onItemClick(position: Int, title: String, groupId: String) {
+                                        RongIM.getInstance().startGroupChat(mContext, groupId, title);
+                                    }
+                                });
                             }
                         }
                     }
