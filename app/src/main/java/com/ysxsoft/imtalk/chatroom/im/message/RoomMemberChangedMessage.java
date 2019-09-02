@@ -17,8 +17,7 @@ import io.rong.imlib.model.MessageContent;
 /**
  * 房间成员变动消息
  */
-//@MessageTag(value = "SM:RMChangeMsg", flag = MessageTag.NONE)
-@MessageTag(value = "CR:CmdMsg", flag = MessageTag.NONE)
+@MessageTag(value = "SM:RMChangeMsg", flag = MessageTag.NONE)
 public class RoomMemberChangedMessage extends MessageContent {
     private final String TAG = RoomMemberChangedMessage.class.getSimpleName();
     private int cmd; //1 join, 2 leave, 3 kick,

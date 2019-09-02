@@ -34,6 +34,8 @@ import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.HomeHLBean
 import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter
 import com.ysxsoft.imtalk.chatroom.im.IMClient
+import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage
+import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.model.MicBehaviorType
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean
@@ -51,6 +53,9 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.dialog.*
 import io.rong.imkit.RongIM
+import io.rong.imlib.IRongCallback
+import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
 import rx.Observer
@@ -105,20 +110,20 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onKickOffRoom() {
         showToastMessage(R.string.toast_chatroom_kick_off_from_room)
-        quiteRoom(SpUtils.getSp(mContext, "uid"),"1")
+        quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
     }
 
 
     override fun onErrorLeaveRoom() {
         showToastMessage(R.string.toast_error_leave_room_because_error)
         // 提示后延迟退出房间
-        handler!!.postDelayed(Runnable { quiteRoom(SpUtils.getSp(mContext, "uid"),"1") }, 3000)
+        handler!!.postDelayed(Runnable { quiteRoom(SpUtils.getSp(mContext, "uid"), "1") }, 3000)
     }
 
     override fun onRoomExistOverTimeLimit() {
         showToastMessage(R.string.toast_room_exist_over_time_limit)
         // 提示后延迟退出房间
-        handler!!.postDelayed(Runnable { quiteRoom(SpUtils.getSp(mContext, "uid"),"1") }, 3000)
+        handler!!.postDelayed(Runnable { quiteRoom(SpUtils.getSp(mContext, "uid"), "1") }, 3000)
     }
 
     companion object {
@@ -233,7 +238,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickExit() {
-                    quiteRoom(SpUtils.getSp(mContext, "uid"),"1")
+                    quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
                 }
 
                 override fun clickSmall() {
@@ -288,12 +293,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val homeSettingDialog = HomeSettingDialog(mContext)
             homeSettingDialog.setHomeSettingClickListener(object : HomeSettingDialog.HomeSettingClickListener {
                 override fun clickHT() {
-//                    ExitCurrentRoom()
                     RandomTalk()
                 }
 
                 override fun clickExit() {
-                    quiteRoom(SpUtils.getSp(mContext, "uid"),"1")
+                    quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
                 }
 
                 override fun clickSmall() {
@@ -866,7 +870,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             behaviorNameList.add(behaviorType.getName(BaseApplication.mContext))
         }
 
-
         if (detailRoomInfo!!.roomInfo.uid.equals(SpUtils.getSp(mContext, "uid"))) {//房主
             if ("0".equals(is_lock_wheat)) {//锁麦  显示解麦
                 val seatMicDialog = UpperSeatMicDialog(mContext)
@@ -941,7 +944,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
 
                         override fun setExit() {
-                            ExitCurrentRoom(userId, "2",room_id!!)
+                            ExitCurrentRoom(userId, "2", room_id!!)
                         }
 
                         override fun blackList() {
@@ -1058,10 +1061,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
-    //退出/踢出房间
-    private fun ExitCurrentRoom(userId: String, leave: String,room_id: String) {
+    //踢出房间
+    private fun ExitCurrentRoom(userId: String, leave: String, room_id: String) {
         NetWork.getService(ImpService::class.java)
-                .tCRoom(userId,leave, room_id)
+                .tCRoom(userId, leave, room_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<CommonBean> {
@@ -1072,6 +1075,24 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
                             updateRoomInfo()
+                            val message = RoomMemberChangedMessage()
+                            message.setCmd(3)//离开房间
+                            message.targetUserId = userId
+                            message.targetPosition = -1
+                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
+                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                override fun onAttached(p0: Message?) {
+
+                                }
+
+                                override fun onSuccess(p0: Message?) {
+                                }
+
+                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                                }
+                            });
+
                         }
                     }
 
@@ -1192,7 +1213,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     /**
      * 退出房间
      */
-    private fun quiteRoom(uid: String,kick:String) {
+    private fun quiteRoom(uid: String, kick: String) {
         NetWork.getService(ImpService::class.java)
                 .tCRoom(uid, kick, room_id!!)
                 .subscribeOn(Schedulers.io())
@@ -1204,9 +1225,27 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
-//                            roomManager!!.clearRoomInfo(room_id)
-                            IMClient.getInstance().quitChatRoom(room_id, null)
+//                            IMClient.getInstance().quitChatRoom(room_id, null)
                             RtcClient.getInstance().quitRtcRoom(room_id, null)
+                            val message = RoomMemberChangedMessage()
+                            message.setCmd(2)
+                            message.targetUserId = uid
+                            message.targetPosition = -1
+                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
+
+                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                override fun onAttached(p0: Message?) {
+
+                                }
+
+                                override fun onSuccess(p0: Message?) {
+                                }
+
+                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                                }
+                            });
+
                             finish()
                         }
                     }
@@ -1242,13 +1281,33 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
-                        showToastMessage("抱他上麦加入麦位失败==" + e!!.message.toString())
                     }
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
                             updateRoomInfo()
                             enableVoiceChat(true)
+
+                            val controlMessage = MicPositionControlMessage()
+                            controlMessage.setCmd(6)//上麦
+                            controlMessage.targetUserId = userId
+                            controlMessage.micPositions = detailRoomInfo!!.micPositions
+                            controlMessage.targetPosition = mic
+
+                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+
+                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                override fun onAttached(p0: Message?) {
+
+                                }
+
+                                override fun onSuccess(p0: Message?) {
+                                }
+
+                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                                }
+                            });
                         } else {
                             updateRoomInfo()
                             showToastMessage(t.msg)
@@ -1276,6 +1335,28 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
                             updateRoomInfo()
+
+                            val controlMessage = MicPositionControlMessage()
+                            controlMessage.setCmd(7)//下麦
+                            controlMessage.targetUserId = userId
+                            controlMessage.micPositions = detailRoomInfo!!.micPositions
+                            controlMessage.targetPosition = mic
+
+                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+
+                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                override fun onAttached(p0: Message?) {
+
+                                }
+
+                                override fun onSuccess(p0: Message?) {
+                                }
+
+                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                                }
+                            });
+
                         } else {
                             showToastMessage(t.msg)
                         }
@@ -1336,7 +1417,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
 
             override fun clickExit() {
-                quiteRoom(SpUtils.getSp(mContext, "uid"),"1")
+                quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
             }
 
             @RequiresApi(Build.VERSION_CODES.M)
