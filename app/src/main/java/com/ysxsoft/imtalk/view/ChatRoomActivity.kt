@@ -10,23 +10,36 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.support.annotation.NonNull
 import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
+import android.support.v4.view.ViewPropertyAnimatorListener
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AccelerateInterpolator
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.id.*
 import com.ysxsoft.imtalk.appservice.FloatingDisplayService
@@ -58,9 +71,13 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
+import pl.droidsonroids.gif.GifDecoder
+import pl.droidsonroids.gif.GifImageView
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.lang.reflect.Field
+import java.lang.reflect.InvocationTargetException
 import java.util.ArrayList
 
 /**
@@ -68,6 +85,13 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+    override fun onRoomEmj(p: Int, url: String?) {
+        //房间表情
+    }
+
+    override fun onRoomGift(p: Int, toP: Int, giftUrl: String?, staticUrl: String?) {
+        //房间动画
+    }
 
     override fun onRoomMemberChange(memberCount: Int) {
         showToastMessage("新成员")
@@ -259,10 +283,20 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             homeSettingDialog.show()
         }
 
+        var a = 0;
+
         img_share.setOnClickListener {
             val friendDialog = ShareFriendDialog(mContext)
             friendDialog.setShareListener(object : ShareFriendDialog.ShareListener {
                 override fun myself() {
+//                    showPositionEmj(a, "")
+//                    showPositionGift(0,a ,"http://chitchat.rhhhyy.com/uploads/images/20190826/728cb202b8af33ad401cf3984dffe74a.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/f09aa72dd01f87a48fd20283e3570278.png")
+//                    showPositionGift(7,a ,"http://chitchat.rhhhyy.com/uploads/images/20190826/1b8e43cd206cbbf8ef9c04cbd2cfc3dd.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/5771f0008c39479aebe64c8b83c7ffb8.png")
+                    showPositionGift(5,a ,"http://chitchat.rhhhyy.com/uploads/images/20190827/091c6b8e131a576a5aa81a93e5365236.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/9cad09a166ffae62066263a0ea0a777d.png")
+                    a++;
+                    if (a == 9) {
+                        a = 0;
+                    }
                     showToastMessage("站内分享")
                 }
 
@@ -1460,5 +1494,271 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
+    fun showPositionEmj(position: Int, emjGifUrl: String) {
+        var emjGifUrl = emjGifUrl
+        emjGifUrl = "http://chitchat.rhhhyy.com/uploads/images/20190902/2c324e0d5efe3ca90a36305b4f8c2081.gif"
+        val viewMap = java.util.HashMap<Int, View>()
 
+        val f = findViewById<FrameLayout>(android.R.id.content)
+        if (viewMap.containsKey(position)) {
+            //正在显示
+            val view = viewMap[position]
+            val showingView = f.findViewById<View>(view!!.id)
+            if (showingView != null) {
+                f.removeView(showingView)
+            }
+        } else {
+            //结束显示
+        }
+        val w = chatroom_mp_mic_1.width;
+        val h = chatroom_mp_mic_1.height;
+
+        val imgW = DisplayUtils.dp2px(mContext, 44);
+        val imgH = DisplayUtils.dp2px(mContext, 44);
+
+        val offsetX = w / 2 - imgW / 2;
+        val offsetY = h / 2 - imgH / 2;
+
+        val location = getPosition(position);
+
+        val locationX = location[0]
+        val locationY = location[1]
+        val x = locationX
+        val y = locationY
+
+        val v = View.inflate(mContext, R.layout.view_emj, null)
+        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
+        v.layoutParams = layoutParams
+
+        v.id = position
+        val imageView = v.findViewById<ImageView>(R.id.gifView)
+
+        Glide.with(this).asGif().listener(object : RequestListener<GifDrawable> {
+            override fun onLoadFailed(e: GlideException?, model: Any, target: Target<GifDrawable>, isFirstResource: Boolean): Boolean {
+                return false
+            }
+
+            override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+//                resource.setLoopCount(2)
+//                try {
+//                    val duration = 0
+//                    // 计算动画时长
+//                    //GifDecoder decoder = gifDrawable.getDecoder();//4.0开始没有这个方法了
+//                    val state = resource.constantState
+//                    if (state != null) {
+//                        //不能混淆GifFrameLoader和GifState类
+//                        val gifFrameLoader = getValue(state, "frameLoader")
+//                        if (gifFrameLoader != null) {
+//                            val decoder = getValue(gifFrameLoader, "gifDecoder")
+//                            if (decoder != null && decoder is GifDecoder) {
+//                                val d = decoder.duration
+//                                Handler(Looper.getMainLooper()).postDelayed({
+//                                    //移除view
+//                                    val f = findViewById<FrameLayout>(android.R.id.content)
+//                                    if (viewMap.containsKey(position)) {
+//                                        val view = viewMap[position]
+//                                        val showingView = f.findViewById<View>(view!!.id)
+//                                        if (showingView != null) {
+//                                            f.removeView(showingView)
+//                                            viewMap.remove(position)
+//                                        }
+//                                    }
+//                                }, (d * 2 * 1000).toLong())
+//                            }
+//                        }
+//                    }
+//                } catch (e: Throwable) {
+//                    Log.e("tag",e.message)
+//                    e.printStackTrace()
+//                }
+//                return false
+                try {
+                    val gifStateField = GifDrawable::class.java.getDeclaredField("state")
+                    gifStateField.isAccessible = true
+                    val gifStateClass = Class.forName("com.bumptech.glide.load.resource.gif.GifDrawable\$GifState")
+                    val gifFrameLoaderField = gifStateClass.getDeclaredField("frameLoader")
+                    gifFrameLoaderField.isAccessible = true
+                    val gifFrameLoaderClass = Class.forName("com.bumptech.glide.load.resource.gif.GifFrameLoader")
+                    val gifDecoderField = gifFrameLoaderClass.getDeclaredField("gifDecoder")
+                    gifDecoderField.isAccessible = true
+                    val gifDecoderClass = Class.forName("com.bumptech.glide.gifdecoder.GifDecoder")
+                    val gifDecoder = gifDecoderField.get(gifFrameLoaderField.get(gifStateField.get(resource)))
+                    val getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", Int::class.javaPrimitiveType!!)
+                    getDelayMethod.isAccessible = true
+                    //设置只播放一次
+                    resource.setLoopCount(3)
+                    //获得总帧数
+                    val count = resource.frameCount
+                    var delay = 0
+                    for (i in 0 until count) {
+                        //计算每一帧所需要的时间进行累加
+                        delay += getDelayMethod.invoke(gifDecoder, i) as Int
+                    }
+                    imageView.postDelayed({
+                        ViewCompat.animate(imageView).scaleX(0f).scaleY(0f).alpha(0f).setDuration(300).setListener(object : ViewPropertyAnimatorListener {
+                            override fun onAnimationStart(view: View) {
+
+                            }
+
+                            override fun onAnimationEnd(view: View) {
+                                //动画结束后隐藏
+                                val f = findViewById<FrameLayout>(android.R.id.content)
+                                if (viewMap.containsKey(position)) {
+                                    val view = viewMap[position]
+                                    val showingView = f.findViewById<View>(view!!.id)
+                                    if (showingView != null) {
+                                        f.removeView(showingView)
+                                        viewMap.remove(position)
+                                    }
+                                }
+                            }
+
+                            override fun onAnimationCancel(view: View) {
+
+                            }
+                        })
+                    }, 3 * delay.toLong())
+                } catch (e: NoSuchFieldException) {
+                    e.printStackTrace()
+                } catch (e: ClassNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IllegalAccessException) {
+                    e.printStackTrace()
+                } catch (e: NoSuchMethodException) {
+                    e.printStackTrace()
+                } catch (e: InvocationTargetException) {
+                    e.printStackTrace()
+                }
+                return false
+            }
+        }).diskCacheStrategy(DiskCacheStrategy.ALL).load(emjGifUrl).into(imageView)
+        v.x = x.toFloat() + offsetX;
+        v.y = y.toFloat() + offsetY;
+        f.addView(v)
+
+        viewMap.put(position, v);
+    }
+
+    fun showPositionGift(position:Int,toPosition:Int,giftImgUrl: String,staticImgUrl: String){
+        val f = findViewById<FrameLayout>(android.R.id.content)
+        val v = View.inflate(mContext, R.layout.view_gift, null)
+        val giftImageView = v.findViewById<ImageView>(R.id.giftView)
+
+        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        v.layoutParams = layoutParams
+        f.addView(v)
+        Glide.with(this).asGif().listener(object : RequestListener<GifDrawable> {
+            override fun onLoadFailed(e: GlideException?, model: Any, target: Target<GifDrawable>, isFirstResource: Boolean): Boolean {
+                return false
+            }
+
+            override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+                try {
+                    val gifStateField = GifDrawable::class.java.getDeclaredField("state")
+                    gifStateField.isAccessible = true
+                    val gifStateClass = Class.forName("com.bumptech.glide.load.resource.gif.GifDrawable\$GifState")
+                    val gifFrameLoaderField = gifStateClass.getDeclaredField("frameLoader")
+                    gifFrameLoaderField.isAccessible = true
+                    val gifFrameLoaderClass = Class.forName("com.bumptech.glide.load.resource.gif.GifFrameLoader")
+                    val gifDecoderField = gifFrameLoaderClass.getDeclaredField("gifDecoder")
+                    gifDecoderField.isAccessible = true
+                    val gifDecoderClass = Class.forName("com.bumptech.glide.gifdecoder.GifDecoder")
+                    val gifDecoder = gifDecoderField.get(gifFrameLoaderField.get(gifStateField.get(resource)))
+                    val getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", Int::class.javaPrimitiveType!!)
+                    getDelayMethod.isAccessible = true
+                    //设置只播放一次
+                    resource.setLoopCount(1)
+                    //获得总帧数
+                    val count = resource.frameCount
+                    var delay = 0
+                    for (i in 0 until count) {
+                        //计算每一帧所需要的时间进行累加
+                        delay += getDelayMethod.invoke(gifDecoder, i) as Int
+                    }
+                    giftImageView.postDelayed({
+                        ViewCompat.animate(giftImageView).scaleX(0f).scaleY(0f).alpha(0f).setDuration(300).setListener(object : ViewPropertyAnimatorListener {
+                            override fun onAnimationStart(view: View) {
+
+                            }
+
+                            override fun onAnimationEnd(view: View) {
+                                //动画结束后删除大礼物图
+                                f.removeView(v)
+                                val w = chatroom_mp_mic_1.width;
+                                val h = chatroom_mp_mic_1.height;
+                                val imgW = DisplayUtils.dp2px(mContext, 44);
+                                val imgH = DisplayUtils.dp2px(mContext, 44);
+                                val imageOffsetX = w / 2 - imgW / 2;
+                                val imageOffsetY = h / 2 - imgH / 2;
+
+                                val startPosition=getPosition(position);
+                                val endPosition=getPosition(toPosition);
+                                val offsetX=endPosition[0]-startPosition[0];
+                                val offsetY=endPosition[1]-startPosition[1];
+
+                                val f = findViewById<FrameLayout>(android.R.id.content)
+                                val childView = View.inflate(mContext, R.layout.view_emj, null)
+                                val childImageView = childView.findViewById<ImageView>(R.id.gifView)
+                                Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
+
+                                childView.x = (startPosition[0] +imageOffsetX).toFloat();
+                                childView.y = (startPosition[1] +imageOffsetY).toFloat();
+
+                                val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
+                                childView.layoutParams = layoutParams
+                                f.addView(childView)
+
+                                Log.e("tag","x:"+offsetX.toFloat()+" y:"+offsetY.toFloat())
+                                ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
+                                    override fun onAnimationStart(view: View) {
+                                    }
+
+                                    override fun onAnimationEnd(view: View) {
+                                        //动画结束后删除大礼物图
+                                        f.removeView(childView)
+                                    }
+
+                                    override fun onAnimationCancel(view: View) {
+                                    }
+                                })
+                            }
+
+                            override fun onAnimationCancel(view: View) {
+
+                            }
+                        })
+                    }, delay.toLong())
+                } catch (e: NoSuchFieldException) {
+                    e.printStackTrace()
+                } catch (e: ClassNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IllegalAccessException) {
+                    e.printStackTrace()
+                } catch (e: NoSuchMethodException) {
+                    e.printStackTrace()
+                } catch (e: InvocationTargetException) {
+                    e.printStackTrace()
+                }
+                return false
+            }
+        }).diskCacheStrategy(DiskCacheStrategy.ALL).load(giftImgUrl).into(giftImageView)
+    }
+    /**
+     * 获取坐标
+     */
+    fun getPosition(p: Int): IntArray {
+        val pos = IntArray(2)
+        when (p) {
+            0 -> {chatroom_mp_mic_1!!.getLocationOnScreen(pos)}
+            1 -> {chatroom_mp_mic_2.getLocationOnScreen(pos)}
+            2 -> {chatroom_mp_mic_3.getLocationOnScreen(pos)}
+            3 -> {chatroom_mp_mic_4.getLocationOnScreen(pos)}
+            4 -> {chatroom_mp_mic_5.getLocationOnScreen(pos)}
+            5 -> {chatroom_mp_mic_6.getLocationOnScreen(pos)}
+            6 -> {chatroom_mp_mic_7.getLocationOnScreen(pos)}
+            7 -> {chatroom_mp_mic_8.getLocationOnScreen(pos)}
+            8 -> {img_head.getLocationOnScreen(pos)}
+        }
+        return pos
+    }
 }

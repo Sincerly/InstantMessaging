@@ -75,4 +75,20 @@ public interface RoomEventListener {
      * 当房间超出了最长存在时间
      */
     void onRoomExistOverTimeLimit();
+
+    /**
+     * 表情
+     * @param p
+     * @param url
+     */
+    void onRoomEmj(int p,String url);
+
+    /**
+     * 礼物
+     * @param p
+     * @param toP
+     * @param giftUrl
+     * @param staticUrl
+     */
+    void onRoomGift(int p,int toP,String giftUrl,String staticUrl);
 }
