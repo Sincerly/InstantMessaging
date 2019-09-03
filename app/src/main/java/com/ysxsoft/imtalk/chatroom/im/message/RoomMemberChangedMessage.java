@@ -2,6 +2,7 @@ package com.ysxsoft.imtalk.chatroom.im.message;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
 
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
+import io.rong.common.ParcelUtils;
 import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
 
@@ -69,7 +71,19 @@ public class RoomMemberChangedMessage extends MessageContent {
 
     @Override
     public byte[] encode() {
-        return new byte[0];
+        JSONObject jsonObj = new JSONObject();
+        try {
+            jsonObj.put("cmd", cmd);
+            jsonObj.put("targetUserId", getTargetUserId());
+            jsonObj.put("targetPosition", getTargetPosition());
+            byte[] bytes = jsonObj.toString().getBytes("UTF-8");
+            return bytes;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
