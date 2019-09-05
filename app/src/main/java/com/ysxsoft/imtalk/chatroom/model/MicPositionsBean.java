@@ -201,21 +201,21 @@ public class MicPositionsBean implements Parcelable {
 
     public static MicPositionsBean parseJsonToMicPositionInfo(JSONObject jsonObject) {
         MicPositionsBean micPositionInfo = new MicPositionsBean();
-        micPositionInfo.setUid(jsonObject.optString("uid"));
-        micPositionInfo.setUid(jsonObject.optString("mw_id"));
+        micPositionInfo.setMw_id(jsonObject.optString("mw_id"));
         micPositionInfo.setRoom_id(jsonObject.optString("room_id"));
-        micPositionInfo.setRoom_id(jsonObject.optString("icon"));
-        micPositionInfo.setIs_lock_wheat(jsonObject.optString("is_lock_wheat"));
-        micPositionInfo.setIs_lock_wheat(jsonObject.optString("gifts"));
-        micPositionInfo.setIs_lock_wheat(jsonObject.optString("sex"));
-        micPositionInfo.setIs_lock_wheat(jsonObject.optString("nickname"));
+        micPositionInfo.setUid(jsonObject.optString("uid"));
+        micPositionInfo.setIcon(jsonObject.optString("icon"));
+        micPositionInfo.setSex(jsonObject.optString("sex"));
         micPositionInfo.setSort(jsonObject.optInt("sort"));
-        micPositionInfo.setSort(jsonObject.optInt("is_room"));
-        micPositionInfo.setSort(jsonObject.optInt("add_time"));
-        micPositionInfo.setSort(jsonObject.optInt("is_wheat"));
-        micPositionInfo.setSort(jsonObject.optInt("is_admin"));
-        micPositionInfo.setSort(jsonObject.optInt("is_room"));
-        micPositionInfo.setSort(jsonObject.optInt("is_oc_wheat"));
+        micPositionInfo.setNickname(jsonObject.optString("nickname"));
+        micPositionInfo.setIs_room(jsonObject.optString("is_room"));
+        micPositionInfo.setIs_admin(jsonObject.optString("is_admin"));
+        micPositionInfo.setIs_block(jsonObject.optString("is_block"));
+        micPositionInfo.setIs_wheat(jsonObject.optString("is_wheat"));
+        micPositionInfo.setIs_lock_wheat(jsonObject.optString("is_lock_wheat"));
+        micPositionInfo.setAdd_time(jsonObject.optString("add_time"));
+        micPositionInfo.setGifts(jsonObject.optString("gifts"));
+        micPositionInfo.setIs_oc_wheat(jsonObject.optString("is_oc_wheat"));
         return micPositionInfo;
     }
 }
