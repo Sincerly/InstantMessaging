@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.chatroom.im;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
@@ -19,6 +20,7 @@ import io.rong.imlib.AnnotationNotFoundException;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
+import io.rong.imlib.model.UserInfo;
 
 /**
  * Rong IM 业务相关封装
@@ -168,10 +170,11 @@ public class IMClient {
      * @param roomId 房间id
      * @return
      */
-    public Message createLocalEnterRoomMessage(String userId, String roomId) {
+    public Message createLocalEnterRoomMessage(String userId, String roomId,String name,String icon) {
         RoomMemberChangedMessage memberChangedMessage = new RoomMemberChangedMessage();
         memberChangedMessage.setTargetUserId(userId);
         memberChangedMessage.setCmd(1);
+        memberChangedMessage.setUserInfo(new UserInfo(userId, name,Uri.parse(icon)));
         return Message.obtain(roomId, Conversation.ConversationType.CHATROOM, memberChangedMessage);
     }
 }
