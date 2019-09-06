@@ -22,7 +22,8 @@ class GiveDialog : ABSDialog {
     constructor(mContext: Context, userId: String, room_id: String) : super(mContext) {
         requestData(userId, room_id)
     }
-    var bean:RoomMwUserBean.DataBean?=null
+
+    var bean: RoomMwUserBean.DataBean? = null
     private fun requestData(userId: String, room_id: String) {
         NetWork.getService(ImpService::class.java)
                 .roomMwUser(userId, room_id)
@@ -39,15 +40,15 @@ class GiveDialog : ABSDialog {
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID：" + t.data.tt_id)
                             tv_familly.setText("所在家族：" + t.data.fmy_name)
-                            tv_tuhao.setText("豪 "+t.data.user_level)
+                            tv_tuhao.setText("豪 " + t.data.user_level)
                             tv_mei.setText("魅 " + t.data.ml_level)
                             tv_zs.setText(t.data.user_level)
-                            when(t.data.sex){
-                                "1"->{
+                            when (t.data.sex) {
+                                "1" -> {
                                     img_sex.setImageResource(R.mipmap.img_boy)
                                 }
-                                 "2"->{
-                                     img_sex.setImageResource(R.mipmap.img_girl)
+                                "2" -> {
+                                    img_sex.setImageResource(R.mipmap.img_girl)
                                 }
 
                             }
@@ -124,6 +125,27 @@ class GiveDialog : ABSDialog {
             }
         }
 
+        tv_bm.setOnClickListener {
+            dismiss()
+            if (giveClickListener != null) {
+                giveClickListener!!.BmClick()
+            }
+        }
+
+        tv_btxm.setOnClickListener {
+            dismiss()
+            if (giveClickListener != null) {
+                giveClickListener!!.BtxmClick()
+            }
+        }
+
+
+        tv_scm.setOnClickListener {
+            dismiss()
+            if (giveClickListener != null) {
+                giveClickListener!!.ScmClick()
+            }
+        }
 
 
     }
@@ -141,6 +163,9 @@ class GiveDialog : ABSDialog {
         fun removeManager()
         fun setExit()
         fun blackList()
+        fun BmClick()
+        fun BtxmClick()
+        fun ScmClick()
     }
 
     private var giveClickListener: GiveClickListener? = null;

@@ -36,7 +36,7 @@ class MsgListDialog : ABSDialog {
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID："+t.data.tt_id)
                             tv_familly.setText("所在家族："+t.data.fmy_name)
-//                            tv_tuhao.setText(t.data.)
+                            tv_tuhao.setText(t.data.user_level)
                             tv_mei.setText("魅 "+t.data.ml_level)
                             tv_zs.setText(t.data.user_level)
                         }
