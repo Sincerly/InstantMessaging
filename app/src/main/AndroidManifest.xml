@@ -144,6 +144,9 @@
 
         <service android:name=".appservice.MyService" />
         <service android:name=".appservice.FloatingDisplayService" />
+        <service android:name=".appservice.MusicService"
+            android:enabled="true"
+            android:exported="true"/>
 
         <!-- 融云广播接收器 -->
         <receiver
@@ -198,6 +201,8 @@
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity android:name=".view.WithDrawRecodeActivity" />
+
+
     </application>
 
 </manifest>

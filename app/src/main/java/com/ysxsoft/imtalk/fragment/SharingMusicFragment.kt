@@ -10,6 +10,7 @@ import com.ysxsoft.imtalk.adapter.SharingMusicAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.MusicListBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.download.DownloadManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.NetWork
@@ -61,6 +62,7 @@ class SharingMusicFragment : BaseFragment() {
                                 override fun onClick(position: Int) {
 //                                    adapter!!.setSelect(position)
                                     val id = adapter!!.dataList.get(position).id.toString()
+                                    DownloadManager.getInstance().download(adapter!!.dataList.get(position).music_url)
                                     addData(id)
                                 }
                             })
