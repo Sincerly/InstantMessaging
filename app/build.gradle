@@ -137,4 +137,6 @@ dependencies {
     implementation files('libs/MiPush_SDK_Client_3_6_9.jar')
     implementation files('libs/oppo_push-1.0.1.jar')
     implementation files('libs/vivo_push_v2.3.1.jar')
+
+    implementation 'com.alibaba:fastjson:1.1.71.android'
 }
