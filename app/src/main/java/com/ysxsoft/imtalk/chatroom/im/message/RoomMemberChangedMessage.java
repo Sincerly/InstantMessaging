@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import io.rong.common.ParcelUtils;
 import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
+import io.rong.imlib.model.UserInfo;
 
 
 /**
@@ -35,10 +36,12 @@ public class RoomMemberChangedMessage extends MessageContent {
         }
         try {
             JSONObject jsonObj = new JSONObject(jsonStr);
-
             setCmd(jsonObj.optInt("cmd"));
             setTargetUserId(jsonObj.optString("targetUserId"));
             setTargetPosition(jsonObj.optInt("targetPosition"));
+            if (jsonObj.has("user")) {
+                this.setUserInfo(this.parseJsonToUserInfo(jsonObj.getJSONObject("user")));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -76,6 +79,9 @@ public class RoomMemberChangedMessage extends MessageContent {
             jsonObj.put("cmd", cmd);
             jsonObj.put("targetUserId", getTargetUserId());
             jsonObj.put("targetPosition", getTargetPosition());
+            if (this.getJSONUserInfo() != null) {
+                jsonObj.putOpt("user", this.getJSONUserInfo());
+            }
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
             return bytes;
         } catch (UnsupportedEncodingException e) {
@@ -96,6 +102,7 @@ public class RoomMemberChangedMessage extends MessageContent {
         dest.writeInt(this.cmd);
         dest.writeString(this.targetUserId);
         dest.writeInt(this.targetPosition);
+        ParcelUtils.writeToParcel(dest, this.getUserInfo());
     }
 
     public RoomMemberChangedMessage() {
@@ -105,6 +112,7 @@ public class RoomMemberChangedMessage extends MessageContent {
         this.cmd = in.readInt();
         this.targetUserId = in.readString();
         this.targetPosition = in.readInt();
+        this.setUserInfo((UserInfo)ParcelUtils.readFromParcel(in, UserInfo.class));
     }
 
     public static final Creator<RoomMemberChangedMessage> CREATOR = new Creator<RoomMemberChangedMessage>() {
