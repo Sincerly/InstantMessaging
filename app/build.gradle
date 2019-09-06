@@ -139,4 +139,10 @@ dependencies {
     implementation files('libs/vivo_push_v2.3.1.jar')
 
     implementation 'com.alibaba:fastjson:1.1.71.android'
+
+    // OKHttp RxJava
+    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
+    // eventbus
+    implementation 'org.greenrobot:eventbus:3.0.0'
+
 }
