@@ -4,17 +4,13 @@ import android.bluetooth.BluetoothHeadset
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.support.annotation.NonNull
 import android.support.annotation.RequiresApi
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
@@ -28,17 +24,17 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.ysxsoft.imtalk.R
-import com.ysxsoft.imtalk.R.id.*
 import com.ysxsoft.imtalk.appservice.FloatingDisplayService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.HomeHLBean
+import com.ysxsoft.imtalk.bean.UserInfoBean
 import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
-import com.ysxsoft.imtalk.chatroom.model.MicBehaviorType
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
@@ -68,15 +64,23 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+    /**
+     * 被踢房间
+     */
+    override fun onRoomMemberKickChange(memberCount: Int) {
+        updateRoomInfo()
+        updateRoomTitle(detailRoomInfo!!.roomInfo.room_name, detailRoomInfo!!.roomInfo.room_num, memberCount.toString())
+//        IMClient.getInstance().quitChatRoom(room_id, null)
+//        RtcClient.getInstance().quitRtcRoom(room_id, null)
+//        finish()
+    }
 
     override fun onRoomMemberChange(memberCount: Int) {
-        showToastMessage("新成员")
         updateRoomInfo()
         updateRoomTitle(detailRoomInfo!!.roomInfo.room_name, detailRoomInfo!!.roomInfo.room_num, memberCount.toString())
     }
 
     override fun onMicUpdate(micPositionInfoList: MutableList<MicPositionsBean>?) {
-        showToastMessage("麦位有更新")
         if (micPositionInfoList != null) {
             updateMicSeatState(micPositionInfoList)
         }
@@ -104,13 +108,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onRoleChanged(role: Role?) {
         if (role != null) {
+            val hasVoiceChatPermission = role.hasVoiceChatPermission()
             enableVoiceChat(role.hasVoiceChatPermission())
         }
     }
 
     override fun onKickOffRoom() {
         showToastMessage(R.string.toast_chatroom_kick_off_from_room)
-        quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
     }
 
 
@@ -127,9 +131,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     companion object {
-        fun starChatRoomActivity(mContext: Context, room_id: String) {
+        fun starChatRoomActivity(mContext: Context, room_id: String, nikeName: String, icon: String) {
             val intent = Intent(mContext, ChatRoomActivity::class.java)
             intent.putExtra("room_id", room_id)
+            intent.putExtra("nikeName", nikeName)
+            intent.putExtra("icon", icon)
             mContext.startActivity(intent)
         }
     }
@@ -169,10 +175,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private var headsetPlugReceiver: HeadsetPlugReceiver? = null
     private var handler: Handler? = null
     var room_id: String? = null
+    var nikeName: String? = null
+    var icon: String? = null
     var roomManager: RoomManager? = null
     var detailRoomInfo: DetailRoomInfo? = null
     private var defaultMarginBottom: Int = 0
     var voiceDialog: SongVoiceDialog? = null
+    var mydatabean: UserInfoBean? = null
 
     /**
      * 监听来电状态进行房间的静音和禁麦操作
@@ -216,15 +225,39 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         room_id = intent.getStringExtra("room_id")
+        nikeName = intent.getStringExtra("nikeName")
+        icon = intent.getStringExtra("icon")
         // 保持屏幕常亮
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         handler = Handler()
         setLightStatusBar(false)
         initStatusBar(topView)
         setTitle("这是哈哈哈的房间")
+        requestMyData()
         initView()
         initRoom(room_id!!)
         initAudioOutputMode()
+    }
+
+    private fun requestMyData() {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            mydatabean = t
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -233,7 +266,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val homeSettingDialog = HomeSettingDialog(mContext)
             homeSettingDialog.setHomeSettingClickListener(object : HomeSettingDialog.HomeSettingClickListener {
                 override fun clickHT() {
-//                    ExitCurrentRoom()
                     RandomTalk()
                 }
 
@@ -351,7 +383,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 //业务代码
                 val msg = chatroom_et_chat_input.text.toString().trim()
                 if (!TextUtils.isEmpty(msg)) {
-                    roomManager!!.sendChatRoomMessage(msg);
+                    roomManager!!.sendChatRoomMessage(msg, SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, mydatabean!!.data.icon);
                 }
                 hideInputKeyboard();
                 chatroom_et_chat_input.setText("");
@@ -415,8 +447,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: HomeHLBean?) {
                         if (t!!.code == 0) {
-                            room_id = t.data.room_id.toString()
-                            joinChatRoom(room_id!!)
+                            joinChatRoom(t.data.room_id.toString())
                         }
                     }
 
@@ -539,7 +570,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val messageList = detailRoomInfo!!.getMessageList()
 
         //加入一条自己进入房间的消息
-        val message = IMClient.getInstance().createLocalEnterRoomMessage(AuthManager.getInstance().currentUserId, room_id)
+        val message = IMClient.getInstance().createLocalEnterRoomMessage(AuthManager.getInstance().currentUserId, room_id, nikeName!!, icon!!)
         chatMessageList.add(message)
 
         //设置聊天信息
@@ -550,31 +581,39 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         chatroom_list_chat.setOnItemClickListener(object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val userid = chatListAdapter!!.messageList.get(position).senderUserId.toString()
-                if (TextUtils.isEmpty(userid)) {
-                    return
-                }
-                val msgListDialog = MsgListDialog(mContext, userid, room_id)
-                msgListDialog.setOnMsgListDialog(object : MsgListDialog.OnMsgListDialogListener {
-                    override fun bMClick() {//闭麦
-
+                if (chatListAdapter!!.messageList.get(position) != null && chatListAdapter!!.messageList.size > 0 && !TextUtils.isEmpty(chatListAdapter!!.messageList.get(position).senderUserId)) {
+                    val userid = chatListAdapter!!.messageList.get(position).senderUserId.toString()
+                    if (TextUtils.isEmpty(userid)) {
+                        return
                     }
+                    val msgListDialog = MsgListDialog(mContext, userid, room_id)
+                    msgListDialog.setOnMsgListDialog(object : MsgListDialog.OnMsgListDialogListener {
+                        override fun bMClick() {//闭麦
 
-                    override fun xMClick() {//下麦旁听
+                        }
 
-                    }
+                        override fun xMClick() {//下麦旁听
 
-                    override fun jMClick() {//解锁
+                        }
 
-                    }
+                        override fun jMClick() {//解锁
 
-                    override fun bTMClick() {//报Ta上麦
-                        UpperWheatDialog(mContext, room_id).show()
-                    }
-                })
-                for (bean in detailRoomInfo!!.roomUserList) {
-                    if (SpUtils.getSp(mContext, "uid").equals(bean.uid) && ("1".equals(bean.role) || "2".equals(bean.role))) {
-                        msgListDialog.show()
+                        }
+
+                        override fun bTMClick() {//报Ta上麦
+                            val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
+                            upperWheatDialog.setOnWheatClickListener(object :UpperWheatDialog.OnWheatClickListener{
+                                override fun onClickWheat( position: Int) {
+                                    JoinMic(userid,position)
+                                }
+                            })
+                            upperWheatDialog.show()
+                        }
+                    })
+                    for (bean in detailRoomInfo!!.roomUserList) {
+                        if (SpUtils.getSp(mContext, "uid").equals(bean.uid) && ("1".equals(bean.role) || "2".equals(bean.role))) {
+                            msgListDialog.show()
+                        }
                     }
                 }
             }
@@ -587,7 +626,20 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             if (!SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid)) {
                 val giveDialog = GiveDialog(mContext, detailRoomInfo!!.roomInfo.uid, room_id)
                 giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
                 giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                    override fun BmClick() {
+
+                    }
+
+                    override fun BtxmClick() {
+
+                    }
+
+                    override fun ScmClick() {
+
+                    }
+
                     override fun clickGiveGift() {
                         GiftBagDialog(mContext, room_id).show()
                     }
@@ -750,13 +802,20 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         clearMicState()
         val seatSize = micSeatViewList!!.size
 
-        for (micInfo in micPositions) {
-            val position = micInfo.sort - 1
+        for (position in micPositions.indices) {
             if (position < seatSize) {
                 val micSeatView = micSeatViewList!!.get(position)
-                micSeatView.updateMicState(micInfo)
+                micSeatView.updateMicState(micPositions.get(position))
             }
         }
+
+//        for (micInfo in micPositions) {
+//            val position = micInfo.sort - 1
+//            if (position < seatSize) {
+//                val micSeatView = micSeatViewList!!.get(position)
+//                micSeatView.updateMicState(micInfo)
+//            }
+//        }
     }
 
     /**
@@ -770,7 +829,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
-    //社会房主的个人信息
+    //设置房主的个人信息
     private fun updataRoomManager() {
         ImageLoadUtil.GlideHeadImageLoad(mContext, detailRoomInfo!!.roomInfo.icon, img_head)
         tv_name.setText(detailRoomInfo!!.roomInfo.nickname)
@@ -847,6 +906,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     var micPosition = -1
+    var micNickname: String? = null
+    var micIcon: String? = null
     private fun doActionToMicSeat(targetMicPositionInfo: MicPositionsBean) {
         if (detailRoomInfo == null) {
             //未加入到房间提示
@@ -854,28 +915,29 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             return
         }
         micPosition = targetMicPositionInfo.sort    //操作的麦位位置
+        micNickname = targetMicPositionInfo.nickname
+        micIcon = targetMicPositionInfo.icon
         val userId = targetMicPositionInfo.uid.toString() //操作的麦位上的用户id
         val is_admin = targetMicPositionInfo.is_admin    //是否管理员：0 否；1 是
         val is_lock_wheat = targetMicPositionInfo.is_lock_wheat //是否锁麦：0 锁麦； 1 已解麦
         val is_wheat = targetMicPositionInfo.is_wheat //	是否上麦 0 下麦；1 上麦
-        showToastMessage("麦位位置===" + micPosition)
-
-        val behaviorList = ArrayList<MicBehaviorType>()   //可执行的麦位操作列表
-        val behaviorNameList = ArrayList<String>()              //可执行的麦位操作的名称列表
-        val currentRole = RoomManager.getInstance().currentRole
-        behaviorList.addAll(currentRole.getBehaviorList(micPosition))
-
-        // 显示根据当前可操作行为显示对话框进行操作选择
-        for (behaviorType in behaviorList) {
-            behaviorNameList.add(behaviorType.getName(BaseApplication.mContext))
-        }
+        val is_oc_wheat = targetMicPositionInfo.is_oc_wheat //		是否闭麦：0 开麦；1 闭麦
 
         if (detailRoomInfo!!.roomInfo.uid.equals(SpUtils.getSp(mContext, "uid"))) {//房主
-            if ("0".equals(is_lock_wheat)) {//锁麦  显示解麦
+            if ("0".equals(userId)) {//判断点击麦位是否为空
                 val seatMicDialog = UpperSeatMicDialog(mContext)
                 seatMicDialog.findViewById<TextView>(R.id.tv_sm).visibility = View.GONE
-                seatMicDialog.findViewById<TextView>(R.id.tv_btsm).visibility = View.GONE
-                seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).setText("解麦")
+                if ("0".equals(is_lock_wheat)) {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).setText("解麦")
+                } else {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).setText("锁麦")
+                }
+                if ("0".equals(is_oc_wheat)) {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+                } else {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+                }
+
                 seatMicDialog.setOnDialogClickListener(object : UpperSeatMicDialog.OnDialogClickListener {
                     override fun SMclick(view: TextView) {
 
@@ -887,88 +949,103 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         startActivityForResult(intent, 1033)
                     }
 
-                    override fun CSMclick(view: TextView) {//锁麦
-
+                    override fun CSMclick(view: TextView) {
+                        if ("0".equals(is_lock_wheat)) {
+                            LockWheat(room_id, micPosition, "2", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        } else {
+                            LockWheat(room_id, micPosition, "1", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        }
                     }
 
-                    override fun BMclick(view: TextView) {//闭麦
-
+                    override fun BMclick(view: TextView) {
+                        if ("0".equals(is_oc_wheat)) {
+                            OcWheat(room_id, micPosition, "2", userId)
+                        } else {
+                            OcWheat(room_id, micPosition, "1", userId)
+                        }
                     }
                 })
                 seatMicDialog.show()
-            } else { // 已接麦  显示锁麦
-                if (TextUtils.equals("0", userId)) {//房主点击 空麦位
-                    val seatMicDialog = UpperSeatMicDialog(mContext)
-                    seatMicDialog.findViewById<TextView>(R.id.tv_sm).visibility = View.GONE
-                    seatMicDialog.setOnDialogClickListener(object : UpperSeatMicDialog.OnDialogClickListener {
-                        override fun SMclick(view: TextView) {
-
-                        }
-
-                        override fun BTSMclick(view: TextView) {
-                            val intent = Intent(mContext, OnLineActivity::class.java)
-                            intent.putExtra("roomId", detailRoomInfo!!.roomInfo.room_id)
-                            startActivityForResult(intent, 1033)
-                        }
-
-                        override fun CSMclick(view: TextView) {//锁麦
-
-                        }
-
-                        override fun BMclick(view: TextView) {//闭麦
-
-                        }
-                    })
-                    seatMicDialog.show()
-                } else {//房主点击 麦位有人
-                    val giveDialog = GiveDialog(mContext, userId, room_id!!)
-                    val tv_setting_manager = giveDialog.findViewById<TextView>(R.id.tv_setting_manager)
-                    val tv_move_manager = giveDialog.findViewById<TextView>(R.id.tv_move_manager)
-                    val zw = giveDialog.findViewById<TextView>(R.id.zw)
-                    if ("1".equals(is_admin)) {
-                        tv_setting_manager.visibility = View.GONE
-                        tv_move_manager.visibility = View.VISIBLE
-                        zw.visibility = View.INVISIBLE
-                    } else {
-                        tv_setting_manager.visibility = View.VISIBLE
-                        tv_move_manager.visibility = View.GONE
-                        zw.visibility = View.INVISIBLE
-                    }
-                    giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
-                        override fun removeManager() {
-                            RemoveManager(userId, room_id!!, "2")
-                        }
-
-                        override fun setManager() {
-                            BlackManager(userId, room_id!!, "2")
-                        }
-
-                        override fun setExit() {
-                            ExitCurrentRoom(userId, "2", room_id!!)
-                        }
-
-                        override fun blackList() {
-                            BlackManager(userId, room_id!!, "1")
-                        }
-
-                        override fun clickGiveGift() {
-                            GiftBagDialog(mContext, room_id!!).show()
-                        }
-
-                        override fun clickPrivateChat() {
-                            RongIM.getInstance().startPrivateChat(mContext, userId, "标题");
-                        }
-
-                        override fun clickGiveZb() {
-                            showToastMessage("装扮")
-                        }
-
-                        override fun clickFoucsOn() {
-                            FocusOnData(SpUtils.getSp(mContext, "uid"), userId, "1")
-                        }
-                    })
-                    giveDialog.show()
+            } else {// 点击有人麦位
+                val giveDialog = GiveDialog(mContext, userId, room_id!!)
+                val tv_setting_manager = giveDialog.findViewById<TextView>(R.id.tv_setting_manager)
+                val tv_move_manager = giveDialog.findViewById<TextView>(R.id.tv_move_manager)
+                val zw = giveDialog.findViewById<TextView>(R.id.zw)
+                val tv_btxm = giveDialog.findViewById<TextView>(R.id.tv_btxm)
+                if ("0".equals(is_lock_wheat)) {
+                    giveDialog.findViewById<TextView>(R.id.tv_scm).setText("解麦")
+                } else {
+                    giveDialog.findViewById<TextView>(R.id.tv_scm).setText("锁麦")
                 }
+                if ("0".equals(is_oc_wheat)) {
+                    giveDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+                } else {
+                    giveDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+                }
+
+                if ("1".equals(is_admin)) {
+                    tv_setting_manager.visibility = View.GONE
+                    tv_move_manager.visibility = View.VISIBLE
+                    zw.visibility = View.INVISIBLE
+                } else {
+                    tv_setting_manager.visibility = View.VISIBLE
+                    tv_move_manager.visibility = View.GONE
+                    zw.visibility = View.INVISIBLE
+                }
+                giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                    override fun BmClick() {//闭麦
+                        if ("0".equals(is_oc_wheat)) {
+                            OcWheat(room_id, micPosition, "2", userId)
+                        } else {
+                            OcWheat(room_id, micPosition, "1", userId)
+                        }
+                    }
+
+                    override fun BtxmClick() {//抱TA下麦
+                        ExitMic(userId, micPosition)
+                    }
+
+                    override fun ScmClick() {//锁麦
+                        if ("0".equals(is_lock_wheat)) {
+                            LockWheat(room_id, micPosition, "2", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        } else {
+                            LockWheat(room_id, micPosition, "1", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        }
+                    }
+
+                    override fun removeManager() {
+                        RemoveManager(userId, room_id!!, "2")
+                    }
+
+                    override fun setManager() {
+                        BlackManager(userId, room_id!!, "2")
+                    }
+
+                    override fun setExit() {
+                        ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
+                    }
+
+                    override fun blackList() {
+                        BlackManager(userId, room_id!!, "1")
+                    }
+
+                    override fun clickGiveGift() {
+                        GiftBagDialog(mContext, room_id!!).show()
+                    }
+
+                    override fun clickPrivateChat() {
+                        RongIM.getInstance().startPrivateChat(mContext, userId, "标题");
+                    }
+
+                    override fun clickGiveZb() {
+                        showToastMessage("装扮")
+                    }
+
+                    override fun clickFoucsOn() {
+                        FocusOnData(SpUtils.getSp(mContext, "uid"), userId, "1")
+                    }
+                })
+                giveDialog.show()
             }
         } else { //非房主  点击控麦位
             if ("0".equals(userId)) {
@@ -1000,7 +1077,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     val seatMicDialog = UpperSeatMicDialog(mContext)
                     seatMicDialog.findViewById<TextView>(R.id.tv_btsm).visibility = View.GONE
                     seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).visibility = View.GONE
+                    seatMicDialog.findViewById<TextView>(R.id.tv_bm).visibility = View.GONE
                     seatMicDialog.findViewById<TextView>(R.id.tv_sm).setText("下麦")
+                    if ("0".equals(is_oc_wheat)) {
+                        seatMicDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+                    } else {
+                        seatMicDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+                    }
                     seatMicDialog.setOnDialogClickListener(object : UpperSeatMicDialog.OnDialogClickListener {
                         override fun SMclick(view: TextView) {
                             ExitMic(userId, micPosition)
@@ -1015,16 +1098,32 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
 
                         override fun BMclick(view: TextView) {//闭麦
-
+                            if ("0".equals(is_oc_wheat)) {
+                                OcWheat(room_id, micPosition, "2", userId)
+                            } else {
+                                OcWheat(room_id, micPosition, "1", userId)
+                            }
                         }
-
                     })
                     seatMicDialog.show()
                 } else { //麦位有人  切不是自己
                     if (!"0".equals(userId) && !(SpUtils.getSp(mContext, "uid")).equals(userId)) {
                         val giveDialog = GiveDialog(mContext, userId, room_id!!)
                         giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                        giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
                         giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                            override fun BmClick() {
+
+                            }
+
+                            override fun BtxmClick() {
+
+                            }
+
+                            override fun ScmClick() {
+
+                            }
+
                             override fun clickGiveGift() {
                                 GiftBagDialog(mContext, room_id!!).show()
                             }
@@ -1054,17 +1153,23 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
                         })
                         giveDialog.show()
-
                     }
                 }
             }
         }
     }
 
-    //踢出房间
-    private fun ExitCurrentRoom(userId: String, leave: String, room_id: String) {
+    /**
+     * 闭麦 - 开麦
+     */
+    private fun OcWheat(room_id: String?, micPosition: Int, s: String, userId: String) {
+        val map = HashMap<String, String>()
+        map.put("room_id", room_id!!)
+        map.put("sort_id", micPosition.toString())
+        map.put("type", s)
+        val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
-                .tCRoom(userId, leave, room_id)
+                .oc_wheat(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<CommonBean> {
@@ -1072,26 +1177,106 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun onNext(t: CommonBean?) {
-                        showToastMessage(t!!.msg)
-                        if (t.code == 0) {
-                            updateRoomInfo()
-                            val message = RoomMemberChangedMessage()
-                            message.setCmd(3)//离开房间
-                            message.targetUserId = userId
-                            message.targetPosition = -1
-                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
-                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
-                                override fun onAttached(p0: Message?) {
+                        if (t!!.code == 0) {
+                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
+                                    if (roomDetailInfo != null) {
+                                        detailRoomInfo = roomDetailInfo
+                                        updateMicSeatState(roomDetailInfo.micPositions)
+                                        val controlMessage = MicPositionControlMessage()
+                                        if ("1".equals(s)) {//闭麦
+                                            controlMessage.setCmd(3)//禁麦
+                                        } else {//开麦
+                                            controlMessage.setCmd(4)//开麦
+                                        }
+                                        controlMessage.targetUserId = userId
+                                        controlMessage.micPositions = roomDetailInfo.micPositions
+                                        controlMessage.targetPosition = micPosition
+                                        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+                                        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                            override fun onAttached(p0: Message?) {
 
+                                            }
+
+                                            override fun onSuccess(p0: Message?) {
+                                                Log.d("SM:MPCtrlMsg=BM=", p0!!.content.toString())
+                                            }
+
+                                            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                                            }
+                                        });
+
+                                    }
                                 }
 
-                                override fun onSuccess(p0: Message?) {
+                                override fun onFail(errorCode: Int) {
+                                    showToastMessage("闭麦 - 开麦失败==")
+                                }
+                            })
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
+    /**
+     * 锁麦 - 解麦
+     */
+    private fun LockWheat(room_id: String?, micPosition: Int, s: String, userId: String) {
+        val map = HashMap<String, String>()
+        map.put("room_id", room_id!!)
+        map.put("sort_id", micPosition.toString())
+        map.put("type", s)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .lock_wheat(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        if (t!!.code == 0) {
+                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
+                                    if (roomDetailInfo != null) {
+                                        detailRoomInfo = roomDetailInfo
+                                        updateMicSeatState(roomDetailInfo.micPositions)
+                                        val controlMessage = MicPositionControlMessage()
+                                        if ("1".equals(s)) {//锁麦
+                                            controlMessage.setCmd(1)//锁麦
+                                        } else {//开麦
+                                            controlMessage.setCmd(2)//开麦
+                                        }
+                                        controlMessage.targetUserId = userId
+                                        controlMessage.micPositions = roomDetailInfo.micPositions
+                                        controlMessage.targetPosition = micPosition
+
+                                        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+                                        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                            override fun onAttached(p0: Message?) {
+                                                Log.d("tag", p0!!.content.toString())
+                                            }
+
+                                            override fun onSuccess(p0: Message?) {
+                                                Log.d("SM:MPCtrlMsg=SCM=", p0!!.content.toString())
+                                            }
+
+                                            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                                Log.d("tag", p1!!.message)
+                                            }
+                                        });
+                                    }
                                 }
 
-                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-
+                                override fun onFail(errorCode: Int) {
+                                    showToastMessage("锁麦开麦失败")
                                 }
-                            });
+                            })
 
                         }
                     }
@@ -1099,7 +1284,47 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onCompleted() {
                     }
                 })
+    }
 
+    //踢出房间
+    private fun ExitCurrentRoom(userId: String, leave: String, room_id: String, micNickname: String, micIcon: String) {
+        val message = RoomMemberChangedMessage()
+        message.setCmd(3)//踢出房间
+        message.targetUserId = userId
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), micNickname, Uri.parse(micIcon))
+        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+
+            }
+
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(userId, leave, room_id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                            }
+
+                            override fun onNext(t: CommonBean?) {
+                                showToastMessage(t!!.msg)
+                                if (t.code == 0) {
+                                    updateRoomInfo()
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
+
+            }
+
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+            }
+        });
     }
 
     /**
@@ -1214,45 +1439,45 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
      * 退出房间
      */
     private fun quiteRoom(uid: String, kick: String) {
-        NetWork.getService(ImpService::class.java)
-                .tCRoom(uid, kick, room_id!!)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<CommonBean> {
-                    override fun onError(e: Throwable?) {
-                    }
+        val message = RoomMemberChangedMessage()
+        message.setCmd(2)//离开房间
+        message.targetUserId = uid
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), nikeName, Uri.parse(icon))
+        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
 
-                    override fun onNext(t: CommonBean?) {
-                        showToastMessage(t!!.msg)
-                        if (t.code == 0) {
-//                            IMClient.getInstance().quitChatRoom(room_id, null)
-                            RtcClient.getInstance().quitRtcRoom(room_id, null)
-                            val message = RoomMemberChangedMessage()
-                            message.setCmd(2)
-                            message.targetUserId = uid
-                            message.targetPosition = -1
-                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+                Log.d("tag", p0!!.content.toString())
+            }
 
-                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
-                                override fun onAttached(p0: Message?) {
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(uid, kick, room_id!!)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                            }
 
+                            override fun onNext(t: CommonBean?) {
+                                showToastMessage(t!!.msg)
+                                if (t.code == 0) {
+                                    IMClient.getInstance().quitChatRoom(room_id, null)
+                                    RtcClient.getInstance().quitRtcRoom(room_id, null)
+                                    finish()
                                 }
+                            }
 
-                                override fun onSuccess(p0: Message?) {
-                                }
+                            override fun onCompleted() {
+                            }
+                        })
+            }
 
-                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-
-                                }
-                            });
-
-                            finish()
-                        }
-                    }
-
-                    override fun onCompleted() {
-                    }
-                })
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                Log.d("tag", p0!!.content.toString())//23409
+            }
+        });
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -1285,29 +1510,43 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            updateRoomInfo()
-                            enableVoiceChat(true)
+                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
+                                    if (roomDetailInfo != null) {
+                                        detailRoomInfo = roomDetailInfo
+                                        detailRoomInfo!!.roomInfo.setMemCount(roomDetailInfo.roomInfo.getMemCount())
+                                        updateMicSeatState(roomDetailInfo.micPositions)
+                                        updateRoomTitle(roomDetailInfo.roomInfo.room_name, roomDetailInfo.roomInfo.room_num, detailRoomInfo!!.roomInfo.memCount.toString())
 
-                            val controlMessage = MicPositionControlMessage()
-                            controlMessage.setCmd(6)//上麦
-                            controlMessage.targetUserId = userId
-                            controlMessage.micPositions = detailRoomInfo!!.micPositions
-                            controlMessage.targetPosition = mic
+                                        val controlMessage = MicPositionControlMessage()
+                                        controlMessage.setCmd(6)//上麦
+                                        controlMessage.targetUserId = userId
+                                        controlMessage.micPositions = roomDetailInfo.micPositions
+                                        controlMessage.targetPosition = mic
 
-                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+                                        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
 
-                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
-                                override fun onAttached(p0: Message?) {
+                                        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                            override fun onAttached(p0: Message?) {
+                                                Log.d("tag", p0!!.content.toString())
+                                            }
 
+                                            override fun onSuccess(p0: Message?) {
+                                                Log.d("tag", p0!!.content.toString())
+                                            }
+
+                                            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                                Log.d("tag", p1!!.message)
+                                            }
+                                        });
+                                    }
                                 }
 
-                                override fun onSuccess(p0: Message?) {
+                                override fun onFail(errorCode: Int) {
+                                    showToastMessage("加入麦位失败==")
                                 }
+                            })
 
-                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-
-                                }
-                            });
                         } else {
                             updateRoomInfo()
                             showToastMessage(t.msg)
@@ -1329,36 +1568,44 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
-                        showToastMessage("抱他上麦加入麦位失败==" + e!!.message.toString())
                     }
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            updateRoomInfo()
+                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
+                                    if (roomDetailInfo != null) {
+                                        detailRoomInfo=roomDetailInfo
+                                        updateMicSeatState(roomDetailInfo.micPositions)
+                                        val controlMessage = MicPositionControlMessage()
+                                        controlMessage.setCmd(7)//下麦
+                                        controlMessage.targetUserId = userId
+                                        controlMessage.micPositions = roomDetailInfo.micPositions
+                                        controlMessage.targetPosition = mic
 
-                            val controlMessage = MicPositionControlMessage()
-                            controlMessage.setCmd(7)//下麦
-                            controlMessage.targetUserId = userId
-                            controlMessage.micPositions = detailRoomInfo!!.micPositions
-                            controlMessage.targetPosition = mic
+                                        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
 
-                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+                                        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                            override fun onAttached(p0: Message?) {
+                                                Log.d("tag===", p0!!.content.toString())
+                                            }
 
-                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
-                                override fun onAttached(p0: Message?) {
+                                            override fun onSuccess(p0: Message?) {
+                                                Log.d("tag===", p0!!.content.toString())
+                                            }
 
+                                            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                                Log.d("tag===", p0!!.content.toString())
+                                            }
+                                        });
+                                    }
                                 }
 
-                                override fun onSuccess(p0: Message?) {
+                                override fun onFail(errorCode: Int) {
                                 }
+                            })
 
-                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
 
-                                }
-                            });
-
-                        } else {
-                            showToastMessage(t.msg)
                         }
                     }
 
@@ -1371,8 +1618,28 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private fun joinChatRoom(roomId: String) {
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                initRoom(room_id!!)
-                initAudioOutputMode()
+
+                val message = RoomMemberChangedMessage()
+                message.setCmd(1)
+                message.targetUserId = SpUtils.getSp(mContext, "uid")
+                message.targetPosition = -1
+                message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
+                val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
+                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                    override fun onAttached(p0: Message?) {
+                        Log.d("tag", p0!!.content.toString())
+                    }
+
+                    override fun onSuccess(p0: Message?) {
+                        Log.d("tag", p0!!.content.toString())
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
+                        finish()
+                    }
+
+                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                        Log.d("tag", p0!!.content.toString())
+                    }
+                });
             }
 
             override fun onFail(errorCode: Int) {
