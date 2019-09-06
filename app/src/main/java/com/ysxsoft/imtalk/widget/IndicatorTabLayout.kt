@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.support.annotation.Nullable
+import android.support.design.widget.TabItem
 import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -40,6 +41,11 @@ class IndicatorTabLayout @JvmOverloads constructor(context: Context, attrs: Attr
         init(context, attrs)
     }
 
+    fun getTabAt(postision: Int): TabLayout.Tab? {
+//        val tabAt = mTabLayout.getTabAt(postision)
+        return mTabLayout.getTabAt(postision)
+    }
+
     private fun readAttr(context: Context, attrs: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.IndicatorTabLayout)
         mSelectIndicatorColor = typedArray.getColor(R.styleable.IndicatorTabLayout_tabIndicatorColor, context.resources.getColor(R.color.colorAccent))
@@ -71,7 +77,7 @@ class IndicatorTabLayout @JvmOverloads constructor(context: Context, attrs: Attr
                 for (i in 0 until mTabLayout.tabCount) {
                     val view = mTabLayout.getTabAt(i)?.customView ?: return
                     val text = view.findViewById(R.id.tab_item_text) as TextView
-                    val indicator : View = view.findViewById(R.id.tab_item_indicator)
+                    val indicator: View = view.findViewById(R.id.tab_item_indicator)
                     if (i == tab.position) { // 选中状态
                         text.setTextColor(mSelectTextColor)
                         indicator.setBackgroundColor(mSelectIndicatorColor)
@@ -147,7 +153,7 @@ class IndicatorTabLayout @JvmOverloads constructor(context: Context, attrs: Attr
             for (i in customViewList.indices) {
                 val view = customViewList[i]
                 val text = view.findViewById(R.id.tab_item_text) as TextView
-                val indicator : View = view.findViewById(R.id.tab_item_indicator)
+                val indicator: View = view.findViewById(R.id.tab_item_indicator)
                 if (i == tab.position) { // 选中状态
                     text.setTextColor(mTabLayout.mSelectTextColor)
                     indicator.setBackgroundColor(mTabLayout.mSelectIndicatorColor)
@@ -180,7 +186,7 @@ class IndicatorTabLayout @JvmOverloads constructor(context: Context, attrs: Attr
         val view = LayoutInflater.from(context).inflate(R.layout.tab_item_layout, null)
         val tabText = view.findViewById(R.id.tab_item_text) as TextView
         if (indicatorWidth > 0) {
-            val indicator : View = view.findViewById(R.id.tab_item_indicator)
+            val indicator: View = view.findViewById(R.id.tab_item_indicator)
             val layoutParams = indicator.layoutParams
             layoutParams.width = indicatorWidth
             layoutParams.height = indicatorHeight
