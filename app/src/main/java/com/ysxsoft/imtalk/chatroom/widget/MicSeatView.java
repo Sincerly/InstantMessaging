@@ -20,6 +20,7 @@ import com.ysxsoft.imtalk.bean.RoomMicListBean;
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean;
 import com.ysxsoft.imtalk.chatroom.model.MicState;
 import com.ysxsoft.imtalk.chatroom.task.AuthManager;
+import com.ysxsoft.imtalk.chatroom.task.RoomManager;
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
 import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils;
 
@@ -92,16 +93,16 @@ public class MicSeatView extends FrameLayout {
 
     public void updateMicState(MicPositionsBean micInfo) {
         this.micInfo = micInfo;
-        int state = Integer.valueOf(micInfo.getIs_lock_wheat());
+        String state = micInfo.getIs_lock_wheat();
         String micUserId = String.valueOf(micInfo.getUid());
         nameTv.setText("");
         String currentUserId = AuthManager.getInstance().getCurrentUserId();
 
         // 麦位是否为空状态
-        if (TextUtils.isEmpty(micUserId) || TextUtils.equals("0", micUserId)) {
+        if ((TextUtils.equals("0", micUserId))&&(!"0".equals(state))&&"0".equals(micInfo.getIs_wheat())) {
             setMicSeatEmpty();
             // 麦位是否被锁定
-        } else if (state == 0) {
+        } else if ("0".equals(state)) {
             lockMicSeat();
             // 麦位有用户
         } else if (!TextUtils.isEmpty(micUserId) && !TextUtils.equals("0", micUserId)) {
@@ -116,7 +117,7 @@ public class MicSeatView extends FrameLayout {
         }
 
         // 麦位是否被禁麦
-        if (MicState.isState(state, MicState.Forbidden)) {
+        if ("1".equals(micInfo.getIs_oc_wheat())) { //闭麦
             setMicMuteState(true);
         } else {
             setMicMuteState(false);
@@ -183,7 +184,7 @@ public class MicSeatView extends FrameLayout {
      */
     public int getPosition() {
         if (micInfo != null) {
-            return micInfo.getSort();
+            return micInfo.getSort()-1;
         }
         return -1;
     }

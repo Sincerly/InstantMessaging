@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 
@@ -40,31 +41,27 @@ class MySongBookFragment : BaseFragment() {
     }
 
     var lists: MutableList<RoomMusicListBean.DataBean>? = null
-    var roomId:String?=null
+    var roomId: String? = null
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         roomId = arguments!!.getString("roomId")
     }
 
-
     override fun initUi() {
         setClickListener()
-    }
-
-    override fun onResume() {
-        super.onResume()
         requestData()
     }
+
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
                 .RoomMusicList(roomId!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<RoomMusicListBean>{
+                .subscribe(object : Action1<RoomMusicListBean> {
                     override fun call(t: RoomMusicListBean?) {
-                        if (t!!.code==0){
-                             lists = t.data
-                            if (lists==null||lists!!.size<=0) {
+                        if (t!!.code == 0) {
+                            lists = t.data
+                            if (lists == null || lists!!.size <= 0) {
                                 includeEmpty.visibility = View.VISIBLE
                                 layoutList.visibility = View.GONE
                             } else {
@@ -82,11 +79,11 @@ class MySongBookFragment : BaseFragment() {
     private fun initAdapter() {
         adapter = object : BaseQuickAdapter<RoomMusicListBean.DataBean, BaseViewHolder>(R.layout.item_music, lists) {
             override fun convert(helper: BaseViewHolder?, item: RoomMusicListBean.DataBean?) {
-                helper!!.getView<ImageView>(R.id.ivEnd)!!.visibility=View.VISIBLE
-                helper.getView<RadioButton>(R.id.rbEnd)!!.visibility=View.GONE
+                helper!!.getView<ImageView>(R.id.ivEnd)!!.visibility = View.VISIBLE
+                helper.getView<RadioButton>(R.id.rbEnd)!!.visibility = View.GONE
                 helper.getView<ImageView>(R.id.ivEnd)?.displayRes(R.mipmap.icon_music_delete)
                 helper.getView<ImageView>(R.id.ivEnd)!!.setOnClickListener {
-                        DelMusic(roomId,item!!.id)
+                    DelMusic(roomId, item!!.id)
                 }
                 helper.getView<TextView>(R.id.tvSongName)!!.setText(item!!.music_name)
                 helper.getView<TextView>(R.id.tvName)!!.setText(item.a_name)
@@ -101,20 +98,20 @@ class MySongBookFragment : BaseFragment() {
 
     private fun DelMusic(roomId: String?, id: Int) {
         val map = HashMap<String, String>()
-        map.put("room_id",roomId!!)
-        map.put("music_id",id.toString())
+        map.put("room_id", roomId!!)
+        map.put("music_id", id.toString())
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .RoomMusicDel(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<CommonBean>{
+                .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
-                        if (t.code==0){
+                        if (t.code == 0) {
                             requestData()
                         }
                     }
@@ -127,8 +124,11 @@ class MySongBookFragment : BaseFragment() {
 
     private fun setClickListener() {
         btnAddMusic.setOnClickListener {
-            includeEmpty.visibility = View.GONE
-            layoutList.visibility = View.VISIBLE
+            if (onAddMusicClickListener != null) {
+                onAddMusicClickListener!!.onClick(btnAddMusic)
+            }
+            val intent = Intent("CHANGEFRAGMENT")
+            activity!!.sendBroadcast(intent)
         }
 
         ivSetting.setOnClickListener {
@@ -168,6 +168,21 @@ class MySongBookFragment : BaseFragment() {
         })
     }
 
+    interface OnAddMusicClickListener {
+        fun onClick(view: View)
+    }
+
+    private var onAddMusicClickListener: OnAddMusicClickListener? = null
+    fun setOnAddMusicClickListener(onAddMusicClickListener: OnAddMusicClickListener) {
+        this.onAddMusicClickListener = onAddMusicClickListener
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            requestData()
+        }
+    }
 
     companion object {
         @JvmStatic

@@ -103,6 +103,12 @@ class SharingMusicFragment : BaseFragment() {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden){
+            requestData()
+        }
+    }
 
     companion object {
         @JvmStatic

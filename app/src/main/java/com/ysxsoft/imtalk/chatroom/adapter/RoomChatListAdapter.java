@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.chatroom.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,15 +87,14 @@ public class RoomChatListAdapter extends BaseAdapter {
         // 文本消息
         if (viewType == VIEW_TYPE_CHAT_MESSAGE) {
             TextMessage textMessage = (TextMessage) message.getContent();
-            viewHolder.nickNameTv.setText(message.getSenderUserId());
+            viewHolder.nickNameTv.setText(textMessage.getUserInfo().getName()+":");
             viewHolder.messageTv.setText(textMessage.getContent());
-//            viewHolder.avatarIv.setImageDrawable(context.getResources().getDrawable(resourceUtils.getUserAvatarResourceId(message.getSenderUserId())));
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
-            String targetUserId = memberMessage.getTargetUserId();
-            viewHolder.nickNameTv.setText(targetUserId);
-//            viewHolder.avatarIv.setImageDrawable(context.getResources().getDrawable(resourceUtils.getUserAvatarResourceId(targetUserId)));
+            if (memberMessage.getUserInfo() != null) {
+                viewHolder.nickNameTv.setText(memberMessage.getUserInfo().getName()+":");
+            }
             RoomMemberChangedMessage.RoomMemberAction roomMemberAction = memberMessage.getRoomMemberAction();
             if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.JOIN) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_enter);
@@ -132,11 +132,11 @@ public class RoomChatListAdapter extends BaseAdapter {
         TextView messageTv;
     }
 
-    interface OnRoomChatListAdapterListener{
+    interface OnRoomChatListAdapterListener {
         void onClick(int position);
     }
 
-    public void setOnRoomChatListAdapterListener(OnRoomChatListAdapterListener onRoomChatListAdapterListener){
+    public void setOnRoomChatListAdapterListener(OnRoomChatListAdapterListener onRoomChatListAdapterListener) {
         this.onRoomChatListAdapterListener = onRoomChatListAdapterListener;
     }
 

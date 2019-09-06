@@ -30,19 +30,19 @@ public class Owner extends Role {
             String micState = micPositionInfo.getIs_lock_wheat();
             String is_block = micPositionInfo.getIs_block();
             // 判断麦位是否有人来进行抱麦和下麦操作
-            if (TextUtils.isEmpty(userId) && !"0".equals(micState)) {
-                behaviorList.add(MicBehaviorType.PickupMic);    //抱麦
-            } else if (!TextUtils.isEmpty(userId)) {
-                behaviorList.add(MicBehaviorType.KickOffMic);   //踢麦
-                behaviorList.add(MicBehaviorType.JumpDownMic);  //下麦
-            }
-
-            // 判断锁麦状态
-            if ("0".equals(is_block)) {
-                behaviorList.add(MicBehaviorType.UnlockMic);        //解锁麦
-            } else {
-                behaviorList.add(MicBehaviorType.LockMic);          //锁麦
-            }
+//            if (TextUtils.isEmpty(userId) && !"0".equals(micState)) {
+//                behaviorList.add(MicBehaviorType.PickupMic);    //抱麦
+//            } else if (!TextUtils.isEmpty(userId)) {
+//                behaviorList.add(MicBehaviorType.KickOffMic);   //踢麦
+//                behaviorList.add(MicBehaviorType.JumpDownMic);  //下麦
+//            }
+//
+//            // 判断锁麦状态
+//            if ("0".equals(is_block)) {
+//                behaviorList.add(MicBehaviorType.UnlockMic);        //解锁麦
+//            } else {
+//                behaviorList.add(MicBehaviorType.LockMic);          //锁麦
+//            }
         }
 
         return behaviorList;

@@ -151,5 +151,10 @@ class Msg22Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         mLuRecyclerViewAdapter!!.notifyDataSetChanged()
     }
 
-
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if(!hidden){
+            onRefresh()
+        }
+    }
 }

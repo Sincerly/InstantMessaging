@@ -54,7 +54,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
     lateinit var adapter1: BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>
     lateinit var adapter2: BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>
-
+    var mydatabean:UserInfoBean?=null
 
     override fun getLayoutResId(): Int {
         return R.layout.fm_home
@@ -70,7 +70,28 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         requestData()
         HomeData()
         requestHLData()
+        requestMyData()
         initClickListernr()
+    }
+    private fun requestMyData() {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            mydatabean =t
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     private fun HomeData() {
@@ -335,7 +356,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                 } else {
                     showToastMessage(R.string.toast_join_room_success)
                 }
-                ChatRoomActivity.starChatRoomActivity(mContext, roomId)
+                ChatRoomActivity.starChatRoomActivity(mContext, roomId,mydatabean!!.data.nickname,mydatabean!!.data.icon)
             }
 
             override fun onFail(errorCode: Int) {
