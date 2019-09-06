@@ -48,6 +48,7 @@ import com.ysxsoft.imtalk.bean.HomeHLBean
 import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage
+import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.model.MicBehaviorType
@@ -85,12 +86,14 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
-    override fun onRoomEmj(p: Int, url: String?) {
+    override fun onRoomEmj(p: Int, url: String) {
         //房间表情
+        showPositionEmj(p,url)
     }
 
-    override fun onRoomGift(p: Int, toP: Int, giftUrl: String?, staticUrl: String?) {
+    override fun onRoomGift(p: Int, toP: Int, giftUrl: String, staticUrl: String) {
         //房间动画
+        showPositionGift(p,toP,giftUrl ,staticUrl)
     }
 
     override fun onRoomMemberChange(memberCount: Int) {
@@ -412,7 +415,31 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         img_simle.setOnClickListener {
-            SmilDialog(mContext).show()
+            val dialog=SmilDialog(mContext);
+            dialog.setOnDialogListener(object : SmilDialog.OnSmileDialogListener{
+                override fun onClick(position: Int, url: String) {
+                    val message = RoomEmjMessage()
+                    message.position=0;//当前用户所在的麦位
+                    message.imageUrl=url;
+                    val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
+                    RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                        override fun onAttached(p0: Message?) {
+
+                        }
+
+                        override fun onSuccess(p0: Message?) {
+                        }
+
+                        override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+
+                        }
+                    });
+
+                    //显示当前用户所在的麦位表情
+                    showPositionEmj(0,url);
+                }
+            })
+           dialog.show()
         }
 
         chatroom_iv_mic_control.setOnClickListener {
@@ -1496,7 +1523,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     fun showPositionEmj(position: Int, emjGifUrl: String) {
         var emjGifUrl = emjGifUrl
-        emjGifUrl = "http://chitchat.rhhhyy.com/uploads/images/20190902/2c324e0d5efe3ca90a36305b4f8c2081.gif"
+//        emjGifUrl = "http://chitchat.rhhhyy.com/uploads/images/20190903/f5d5ee9871ffbd2c422e4f436a72181e.gif"
         val viewMap = java.util.HashMap<Int, View>()
 
         val f = findViewById<FrameLayout>(android.R.id.content)
@@ -1586,7 +1613,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     val getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", Int::class.javaPrimitiveType!!)
                     getDelayMethod.isAccessible = true
                     //设置只播放一次
-                    resource.setLoopCount(3)
+                    resource.setLoopCount(1)
                     //获得总帧数
                     val count = resource.frameCount
                     var delay = 0
@@ -1617,7 +1644,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                             }
                         })
-                    }, 3 * delay.toLong())
+                    }, 1 * delay.toLong())
                 } catch (e: NoSuchFieldException) {
                     e.printStackTrace()
                 } catch (e: ClassNotFoundException) {
@@ -1631,7 +1658,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
                 return false
             }
-        }).diskCacheStrategy(DiskCacheStrategy.ALL).load(emjGifUrl).into(imageView)
+        }).diskCacheStrategy(DiskCacheStrategy.RESOURCE).load(emjGifUrl).into(imageView)
         v.x = x.toFloat() + offsetX;
         v.y = y.toFloat() + offsetY;
         f.addView(v)
@@ -1741,7 +1768,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
                 return false
             }
-        }).diskCacheStrategy(DiskCacheStrategy.ALL).load(giftImgUrl).into(giftImageView)
+        }).diskCacheStrategy(DiskCacheStrategy.RESOURCE).load(giftImgUrl).into(giftImageView)
     }
     /**
      * 获取坐标

@@ -49,18 +49,31 @@ class SmilDialog:ABSDialog{
                         if (t!!.code==0){
                             val data = t.data
                             val adapter = SmilDialogAdapter(this@SmilDialog.context)
-                            val manager = GridLayoutManager(this@SmilDialog.context, 5)
-                            manager.orientation=GridLayoutManager.HORIZONTAL
+                            val manager = GridLayoutManager(this@SmilDialog.context, 6)
+                            manager.orientation=GridLayoutManager.VERTICAL
                             recyclerView.layoutManager=manager
                             recyclerView.adapter=adapter
                             adapter.addAll(data)
                             adapter.setOnSmileListener(object :SmilDialogAdapter.OnSmileListener{
-                                override fun onClick(position: Int) {
-                                   ToastUtils.showToast(this@SmilDialog.context,adapter.dataList.get(position).bq_name)
+                                override fun onClick(position: Int,url:String) {
+                                    if(onDialogListener!=null){
+                                        onDialogListener!!.onClick(position,url)
+                                    }
+                                   //ToastUtils.showToast(this@SmilDialog.context,url)
                                 }
                             })
                         }
                     }
                 })
     }
+
+    interface OnSmileDialogListener {
+        fun onClick(position: Int,url:String)
+    }
+
+    private var onDialogListener: OnSmileDialogListener? = null
+    fun setOnDialogListener(onSmileListener: OnSmileDialogListener) {
+        this.onDialogListener = onSmileListener
+    }
+
 }

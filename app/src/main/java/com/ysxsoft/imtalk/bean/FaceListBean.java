@@ -52,6 +52,7 @@ public class FaceListBean {
         private int id;
         private String bq_name;
         private String bq_pic;
+        private String bq_gif;
 
         public int getId() {
             return id;
@@ -75,6 +76,14 @@ public class FaceListBean {
 
         public void setBq_pic(String bq_pic) {
             this.bq_pic = bq_pic;
+        }
+
+        public String getBq_gif() {
+            return bq_gif == null ? "" : bq_gif;
+        }
+
+        public void setBq_gif(String bq_gif) {
+            this.bq_gif = bq_gif;
         }
     }
 }

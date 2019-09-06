@@ -21,18 +21,18 @@ class SmilDialogAdapter(mContext: Context) : ListBaseAdapter<FaceListBean.DataBe
 
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
-        Glide.with(mContext).asGif().load(bean.bq_pic).into(holder.getView<GifImageView>(R.id.gif)!!)
+        Glide.with(mContext).load(bean.bq_pic).into(holder.getView<GifImageView>(R.id.gif)!!)
         holder.getView<TextView>(R.id.tv_name)!!.setText(bean.bq_name)
         holder.itemView.setOnClickListener {
             if (onSmileListener!=null){
-                onSmileListener!!.onClick(position)
+                onSmileListener!!.onClick(position,bean.bq_gif)
             }
         }
 
     }
 
     interface OnSmileListener {
-        fun onClick(position: Int)
+        fun onClick(position: Int,url:String)
     }
 
     private var onSmileListener: OnSmileListener? = null

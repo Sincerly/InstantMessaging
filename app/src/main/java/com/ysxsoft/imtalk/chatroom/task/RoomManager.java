@@ -9,6 +9,8 @@ import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomIsActiveMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.model.BaseRoomInfo;
@@ -49,6 +51,7 @@ import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
+import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
 
 public class RoomManager {
@@ -700,6 +703,26 @@ public class RoomManager {
                                 @Override
                                 public void run() {
                                     roomEventlistener.onRoomExistOverTimeLimit();
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomEmjMessage) {
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomEmjMessage content=new RoomEmjMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomEmj(content.getPosition(),content.getImageUrl());
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomGiftMessage) {
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomGiftMessage content=new RoomGiftMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomGift(content.getPosition(),content.getToPosition(),content.getGiftUrl(),content.getStaticUrl());
                                 }
                             });
                         }

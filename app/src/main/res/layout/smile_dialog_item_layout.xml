@@ -8,8 +8,8 @@
 
     <pl.droidsonroids.gif.GifImageView
         android:id="@+id/gif"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:src="@mipmap/img_normal_head" />
 
     <TextView
@@ -17,6 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
+        android:textSize="@dimen/sp_12"
         tools:text="大笑" />
 
 
