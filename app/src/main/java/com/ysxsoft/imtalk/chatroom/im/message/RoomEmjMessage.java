@@ -77,6 +77,7 @@ public class RoomEmjMessage extends MessageContent {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.position);
+        dest.writeString(this.imageUrl);
     }
 
     protected RoomEmjMessage(Parcel in) {

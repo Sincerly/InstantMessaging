@@ -99,6 +99,9 @@ public class RoomGiftMessage extends MessageContent {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.position);
+        dest.writeInt(this.toPosition);
+        dest.writeString(this.giftUrl);
+        dest.writeString(this.staticUrl);
     }
 
     protected RoomGiftMessage(Parcel in) {

@@ -329,7 +329,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 //                    showPositionEmj(a, "")
 //                    showPositionGift(0,a ,"http://chitchat.rhhhyy.com/uploads/images/20190826/728cb202b8af33ad401cf3984dffe74a.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/f09aa72dd01f87a48fd20283e3570278.png")
 //                    showPositionGift(7,a ,"http://chitchat.rhhhyy.com/uploads/images/20190826/1b8e43cd206cbbf8ef9c04cbd2cfc3dd.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/5771f0008c39479aebe64c8b83c7ffb8.png")
-                    showPositionGift(5,a ,"http://chitchat.rhhhyy.com/uploads/images/20190906/07511341808b21d60475931e8eaaf252.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/9cad09a166ffae62066263a0ea0a777d.png")
+                    showPositionGift(-1,a ,"http://chitchat.rhhhyy.com/uploads/images/20190906/07511341808b21d60475931e8eaaf252.gif","http://chitchat.rhhhyy.com/uploads/images/20190826/9cad09a166ffae62066263a0ea0a777d.png")
                     a++;
                     if (a == 9) {
                         a = 0;
@@ -2046,6 +2046,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     fun getPosition(p: Int): IntArray {
         val pos = IntArray(2)
         when (p) {
+            -1 -> {
+                pos[0]=AppUtil.getScreenWidth(mContext)/2-DisplayUtils.dp2px(mContext,32);
+                pos[1]=AppUtil.getScreenHeight(mContext)/2
+            }
             0 -> {chatroom_mp_mic_1!!.getLocationOnScreen(pos)}
             1 -> {chatroom_mp_mic_2.getLocationOnScreen(pos)}
             2 -> {chatroom_mp_mic_3.getLocationOnScreen(pos)}
