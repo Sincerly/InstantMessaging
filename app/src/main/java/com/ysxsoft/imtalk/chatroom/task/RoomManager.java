@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.chatroom.task;
 
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
@@ -51,6 +52,7 @@ import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
+import io.rong.imlib.model.UserInfo;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
 
@@ -209,7 +211,7 @@ public class RoomManager {
                             currentRoom.setMicPositions(dataResult.getMicPositions());
                             currentRoom.setAdminListInfo(dataResult.getAdminListInfo());//2019-8-10 add
 
-//                            //检测角色是否发生了改变
+                            //检测角色是否发生了改变
                             final Role newRole = initCurrentRole();
                             if (newRole != null && !newRole.isSameRole(currentRole)) { // 角色发生改变时回调角色改变监听
                                 currentRole = newRole;
@@ -233,18 +235,43 @@ public class RoomManager {
         });
     }
 
+
+    public void getRoomDetailInfo1(final String roomId, final ResultCallback<DetailRoomInfo> callBack) {
+        request.getChatRoomDetail(roomId, new HandleRequestWrapper<DetailRoomInfo, DetailRoomInfo>(callBack) {
+            @Override
+            public DetailRoomInfo handleRequestResult(DetailRoomInfo dataResult) {
+
+                synchronized (roomLock) {
+                    /*
+                     * 当现在已加入房间且与获取的房间 id 相同时更新房间人数和房间人员
+                     */
+                    if (currentRoom != null && dataResult != null) {
+                        if (currentRoom.getRoomInfo().getRoom_id().equals(dataResult.getRoomInfo().getRoom_id())) {
+                            currentRoom.getRoomInfo().setMemCount(dataResult.getRoomInfo().getMemCount());
+                            currentRoom.setAudiences(dataResult.getAudiences());
+                            currentRoom.setMicPositions(dataResult.getMicPositions());
+                            currentRoom.setAdminListInfo(dataResult.getAdminListInfo());//2019-8-10 add
+                        }
+                    }
+                }
+                return dataResult;
+            }
+        });
+    }
+
     /**
      * 在当前所在聊天室发送消息
      *
      * @param message
      */
-    public void sendChatRoomMessage(String message) {
+    public void sendChatRoomMessage(String message, String id, String name, String icon) {
         synchronized (roomLock) {
             if (currentRoom == null) {
                 return;
             }
 
             TextMessage textMessage = TextMessage.obtain(message);
+            textMessage.setUserInfo(new UserInfo(id, name, Uri.parse(icon)));
             RongIMClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, currentRoom.getRoomInfo().getRoom_id(), textMessage, null, null, new IRongCallback.ISendMessageCallback() {
                 @Override
                 public void onAttached(Message message) {
@@ -424,7 +451,7 @@ public class RoomManager {
                 // 加入麦位上可发言的用户
                 for (MicPositionsBean micInfo : micPositions) {
                     String state = micInfo.getIs_wheat();
-                    if (!"0".equals(state) /*&& !"0".equals(micInfo.getIs_lock_wheat())*/) {
+                    if (!"0".equals(state) && !"0".equals(micInfo.getUid())&&!"0".equals(micInfo.getIs_lock_wheat())) {
                         userList.add(micInfo.getUid());
                     }
                 }
@@ -432,6 +459,7 @@ public class RoomManager {
             return userList;
         }
     }
+
     /**
      * 获取当前角色
      *
@@ -583,14 +611,41 @@ public class RoomManager {
                             currentRoom.getRoomInfo().setMemCount(currentRoom.getRoomInfo().getMemCount() - 1);
                         }
                         final int memCount = currentRoom.getRoomInfo().getMemCount();
-                        if (roomEventlistener != null) {
-                            threadManager.runOnUIThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    roomEventlistener.onMessageEvent(message);
-                                    roomEventlistener.onRoomMemberChange(memCount);
+                        switch (memberChangedMessage.getRoomMemberAction()) {
+                            case JOIN:
+                                if (roomEventlistener != null) {
+                                    threadManager.runOnUIThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            roomEventlistener.onMessageEvent(message);
+                                            roomEventlistener.onRoomMemberChange(memCount);
+                                        }
+                                    });
                                 }
-                            });
+                                break;
+                            case LEAVE:
+                                if (roomEventlistener != null) {
+                                    threadManager.runOnUIThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            roomEventlistener.onMessageEvent(message);
+                                            roomEventlistener.onRoomMemberChange(memCount);
+                                        }
+                                    });
+                                }
+                                break;
+                            case KICK:
+                                if (roomEventlistener != null) {
+                                    threadManager.runOnUIThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            roomEventlistener.onMessageEvent(message);
+                                            roomEventlistener.onRoomMemberChange(memCount);
+                                            roomEventlistener.onRoomMemberKickChange(memCount);
+                                        }
+                                    });
+                                }
+                                break;
                         }
                         //麦位变动消息更新麦位信息
                     } else if (message.getContent() instanceof MicPositionChangeMessage) {
@@ -637,7 +692,6 @@ public class RoomManager {
                         if (currentUserId.equals(targetUserId)) {
                             final Role newRole = initCurrentRole();
                             currentRole = newRole;
-
                             if (roomEventlistener != null && newRole != null) {
                                 threadManager.runOnUIThread(new Runnable() {
                                     @Override
@@ -788,29 +842,32 @@ public class RoomManager {
                 });
             }
         }
+
         /**
          * 用户发布的音频资源静音或者取消静音
          *
          * @param rongRTCRemoteUser    远端用户
          * @param rongRTCAVInputStream 音频流
-         * @param b          true表示静音，false表示取消静音
+         * @param b                    true表示静音，false表示取消静音
          */
         @Override
         public void onRemoteUserAudioStreamMute(RongRTCRemoteUser rongRTCRemoteUser, RongRTCAVInputStream rongRTCAVInputStream, boolean b) {
 
         }
+
         /**
          * 远端用户打开或关闭发布的视频流。
          * 例如用户开启或者关闭摄像头
          *
          * @param rongRTCRemoteUser    远端用户
          * @param rongRTCAVInputStream 视频流
-         * @param b        true表示打开，false表示关闭
+         * @param b                    true表示打开，false表示关闭
          */
         @Override
         public void onRemoteUserVideoStreamEnabled(RongRTCRemoteUser rongRTCRemoteUser, RongRTCAVInputStream rongRTCAVInputStream, boolean b) {
 
         }
+
         /**
          * 房间内用户取消发布资源
          *
@@ -819,6 +876,7 @@ public class RoomManager {
         @Override
         public void onRemoteUserUnPublishResource(RongRTCRemoteUser rongRTCRemoteUser, List<RongRTCAVInputStream> list) {
         }
+
         /**
          * 用户加入房间
          *
@@ -827,6 +885,7 @@ public class RoomManager {
         @Override
         public void onUserJoined(RongRTCRemoteUser rongRTCRemoteUser) {
         }
+
         /**
          * 用户离开房间
          *
@@ -836,6 +895,7 @@ public class RoomManager {
         public void onUserLeft(RongRTCRemoteUser rongRTCRemoteUser) {
             ToastUtils.showToast("用户离开房间");
         }
+
         /**
          * 用户离线
          *
@@ -844,6 +904,7 @@ public class RoomManager {
         @Override
         public void onUserOffline(RongRTCRemoteUser rongRTCRemoteUser) {
         }
+
         /**
          * 远端用户发布视频资源，订阅成功后，视频流通道建立成功的通知。
          * 目前自动化测试会使用。
@@ -855,6 +916,7 @@ public class RoomManager {
         public void onVideoTrackAdd(String userId, String tag) {
 
         }
+
         /**
          * 远端用户发布视频资源，订阅成功后，绘制视频第一帧的通知
          *
@@ -881,6 +943,7 @@ public class RoomManager {
                 });
             }
         }
+
         /**
          * 收到IM消息
          */

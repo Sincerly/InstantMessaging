@@ -18,6 +18,13 @@ public interface RoomEventListener {
      */
     void onRoomMemberChange(int memberCount);
 
+     /**
+     * 房间人数发生变化
+     * @param memberCount
+     */
+    void onRoomMemberKickChange(int memberCount);
+
+
     /**
      * 麦位信息更新
      *

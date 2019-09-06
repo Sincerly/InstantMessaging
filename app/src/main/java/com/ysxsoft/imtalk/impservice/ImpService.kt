@@ -563,5 +563,13 @@ interface ImpService {
     @POST("Sign/help_sign")
     fun help_sign(@Body body: RequestBody): Observable<SignDayBean>
 
+    //锁麦 解麦
+    @POST("Room/lock_wheat")
+    fun lock_wheat(@Body body: RequestBody): Observable<CommonBean>
+
+    //闭麦 - 开麦
+    @POST("Room/oc_wheat")
+    fun oc_wheat(@Body body: RequestBody): Observable<CommonBean>
+
 
 }

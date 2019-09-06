@@ -37,6 +37,7 @@
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/tv_zs_num"
         android:gravity="center"
+        android:textSize="12sp"
         android:textColor="@color/white"
         tools:text="周围:" />
 
@@ -45,12 +46,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/chatroom_item_chatlist_tv_nickname"
-        android:paddingBottom="4dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="4dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:layout_marginTop="5dp"
         android:textColor="@color/white"
-        android:textSize="12dp"
+        android:textSize="12sp"
         tools:text="你们在玩什么" />
 
    <!-- android:background="@drawable/chatroom_bg_chatlist_chat"-->

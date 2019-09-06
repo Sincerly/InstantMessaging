@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.fragment
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -58,11 +59,10 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 
     private var position = 0
     private var pids: String? = null
-
+    var mydatabean:UserInfoBean?=null
     override fun getLayoutResId(): Int {
         return R.layout.fragment_house_item
     }
-
     var datas: MutableList<BannerBean.DataBean>? = null
     var urls = ArrayList<String>() as MutableList<String>
     var tuijainDatas: MutableList<HomeRoomBean.DataBean.RoomListBean>? = null
@@ -73,6 +73,26 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
         super.onAttach(context)
         position = arguments?.getInt(ARG_POSITION) ?: position
         pids = arguments!!.getString("pids")
+    }
+    private fun requestMyData() {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            mydatabean = t
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     private fun LunBoData() {
@@ -210,6 +230,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
     }
 
     override fun initUi() {
+        requestMyData()
         banner.visibility = if (0 == position) View.VISIBLE else View.GONE
         refreshLayout.setOnRefreshListener(this)
         refreshLayout.setColorSchemeResources(R.color.btn_color)
@@ -265,24 +286,24 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
     fun joinChatRoom(roomId: String) {
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                ChatRoomActivity.starChatRoomActivity(mContext, roomId)
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
                 message.targetUserId = SpUtils.getSp(mContext, "uid")
                 message.targetPosition = -1
+                message.userInfo=io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"),mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
                 val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
-
                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                     override fun onAttached(p0: Message?) {
-
+                        Log.d("tag",p0!!.content.toString())
                     }
 
                     override fun onSuccess(p0: Message?) {
-                        showToastMessage("发送成功=="+p0)
+                        Log.d("tag",p0!!.content.toString())
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId,mydatabean!!.data.nickname,mydatabean!!.data.icon)
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-
+                        Log.d("tag",p0!!.content.toString())
                     }
                 });
             }

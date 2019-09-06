@@ -23,7 +23,7 @@ public abstract class Role {
 
             if (micPositions != null) {
                 for (MicPositionsBean info : micPositions) {
-                    if (info.getSort() == position) {
+                    if (info.getSort()-1 == position) {
                         return info;
                     }
                 }

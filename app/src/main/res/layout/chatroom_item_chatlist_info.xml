@@ -10,6 +10,7 @@
         android:id="@+id/chatroom_item_chatlist_iv_avatar"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:visibility="gone"
         tools:src="@drawable/chatroom_user_avatar_02" />
 
     <TextView
@@ -22,7 +23,7 @@
         android:layout_toRightOf="@id/chatroom_item_chatlist_iv_avatar"
         android:gravity="center"
         android:textColor="@color/btn_color"
-        android:textSize="12dp"
+        android:textSize="12sp"
         tools:text="周围" />
 
     <TextView
@@ -35,6 +36,6 @@
         android:layout_toRightOf="@id/chatroom_item_chatlist_tv_nickname"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="12dp"
+        android:textSize="12sp"
         tools:text="加入房间" />
 </RelativeLayout>

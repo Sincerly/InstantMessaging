@@ -31,7 +31,7 @@ public class Linker extends Role {
             // 当麦位上没有用户且非锁麦下课进行跳麦
             if (TextUtils.isEmpty(micUserId) && !"0".equals(micState)) {
                 behaviorList.add(MicBehaviorType.JumpToMic);//跳麦
-            } else if (currentMicInfo.getSort() == micPosition) {
+            } else if (currentMicInfo.getSort()-1 == micPosition) {
                 behaviorList.add(MicBehaviorType.JumpDownMic);
             }
         }
@@ -44,7 +44,7 @@ public class Linker extends Role {
         switch (micBehaviorType) {
             case JumpToMic:
                 if (currentMicInfo != null) {
-                    int fromPosition = currentMicInfo.getSort();
+                    int fromPosition = currentMicInfo.getSort()-1;
 //                    roomManager.changeMicPosition(fromPosition, targetPosition, callback);
                     break;
                 }
@@ -98,8 +98,8 @@ public class Linker extends Role {
             Linker targetLinker = (Linker) target;
             if (currentMicInfo != null && targetLinker.getMicPositionInfo() != null) {
                 MicPositionsBean targetPosition = targetLinker.getMicPositionInfo();
-                return currentMicInfo.getSort() == targetPosition.getSort()
-                        && currentMicInfo.getUid() != null
+                return currentMicInfo.getSort()-1 == targetPosition.getSort()-1
+                        && !"0".equals(currentMicInfo.getUid())
                         && currentMicInfo.getUid().equals(targetPosition.getUid())
                         && currentMicInfo.getIs_lock_wheat().equals(targetPosition.getIs_lock_wheat())
                         && currentMicInfo.getIs_wheat().equals(targetPosition.getIs_wheat());

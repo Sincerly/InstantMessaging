@@ -63,14 +63,8 @@ class Msg21Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     var db: SQLiteDatabase? = null
     private val TABLE_NAME = "RoomUserListBean"
 
-    override fun onResume() {
-        super.onResume()
-        initView()
-
-    }
-
     override fun initUi() {
-
+        initView()
     }
 
     private fun initView() {
@@ -181,5 +175,10 @@ class Msg21Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun notifyDataSetChanged() {
         mLuRecyclerViewAdapter!!.notifyDataSetChanged()
     }
-
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if(!hidden){
+            onRefresh()
+        }
+    }
 }
