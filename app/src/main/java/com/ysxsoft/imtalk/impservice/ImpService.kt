@@ -210,7 +210,7 @@ interface ImpService {
     //开始砸金蛋
     @POST("Share/beginAward")
     fun beginAward(@Query("uid") uid: String,
-                   @Query("type") type: String): Observable<CommonBean>
+                   @Query("type") type: String): Observable<EggBean>
 
 
     //音乐（共享）列表 - 后台设置

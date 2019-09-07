@@ -1,25 +1,45 @@
 package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
+import android.os.Looper
+import android.support.v4.view.ViewCompat
+import android.support.v4.view.ViewPropertyAnimatorListener
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
+import android.util.Log
+import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.FrameLayout
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.TimesAdapter
 import com.ysxsoft.imtalk.bean.AwardListDataBean
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.bean.EggBean
+import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.utils.ToastUtils
 import com.ysxsoft.imtalk.view.JbWithDrawActivity
 import com.ysxsoft.imtalk.widget.ABSDialog
+import kotlinx.android.synthetic.main.activity_chatroom.*
 import kotlinx.android.synthetic.main.za_dialog_layout.*
+import pl.droidsonroids.gif.AnimationListener
 import pl.droidsonroids.gif.GifDrawable
 import pl.droidsonroids.gif.GifImageView
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
+import java.lang.reflect.InvocationTargetException
+import java.util.logging.Handler
 import kotlin.text.Typography.times
 
 /**
@@ -73,6 +93,9 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
 
             when (type) {
                 "1" -> {
+                    boxView.alpha = 0f
+                    boxView.translationX = 0f
+                    boxView.translationY = 0f
                     gifDrawable!!.start(); //开始播放
                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                     gifDrawable!!.reset()
@@ -80,6 +103,9 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 }
 
                 "2" -> {
+                    boxView.alpha = 0f
+                    boxView.translationX = 0f
+                    boxView.translationY = 0f
                     gifDrawable!!.start(); //开始播放
                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                     gifDrawable!!.reset()
@@ -87,6 +113,9 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 }
 
                 "3" -> {
+                    boxView.alpha = 0f
+                    boxView.translationX = 0f
+                    boxView.translationY = 0f
                     gifDrawable!!.start(); //开始播放
                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                     gifDrawable!!.reset()
@@ -109,19 +138,70 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 .beginAward(SpUtils.getSp(this.context, "uid"), type!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<CommonBean> {
-                    override fun call(t: CommonBean?) {
+                .subscribe(object : Action1<EggBean> {
+                    override fun call(t: EggBean?) {
                         ToastUtils.showToast(this@EggDialog.context, t!!.msg)
                         if (t.code == 0) {
                             if ("4".equals(type)) {
                                 if (isClick) {
                                     ZdData()
                                 }
+                            } else {
+                                //播放飞出动画
+                                android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                    showAnim(t.data.aw_pic)
+                                }, 3000)
                             }
                         }
                     }
                 })
     }
+
+//    private fun showGif(picUrl:String){
+//        Glide.with(context).asGif().listener(object : RequestListener<com.bumptech.glide.load.resource.gif.GifDrawable> {
+//            override fun onLoadFailed(e: GlideException?, model: Any, target: Target<com.bumptech.glide.load.resource.gif.GifDrawable>, isFirstResource: Boolean): Boolean {
+//                return false
+//            }
+//
+//            override fun onResourceReady(resource: com.bumptech.glide.load.resource.gif.GifDrawable, model: Any, target: Target<com.bumptech.glide.load.resource.gif.GifDrawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+//                try {
+//                    val gifStateField = com.bumptech.glide.load.resource.gif.GifDrawable::class.java.getDeclaredField("state")
+//                    gifStateField.isAccessible = true
+//                    val gifStateClass = Class.forName("com.bumptech.glide.load.resource.gif.GifDrawable\$GifState")
+//                    val gifFrameLoaderField = gifStateClass.getDeclaredField("frameLoader")
+//                    gifFrameLoaderField.isAccessible = true
+//                    val gifFrameLoaderClass = Class.forName("com.bumptech.glide.load.resource.gif.GifFrameLoader")
+//                    val gifDecoderField = gifFrameLoaderClass.getDeclaredField("gifDecoder")
+//                    gifDecoderField.isAccessible = true
+//                    val gifDecoderClass = Class.forName("com.bumptech.glide.gifdecoder.GifDecoder")
+//                    val gifDecoder = gifDecoderField.get(gifFrameLoaderField.get(gifStateField.get(resource)))
+//                    val getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", Int::class.javaPrimitiveType!!)
+//                    getDelayMethod.isAccessible = true
+//                    //设置只播放一次
+//                    resource.setLoopCount(1)
+//                    //获得总帧数
+//                    val count = resource.frameCount
+//                    var delay = 0
+//                    for (i in 0 until count) {
+//                        //计算每一帧所需要的时间进行累加
+//                        delay += getDelayMethod.invoke(gifDecoder, i) as Int
+//                    }
+//                    Log.e("tag","delay:"+delay)
+//                } catch (e: NoSuchFieldException) {
+//                    e.printStackTrace()
+//                } catch (e: ClassNotFoundException) {
+//                    e.printStackTrace()
+//                } catch (e: IllegalAccessException) {
+//                    e.printStackTrace()
+//                } catch (e: NoSuchMethodException) {
+//                    e.printStackTrace()
+//                } catch (e: InvocationTargetException) {
+//                    e.printStackTrace()
+//                }
+//                return false
+//            }
+//        }).diskCacheStrategy(DiskCacheStrategy.RESOURCE).load(R.mipmap.egg).into(img_egg)
+//    }
 
     private fun requestData(mContext: Context) {
         NetWork.getService(ImpService::class.java)
@@ -149,8 +229,6 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 }
                             })
                             tv_jb.setText(t.data.money)
-
-
                         }
                     }
 
@@ -164,5 +242,26 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         return R.layout.za_dialog_layout
     }
 
+    private fun showAnim(picUrl: String) {
+        boxView.alpha = 0f
+        boxView.translationX = 0f
+        boxView.translationY = 0f
+        Glide.with(context).load(picUrl).into(boxView)
+        //var width = boxLayout.width /2- DisplayUtils.dp2px(context!!, 22)//活动范围是高度
+        var width = boxLayout.width /2- DisplayUtils.dp2px(context!!, 22)//活动范围是高度
+        var height = boxLayout.height / 2//边界检测
+
+        val x = floatArrayOf(0.3f, 0.4f, 0.5f, 0.6f, 0.7f)
+        val xv = (Math.random() * x.size).toInt()
+        var offsetX = (x[xv] * width).toInt()//偏移的位置
+        //var offsetY = -(Math.random() * height).toInt()
+        val f = floatArrayOf(0.7f, 0.72f, 0.73f)
+        val v = (Math.random() * f.size).toInt()
+        var offsetY = -(f[v] * height).toInt() + DisplayUtils.dp2px(context!!, 5)//偏移的高度
+        if (offsetX < (boxLayout.width / 2)) {
+            offsetX = -offsetX;
+        }
+        ViewCompat.animate(boxView).alpha(1f).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).setDuration(700).start()
+    }
 
 }

@@ -54,6 +54,7 @@
                 android:textColor="@color/white" />
 
             <FrameLayout
+                android:id="@+id/boxLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -61,7 +62,8 @@
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="20dp">
+                  android:paddingTop="20dp"
+                    >
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -84,16 +86,21 @@
                             android:textColor="#FFCF11" />
                     </FrameLayout>
 
-                    <pl.droidsonroids.gif.GifImageView
-                        android:id="@+id/img_egg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
 
-                        android:src="@mipmap/egg"
-                        android:layout_marginBottom="10dp"
-                       />
+                        <pl.droidsonroids.gif.GifImageView
+                            android:id="@+id/img_egg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@mipmap/egg"
+                            android:layout_marginBottom="10dp"/>
 
+                        <ImageView
+                            android:id="@+id/boxView"
+                            android:layout_width="44dp"
+                            android:scaleType="fitXY"
+                            android:layout_gravity="center"
+                            android:layout_height="44dp"/>
                 </FrameLayout>
 
                 <ImageView
