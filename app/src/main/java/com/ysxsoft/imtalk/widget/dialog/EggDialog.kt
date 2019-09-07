@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPropertyAnimatorListener
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
@@ -93,9 +94,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
 
             when (type) {
                 "1" -> {
-                    boxView.alpha = 0f
-                    boxView.translationX = 0f
-                    boxView.translationY = 0f
+                   boxViewLayout.removeAllViews()
                     gifDrawable!!.start(); //开始播放
                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                     gifDrawable!!.reset()
@@ -103,9 +102,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 }
 
                 "2" -> {
-                    boxView.alpha = 0f
-                    boxView.translationX = 0f
-                    boxView.translationY = 0f
+                    boxViewLayout.removeAllViews()
                     gifDrawable!!.start(); //开始播放
                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                     gifDrawable!!.reset()
@@ -113,9 +110,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 }
 
                 "3" -> {
-                    boxView.alpha = 0f
-                    boxView.translationX = 0f
-                    boxView.translationY = 0f
+                    boxViewLayout.removeAllViews()
                     gifDrawable!!.start(); //开始播放
                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                     gifDrawable!!.reset()
@@ -146,8 +141,26 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 if (isClick) {
                                     ZdData()
                                 }
-                            } else {
-                                //播放飞出动画
+                            } else if("1".equals(type)) {
+                                //砸1次
+                                android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                    showAnim(t.data.aw_pic)
+                                }, 3000)
+                            }else if("2".equals(type)) {
+                                //砸10次
+                                android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                    showAnim(t.data.aw_pic)
+                                }, 3000)
+                            }else{
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     showAnim(t.data.aw_pic)
                                 }, 3000)
@@ -243,25 +256,32 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
     }
 
     private fun showAnim(picUrl: String) {
-        boxView.alpha = 0f
-        boxView.translationX = 0f
-        boxView.translationY = 0f
+        val v = View.inflate(mContext, R.layout.view_box, null)
+        val boxView = v.findViewById<ImageView>(R.id.boxView)
+        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        layoutParams.gravity=Gravity.CENTER;
+        v.layoutParams = layoutParams
+        v.alpha = 0f
+        v.translationX = 0f
+        v.translationY = 0f
         Glide.with(context).load(picUrl).into(boxView)
-        //var width = boxLayout.width /2- DisplayUtils.dp2px(context!!, 22)//活动范围是高度
-        var width = boxLayout.width /2- DisplayUtils.dp2px(context!!, 22)//活动范围是高度
+        //var width = boxLayout.width /2- DisplayUtils.dp2px(context!!, 22)
+        var width = boxLayout.width /2
         var height = boxLayout.height / 2//边界检测
 
-        val x = floatArrayOf(0.3f, 0.4f, 0.5f, 0.6f, 0.7f)
+        val x = floatArrayOf(0.1f, 0.2f, 0.3f,0.5f,0.6f,1.0f,1.1f,1.2f,1.3f,1.5f,1.6f)
         val xv = (Math.random() * x.size).toInt()
-        var offsetX = (x[xv] * width).toInt()//偏移的位置
+        var offsetX = (x[xv] * width).toInt()
         //var offsetY = -(Math.random() * height).toInt()
-        val f = floatArrayOf(0.7f, 0.72f, 0.73f)
-        val v = (Math.random() * f.size).toInt()
-        var offsetY = -(f[v] * height).toInt() + DisplayUtils.dp2px(context!!, 5)//偏移的高度
+        val f = floatArrayOf(0.3f,0.4f,0.5f,0.6f, 0.72f, 0.73f)
+        val yv = (Math.random() * f.size).toInt()
+        var offsetY = -(f[yv] * height).toInt() + DisplayUtils.dp2px(context!!, 5)//偏移的高度
         if (offsetX < (boxLayout.width / 2)) {
             offsetX = -offsetX;
+        }else{
+            offsetX=offsetX-boxLayout.width/2;
         }
-        ViewCompat.animate(boxView).alpha(1f).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).setDuration(700).start()
+        boxViewLayout.addView(v)
+        ViewCompat.animate(v).alpha(1f).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).setDuration(700).start()
     }
-
 }
