@@ -6,8 +6,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.SpUtils
@@ -20,7 +22,7 @@ import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.conversation.*
 import kotlinx.android.synthetic.main.fm_family_find.*
 import kotlinx.android.synthetic.main.tab_item_layout.*
-import kotlinx.android.synthetic.main.title_layout.*
+import kotlinx.android.synthetic.main.conversation.*
 import java.util.*
 
 
@@ -47,35 +49,37 @@ class ConversationActivity : BaseActivity() {
         super.onCreate(savedInstanceState, persistentState)
 //        Theme.AppCompat.Light.DarkActionBar
         // 没有intent 的则直接返回
-        val intent = intent
-        if (intent == null || intent.data == null) {
+//        val intent = intent
+//        if (intent == null || intent.data == null) {
+//            finish()
+//            return
+//        }
+//        targetId = intent.data!!.getQueryParameter("targetId")
+//        conversationType = Conversation.ConversationType.valueOf(intent.data!!.lastPathSegment.toUpperCase(Locale.US))
+//        title1 = intent.data!!.getQueryParameter("title")
+//        val fragmentManage = supportFragmentManager
+//        val fragement = fragmentManage.findFragmentById(R.id.conversation) as ConversationFragment
+//        val uri = Uri.parse("rong://" + applicationInfo.packageName).buildUpon()
+//                .appendPath("conversation")
+//                .appendPath(conversationType!!.getName().toLowerCase())
+//                .appendQueryParameter("targetId", targetId).build()
+//        fragement.uri = uri
+        Log.e("tag","已执行");
+        img_back.setOnClickListener(View.OnClickListener {
+            Log.e("tag","已执行点击");
             finish()
-            return
-        }
-        targetId = intent.data!!.getQueryParameter("targetId")
-        conversationType = Conversation.ConversationType.valueOf(intent.data!!.lastPathSegment.toUpperCase(Locale.US))
-        title1 = intent.data!!.getQueryParameter("title")
-        val fragmentManage = supportFragmentManager
-        val fragement = fragmentManage.findFragmentById(R.id.conversation) as ConversationFragment
-        val uri = Uri.parse("rong://" + applicationInfo.packageName).buildUpon()
-                .appendPath("conversation")
-                .appendPath(conversationType!!.getName().toLowerCase())
-                .appendQueryParameter("targetId", targetId).build()
-        fragement.uri = uri
-    }
-
-    override fun initUi() {
-        super.initUi()
-        initTitleBar(conversationType!!,targetId)
+        })
+        tv_title.text="1111"
+//        initTitleBar(conversationType!!,targetId)
     }
 
     private fun initTitleBar(conversationType: Conversation.ConversationType, targetId: String?) {
-        img_back.setImageResource(R.mipmap.img_black_back)
-        img_back.isClickable=true;
+        Log.e("tag","已执行");
+        val img_back=findViewById<ImageView>(R.id.img_back)
         img_back.setOnClickListener(View.OnClickListener {
+            Log.e("tag","已执行点击");
             finish()
         })
-        img_back.visibility=View.VISIBLE
         img_right.setOnClickListener(View.OnClickListener {
             toDetailActivity(conversationType, targetId)
         })
@@ -84,8 +88,6 @@ class ConversationActivity : BaseActivity() {
         }else if(conversationType == Conversation.ConversationType.GROUP){
             img_back.setImageResource(R.mipmap.icon_group_profile)
         }
-        img_right.isClickable=true;
-        img_right.visibility=View.VISIBLE
         tv_title.text="1111"
     }
 

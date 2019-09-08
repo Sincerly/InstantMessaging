@@ -162,8 +162,9 @@
             </intent-filter>
         </receiver>
 
+<!--        android:name=".im.ui.ConversationActivity"-->
         <activity
-            android:name=".im.ui.ConversationActivity"
+            android:name=".im.ui.ConversionTwoActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
