@@ -20,6 +20,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
@@ -31,10 +33,15 @@ import com.ysxsoft.imtalk.utils.FileUtils;
 import com.ysxsoft.imtalk.utils.ToastUtils;
 
 import java.io.File;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.manager.SendImageManager;
 import io.rong.imkit.plugin.IPluginModule;
 import io.rong.imkit.plugin.IPluginRequestPermissionResultCallback;
 import io.rong.imkit.plugin.image.PictureSelectorActivity;
@@ -49,7 +56,7 @@ import io.rong.message.ImageMessage;
  * Create By 胡
  * on 2019/8/15 0015
  */
-public class MyPlugin implements IPluginModule,IPluginRequestPermissionResultCallback {
+public class MyPlugin implements IPluginModule, IPluginRequestPermissionResultCallback {
     Conversation.ConversationType conversationType;
     String targetId;
 
@@ -79,32 +86,47 @@ public class MyPlugin implements IPluginModule,IPluginRequestPermissionResultCal
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (resultCode == Activity.RESULT_OK) {
-//            Uri uri = data.getData();
-//            ImageMessage imageMessage = ImageMessage.obtain(null, uri);
-//            RongIM.getInstance().sendImageMessage(Conversation.ConversationType.PRIVATE, targetId, imageMessage, null, null, new RongIMClient.SendImageMessageCallback() {
+        if (resultCode == Activity.RESULT_OK) {
+            String json = data.getStringExtra("android.intent.extra.RETURN_RESULT");
+            Type type = new TypeToken<LinkedHashMap<String, Integer>>() {}.getType();
+            Gson g = new Gson();
+            LinkedHashMap<String, Integer> map = g.fromJson(json, type);
+
+            List<Uri> uris=new ArrayList<>();
+            for(Map.Entry<String,Integer> key:map.entrySet()){
+                Uri uri=Uri.parse(key.getKey());
+                uris.add(uri);
+//                ImageMessage imageMessage = ImageMessage.obtain(null, uri);
+//                RongIM.getInstance().getInstance().sendImageMessage(Conversation.ConversationType.PRIVATE, targetId, imageMessage, null, null, new RongIMClient.SendImageMessageCallback() {
 //
-//                @Override
-//                public void onAttached(Message message) {
-//                    //保存数据库成功
-//                }
+//                    @Override
+//                    public void onAttached(Message message) {
+//                        //保存数据库成功
+//                    }
 //
-//                @Override
-//                public void onError(Message message, RongIMClient.ErrorCode code) {
-//                    //发送失败
-//                }
+//                    @Override
+//                    public void onError(Message message, RongIMClient.ErrorCode code) {
+//                        //发送失败
+//                        Log.e("tag","图片发送onError!");
+//                    }
 //
-//                @Override
-//                public void onSuccess(Message message) {
-//                    //发送成功
-//                }
+//                    @Override
+//                    public void onSuccess(Message message) {
+//                        //发送成功
+//                        Log.e("tag","图片发送onSuccess!");
+//                    }
 //
-//                @Override
-//                public void onProgress(Message message, int progress) {
-//                    //发送进度
-//                }
-//            });
-//        }
+//                    @Override
+//                    public void onProgress(Message message, int progress) {
+//                        //发送进度
+//                    }
+//                });
+            }
+
+
+            SendImageManager.getInstance().sendImages(Conversation.ConversationType.PRIVATE, targetId, uris, false);
+
+        }
     }
 
 

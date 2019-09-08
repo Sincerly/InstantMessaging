@@ -14,6 +14,7 @@ import com.ysxsoft.imtalk.view.MyDataActivity;
 
 import java.util.Locale;
 
+import io.rong.imkit.fragment.ConversationFragment;
 import io.rong.imlib.model.Conversation;
 
 public class ConversionTwoActivity extends BaseActivity implements View.OnClickListener {
@@ -48,6 +49,8 @@ public class ConversionTwoActivity extends BaseActivity implements View.OnClickL
                 .getLastPathSegment().toUpperCase(Locale.US));
         conversationTitle = intent.getData().getQueryParameter("title");
         initTitleBar();
+
+        ConversationFragment fragment= (ConversationFragment) getSupportFragmentManager().findFragmentById(R.id.conversation);
     }
 
     private void initTitleBar() {
@@ -94,5 +97,6 @@ public class ConversionTwoActivity extends BaseActivity implements View.OnClickL
         } else if (conversationType == Conversation.ConversationType.DISCUSSION) {
         }
     }
+
 
 }

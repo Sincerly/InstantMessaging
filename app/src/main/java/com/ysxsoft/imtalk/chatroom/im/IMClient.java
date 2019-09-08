@@ -91,7 +91,7 @@ public class IMClient {
                         }
                     }
                 }
-                return true;
+                return false;
             }
         });
     }

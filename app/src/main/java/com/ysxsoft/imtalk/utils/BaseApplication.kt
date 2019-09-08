@@ -121,7 +121,7 @@ class BaseApplication : MyApplication() {
 
             val intent = Intent("RECEIVEMESSAGE")
             sendBroadcast(intent)
-            return true
+            return false
         }
     }
 
