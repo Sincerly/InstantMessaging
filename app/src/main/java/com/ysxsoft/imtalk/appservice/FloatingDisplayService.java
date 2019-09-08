@@ -16,9 +16,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
+import com.ysxsoft.imtalk.utils.ImageLoadUtil;
 import com.ysxsoft.imtalk.widget.CircleImageView;
 
 public class FloatingDisplayService extends Service {
@@ -29,6 +33,9 @@ public class FloatingDisplayService extends Service {
     private View displayView;
     private int mWindowWidth;
     private int mWindowHeight;
+    private CircleImageView imageView;
+    @org.jetbrains.annotations.Nullable
+    private String icon;
 
     @Override
     public void onCreate() {
@@ -60,9 +67,13 @@ public class FloatingDisplayService extends Service {
 
     public MyBinder mBinder = new MyBinder();
 
+    public void setImg(@org.jetbrains.annotations.Nullable String icon) {
+        this.icon = icon;
+    }
+
     public class MyBinder extends Binder {
-        public void CancleService() {
-            stopService(new Intent("com.ysxsoft.imtalk.appservice.FloatingDisplayService"));
+        public FloatingDisplayService getService(){
+            return FloatingDisplayService.this;
         }
     }
 
@@ -79,8 +90,17 @@ public class FloatingDisplayService extends Service {
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             displayView = layoutInflater.inflate(R.layout.floatwindow_layout, null);
             displayView.setOnTouchListener(new FloatingOnTouchListener());
-            CircleImageView imageView = displayView.findViewById(R.id.img_head);
+            imageView = displayView.findViewById(R.id.img_head);
+            Glide.with(MyApplication.mcontext).load(icon).into(imageView);
             windowManager.addView(displayView, layoutParams);
+            FrameLayout viewById = displayView.findViewById(R.id.fl);
+            viewById.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MyApplication.mcontext, FloatingDisplayService.class);
+                    stopService(intent);
+                }
+            });
         }
     }
 

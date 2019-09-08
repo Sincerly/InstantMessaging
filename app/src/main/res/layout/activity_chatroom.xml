@@ -384,6 +384,7 @@
                 android:layout_height="32dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
+                android:visibility="gone"
                 android:src="@mipmap/img_simle" />
 
             <ImageView

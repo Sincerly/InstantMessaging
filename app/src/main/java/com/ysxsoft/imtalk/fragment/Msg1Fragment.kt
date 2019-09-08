@@ -10,6 +10,7 @@ import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.MsgChatListAdapter
+import com.ysxsoft.imtalk.bean.UserInfo
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.widget.SysCustomerBanner
 import io.rong.imkit.RongIM
@@ -17,6 +18,8 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.fm_msg1.*
 import io.rong.imkit.model.ConversationProviderTag
+import org.litepal.LitePal
+import org.litepal.extension.find
 
 
 /**
@@ -53,7 +56,7 @@ class Msg1Fragment : BaseFragment() {
 
         conversionList()
     }
-
+    var userInfo:UserInfo?=null
     private fun conversionList() {
         RongIMClient.getInstance().getConversationList(object : RongIMClient.ResultCallback<MutableList<Conversation>>() {
             override fun onSuccess(datas: MutableList<Conversation>?) {
@@ -69,11 +72,16 @@ class Msg1Fragment : BaseFragment() {
         })
         mAdapter!!.setOnChatMsgListener(object : MsgChatListAdapter.OnChatMsgListener {
             override fun onClick(position: Int) {
+
                 val targetId = mAdapter!!.dataList.get(position).targetId
                 val type = mAdapter!!.dataList.get(position).conversationType
+                val list = LitePal.where("uid=?", targetId).find<com.ysxsoft.imtalk.bean.UserInfo>()
+                if(list.size>0){
+                     userInfo = list.get(0)
+                }
                 when (type) {
                     Conversation.ConversationType.PRIVATE -> {
-                        RongIM.getInstance().startPrivateChat(getActivity(), targetId, "标题");
+                        RongIM.getInstance().startPrivateChat(getActivity(), targetId, userInfo!!.nikeName);
                     }
                     Conversation.ConversationType.GROUP -> {
                         RongIM.getInstance().startGroupChat(getActivity(), targetId, "标题");

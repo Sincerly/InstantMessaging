@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
 import android.widget.ImageView
@@ -54,7 +55,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
     lateinit var adapter1: BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>
     lateinit var adapter2: BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>
-    var mydatabean:UserInfoBean?=null
+    var mydatabean: UserInfoBean? = null
 
     override fun getLayoutResId(): Int {
         return R.layout.fm_home
@@ -73,6 +74,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         requestMyData()
         initClickListernr()
     }
+
     private fun requestMyData() {
         NetWork.getService(ImpService::class.java)
                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -84,7 +86,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
-                            mydatabean =t
+                            mydatabean = t
                         }
                     }
 
@@ -155,14 +157,14 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                     return decoration
                                 }
                             })
-                            recyclerView1.layoutManager = GridLayoutManager(mContext, 2)
+                            recyclerView1.layoutManager = GridLayoutManager(mContext, 2) as RecyclerView.LayoutManager?
                             recyclerView1.adapter = adapter1
                             adapter2 = object : BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_room, roomLists1) {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<CircleImageView>(R.id.ivAvatar))
                                     helper.getView<TextView>(R.id.tv_name).setText(item.room_name)
                                     helper.getView<TextView>(R.id.tv_Tag).setText(item.label_name)
-                                    helper.getView<TextView>(R.id.tv_Online).setText(item.memCount+"人在线")
+                                    helper.getView<TextView>(R.id.tv_Online).setText(item.memCount + "人在线")
                                     helper.itemView.setOnClickListener {
                                         //                                        ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                                         joinChatRoom(item.room_id.toString(), false)
@@ -194,7 +196,6 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val myBinder = service as (FloatingDisplayService.MyBinder)
-            myBinder.CancleService()
             startActivity(ChatRoomActivity::class.java)
         }
     }
@@ -337,30 +338,25 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                 if (!checkPermissions()) return
                 // 标记正在进入房间
                 isJoiningRoom = true
-                if (TextUtils.isEmpty(result!!.roomInfo.room_id)) joinChatRoom(result.roomInfo.room_id, true) else joinChatRoom(result.roomInfo.room_id, false)
+                if (!TextUtils.isEmpty(result!!.roomInfo.room_id))
+                    joinChatRoom(result.roomInfo.room_id, true)
             }
 
             override fun onFail(errorCode: Int) {
+
             }
         })
     }
 
     private fun joinChatRoom(roomId: String, isCreate: Boolean) {
-        if (!isCreate) {
-            showToastMessage(R.string.toast_joining_room)
-        }
+        showToastMessage(R.string.toast_joining_room)
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                if (isCreate) {
-                    showToastMessage(R.string.toast_create_room_success)
-                } else {
-                    showToastMessage(R.string.toast_join_room_success)
-                }
-                ChatRoomActivity.starChatRoomActivity(mContext, roomId,mydatabean!!.data.nickname,mydatabean!!.data.icon)
+                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
             }
 
             override fun onFail(errorCode: Int) {
-                isJoiningRoom = false
+
             }
         })
     }

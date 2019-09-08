@@ -105,6 +105,10 @@ public class RoomGiftMessage extends MessageContent {
     }
 
     protected RoomGiftMessage(Parcel in) {
+        this.position = in.readInt();
+        this.toPosition = in.readInt();
+        this.giftUrl = in.readString();
+        this.staticUrl = in.readString();
     }
 
     public static final Creator<RoomGiftMessage> CREATOR = new Creator<RoomGiftMessage>() {

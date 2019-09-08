@@ -18,7 +18,7 @@ class GiftTimesAdapter(mContext: Context):ListBaseAdapter<GiftTimesBean.DataBean
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
         holder.getView<TextView>(R.id.tv_name)!!.setText(bean.name)
-        holder.getView<TextView>(R.id.tv_num)!!.setText("X   "+bean.times)
+        holder.getView<TextView>(R.id.tv_num)!!.setText("  "+bean.times)
         holder.itemView.setOnClickListener {
             if (onGiftTimeListener!=null){
                 onGiftTimeListener!!.onClick(position)

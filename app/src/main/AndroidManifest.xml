@@ -147,6 +147,9 @@
         <service android:name=".appservice.MusicService"
             android:enabled="true"
             android:exported="true"/>
+        <service android:name=".appservice.PlayMusicService"
+            android:enabled="true"
+            android:exported="true"/>
 
         <!-- 融云广播接收器 -->
         <receiver

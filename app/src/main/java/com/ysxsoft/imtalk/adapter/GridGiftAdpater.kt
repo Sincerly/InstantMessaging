@@ -23,6 +23,7 @@ class GridGiftAdpater(mContext: Context):ListBaseAdapter<DressMallBean.DataBean>
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideGoodsImageLoad(mContext,bean.pic,holder.getView<ImageView>(R.id.img_gift)!!)
         holder.getView<TextView>(R.id.tv_name)!!.setText(bean.name)
+        holder.getView<TextView>(R.id.tv_gold)!!.setText(bean.gold+"金币")
         if (click==position) {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.drawable.theme_fragme)
         }/*else{

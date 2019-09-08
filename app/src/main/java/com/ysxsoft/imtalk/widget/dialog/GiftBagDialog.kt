@@ -14,6 +14,7 @@ import com.ysxsoft.imtalk.adapter.MicPostionAdapter
 import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.impservice.ImpService
@@ -61,12 +62,6 @@ class GiftBagDialog : ABSDialog {
         }
 
         tv_zs.setOnClickListener {
-            //            for (bean in micPostionAdapter!!.dataList) {
-//                if (bean.isChoosed) {
-//                    sectionNum.append(bean.uid).append(",")
-//                }
-//            }
-
             if (TextUtils.isEmpty(mwuid) || "0".equals(mwuid)) {
                 ToastUtils.showToast(this@GiftBagDialog.context, "赠送人不能为空")
                 return@setOnClickListener
@@ -90,6 +85,7 @@ class GiftBagDialog : ABSDialog {
         }
     }
 
+    val uidList = ArrayList<String>()
     private fun sendGift() {
         val map = HashMap<String, String>()
         map.put("type", giftbage.toString())
@@ -108,11 +104,40 @@ class GiftBagDialog : ABSDialog {
                     }
 
                     override fun onNext(t: CommonBean?) {
-                       if (t!!.code==0){
-                           GifDialog(this@GiftBagDialog.context,gifurl).show()
-                       }else{
-                           ToastUtils.showToast(this@GiftBagDialog.context,t.msg)
-                       }
+                        if (t!!.code == 0) {
+                            for (bean in micPositons!!) {
+                                uidList.add(bean.uid.toString())
+                            }
+                            //TODO 自己位置 对方位置  动态URl 静态URL
+                            if (onGiftListener != null) {
+                                for (bean in micPositons!!) {
+
+                                    if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {//自己在麦位
+                                        val sort = bean.sort
+                                        if (sort == 0 && toPosition != 0) {//自己是房主    送其他人
+                                            onGiftListener!!.onClck(8, toPosition-1, pic!!, gifurl!!)
+                                        } else if (sort == 0 && toPosition == 0){ //房主送房主
+                                            onGiftListener!!.onClck(8, 8, pic!!, gifurl!!)
+                                        }else{
+                                            if (toPosition == 0) {//送房主
+                                                onGiftListener!!.onClck(sort - 1, 8, pic!!, gifurl!!)
+                                            } else {
+                                                onGiftListener!!.onClck(sort - 1, toPosition-1, pic!!, gifurl!!)
+                                            }
+                                        }
+                                    }
+                                    if (!uidList.contains(AuthManager.getInstance().currentUserId)) {//自己没在麦位上
+                                        if (toPosition == 0) {//送房主
+                                            onGiftListener!!.onClck(-1, 8, pic!!, gifurl!!)
+                                        } else {//送其他人
+                                            onGiftListener!!.onClck(-1, toPosition-1, pic!!, gifurl!!)
+                                        }
+                                    }
+                                }
+                            }
+                        }else{
+                            ToastUtils.showToast(this@GiftBagDialog.context,t.msg)
+                        }
                     }
 
                     override fun onCompleted() {
@@ -143,6 +168,7 @@ class GiftBagDialog : ABSDialog {
                                 override fun onBage(position: Int) {
                                     giftid = bageAdpater.dataList.get(position).id.toString()
                                     gifurl = bageAdpater.dataList.get(position).aw_gif
+                                    pic = bageAdpater.dataList.get(position).aw_images
                                     bageAdpater.setSelect(position)
                                 }
                             })
@@ -173,6 +199,7 @@ class GiftBagDialog : ABSDialog {
     }
 
     var giftid: String? = null
+    var pic: String? = null
 
     //礼物数据
     private fun GiftData() {
@@ -190,6 +217,7 @@ class GiftBagDialog : ABSDialog {
                             giftAdpater.setOnClickListener(object : GridGiftAdpater.OnClickListener {
                                 override fun onGift(position: Int) {
                                     giftid = giftAdpater.dataList.get(position).id.toString()
+                                    pic = giftAdpater.dataList.get(position).pic
                                     gifurl = giftAdpater.dataList.get(position).gif_pic
                                     giftAdpater.setSelect(position)
                                 }
@@ -200,6 +228,8 @@ class GiftBagDialog : ABSDialog {
     }
 
     var mwuid: String? = null
+    var toPosition = -2
+    var micPositons: List<RoomMicListBean.DataBean>? = null
     var micPostionAdapter: MicPostionAdapter? = null
     //麦位头像数据
     private fun MwData(room_id: String, mContext: Context) {
@@ -210,6 +240,7 @@ class GiftBagDialog : ABSDialog {
                 .subscribe(object : Action1<RoomMicListBean> {
                     override fun call(t: RoomMicListBean?) {
                         if (t!!.code == 0) {
+                            micPositons = t.data
                             micPostionAdapter = MicPostionAdapter(mContext)
                             val manager = LinearLayoutManager(mContext)
                             manager.orientation = LinearLayoutManager.HORIZONTAL
@@ -219,6 +250,7 @@ class GiftBagDialog : ABSDialog {
                             micPostionAdapter!!.setOnClickListener(object : MicPostionAdapter.OnClickListener {
                                 override fun onClick(position: Int) {
                                     mwuid = micPostionAdapter!!.dataList.get(position).uid.toString()
+                                    toPosition = micPostionAdapter!!.dataList.get(position).sort
                                     micPostionAdapter!!.setSelect(position)
                                 }
                             })
@@ -254,4 +286,13 @@ class GiftBagDialog : ABSDialog {
         userInfo()
     }
 
+    interface OnGiftListener {
+        fun onClck(targetPosition: Int, toPosition: Int, pic: String, gifPic: String)
+    }
+
+    private var onGiftListener: OnGiftListener? = null
+
+    fun setonGiftListener(onGiftListener: OnGiftListener) {
+        this.onGiftListener = onGiftListener
+    }
 }

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ll_bg"
     android:layout_width="75dp"
-    android:layout_height="75dp"
+    android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="8dp">
@@ -27,5 +27,15 @@
             android:textColor="@color/white"
             android:textSize="10sp"
             tools:text="玫瑰" />
+
+           <TextView
+            android:id="@+id/tv_gold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            tools:text="100" />
+
     </LinearLayout>
 </LinearLayout>

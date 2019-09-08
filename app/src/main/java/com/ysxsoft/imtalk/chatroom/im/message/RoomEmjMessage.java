@@ -81,6 +81,8 @@ public class RoomEmjMessage extends MessageContent {
     }
 
     protected RoomEmjMessage(Parcel in) {
+        this.position = in.readInt();
+        this.imageUrl = in.readString();
     }
 
     public static final Creator<RoomEmjMessage> CREATOR = new Creator<RoomEmjMessage>() {

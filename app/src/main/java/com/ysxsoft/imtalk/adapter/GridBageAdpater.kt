@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -23,6 +24,7 @@ class GridBageAdpater(mContext: Context) : ListBaseAdapter<BageListBean.DataBean
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideGoodsImageLoad(mContext, bean.aw_images, holder.getView<ImageView>(R.id.img_gift)!!)
         holder.getView<TextView>(R.id.tv_name)!!.setText(bean.aw_name)
+        holder.getView<TextView>(R.id.tv_gold)!!.visibility=View.GONE
         if (click == position) {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.drawable.theme_fragme)
         }

@@ -1,8 +1,12 @@
 package com.ysxsoft.imtalk.fragment
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Context.BIND_AUTO_CREATE
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 
 import android.view.View
@@ -14,14 +18,18 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.appservice.MyService
+import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.RoomMusicListBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.music.AudioUtils
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.displayRes
 import kotlinx.android.synthetic.main.fragment_my_song_book.*
+import kotlinx.android.synthetic.main.fragment_my_song_book.view.*
 import kotlinx.android.synthetic.main.include_my_song_book_empty.*
 import kotlinx.android.synthetic.main.include_onlyrecyclerview.*
 import rx.Observer
@@ -48,6 +56,8 @@ class MySongBookFragment : BaseFragment() {
     }
 
     override fun initUi() {
+        seekBarMusic.progress = AudioUtils.getCurrentAudioVolume(mContext)
+        seekBarMusic.setMax(AudioUtils.getMaxAudioVolume(context));//最大音量
         setClickListener()
         requestData()
     }
@@ -76,6 +86,7 @@ class MySongBookFragment : BaseFragment() {
 
     }
 
+    var position = 0
     private fun initAdapter() {
         adapter = object : BaseQuickAdapter<RoomMusicListBean.DataBean, BaseViewHolder>(R.layout.item_music, lists) {
             override fun convert(helper: BaseViewHolder?, item: RoomMusicListBean.DataBean?) {
@@ -88,12 +99,30 @@ class MySongBookFragment : BaseFragment() {
                 helper.getView<TextView>(R.id.tvSongName)!!.setText(item!!.music_name)
                 helper.getView<TextView>(R.id.tvName)!!.setText(item.a_name)
                 helper.itemView.setOnClickListener {
-                    showToastMessage("播放音乐")
+                   position = helper.adapterPosition
+                    startService()
                 }
             }
         }
         recyclerView.layoutManager = LinearLayoutManager(mContext)
         recyclerView.adapter = adapter
+    }
+
+    private fun startService() {
+        val intent = Intent(mContext, PlayMusicService::class.java)
+        activity!!.bindService(intent, connection, BIND_AUTO_CREATE)
+    }
+
+    var playMusicService: PlayMusicService? = null
+    var connection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val myBind = service as (PlayMusicService.MyBind)
+            playMusicService = myBind.service
+            playMusicService!!.setData(lists,position)
+        }
     }
 
     private fun DelMusic(roomId: String?, id: Int) {
@@ -164,6 +193,7 @@ class MySongBookFragment : BaseFragment() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val percentage = "$progress%"
                 tvSeekMusic.text = percentage
+                AudioUtils.setAudioVolume(mContext, progress)
             }
         })
     }
@@ -173,6 +203,7 @@ class MySongBookFragment : BaseFragment() {
     }
 
     private var onAddMusicClickListener: OnAddMusicClickListener? = null
+
     fun setOnAddMusicClickListener(onAddMusicClickListener: OnAddMusicClickListener) {
         this.onAddMusicClickListener = onAddMusicClickListener
     }
