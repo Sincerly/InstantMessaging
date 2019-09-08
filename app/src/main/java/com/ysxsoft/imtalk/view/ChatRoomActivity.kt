@@ -51,8 +51,10 @@ import com.ysxsoft.imtalk.chatroom.task.role.Role
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetPlugReceiver
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetUtils
+import com.ysxsoft.imtalk.chatroom.utils.MyApplication
 import com.ysxsoft.imtalk.chatroom.widget.MicSeatView
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.music.CustomeWindow
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.dialog.*
 import io.rong.imkit.RongIM
@@ -242,16 +244,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
-    var connection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {
-        }
-
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val myBinder = service as (FloatingDisplayService.MyBinder)
-             floatingDisplayService = myBinder.service
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -305,13 +297,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickSmall() {
-                    if (FloatingDisplayService.isStarted) {
-                        return
-                    }
+
                     if (!Settings.canDrawOverlays(mContext)) {
                         startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                     } else {
-                        startService(Intent(this@ChatRoomActivity, FloatingDisplayService::class.java))
+                        val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
+                        customeWindow.show()
+                        finish()
                     }
                 }
 
@@ -371,14 +363,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickSmall() {
-                    if (FloatingDisplayService.isStarted) {
-                        return
-                    }
                     if (!Settings.canDrawOverlays(mContext)) {
                         startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                     } else {
-                        startService(Intent(this@ChatRoomActivity, FloatingDisplayService::class.java))
-//                        floatingDisplayService!!.setImg(mydatabean!!.data.icon)
+                        val customeWindow = CustomeWindow(BaseApplication.mContext!!,mydatabean!!.data.icon)
+                        customeWindow.show()
+                        finish()
                     }
                 }
 
@@ -1597,8 +1587,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             if (!Settings.canDrawOverlays(this)) {
                 showToastMessage("授权失败")
             } else {
-                startService(Intent(this@ChatRoomActivity, FloatingDisplayService::class.java))
-                finish()
+                val customeWindow = CustomeWindow(BaseApplication.mContext!!,mydatabean!!.data.icon)
+                customeWindow.show()
             }
         }
         if (requestCode == 1033 && resultCode == 1035) {
@@ -1820,7 +1810,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 if (!Settings.canDrawOverlays(mContext)) {
                     startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                 } else {
-                    startService(Intent(this@ChatRoomActivity, FloatingDisplayService::class.java))
+                    val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
+                    customeWindow.show()
+                    finish()
                 }
             }
 

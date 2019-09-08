@@ -108,10 +108,8 @@ class GiftBagDialog : ABSDialog {
                             for (bean in micPositons!!) {
                                 uidList.add(bean.uid.toString())
                             }
-                            //TODO 自己位置 对方位置  动态URl 静态URL
                             if (onGiftListener != null) {
                                 for (bean in micPositons!!) {
-
                                     if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {//自己在麦位
                                         val sort = bean.sort
                                         if (sort == 0 && toPosition != 0) {//自己是房主    送其他人
@@ -126,12 +124,13 @@ class GiftBagDialog : ABSDialog {
                                             }
                                         }
                                     }
-                                    if (!uidList.contains(AuthManager.getInstance().currentUserId)) {//自己没在麦位上
-                                        if (toPosition == 0) {//送房主
-                                            onGiftListener!!.onClck(-1, 8, pic!!, gifurl!!)
-                                        } else {//送其他人
-                                            onGiftListener!!.onClck(-1, toPosition-1, pic!!, gifurl!!)
-                                        }
+                                }
+
+                                if (!uidList.contains(AuthManager.getInstance().currentUserId)) {//自己没在麦位上
+                                    if (toPosition == 0) {//送房主
+                                        onGiftListener!!.onClck(-1, 8, pic!!, gifurl!!)
+                                    } else {//送其他人
+                                        onGiftListener!!.onClck(-1, toPosition-1, pic!!, gifurl!!)
                                     }
                                 }
                             }

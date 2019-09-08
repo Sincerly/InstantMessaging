@@ -98,7 +98,7 @@ public class PlayMusicService extends Service {
         musics.clear();
         musics.addAll(m);
         if (musics != null && musics.size() > 0) {
-            musicPlay(musics.get(position).getMusic_url());//TODO:去除音乐播放
+            musicPlay(musics.get(position).getMusic_url());
         }
     }
     public void next() {
