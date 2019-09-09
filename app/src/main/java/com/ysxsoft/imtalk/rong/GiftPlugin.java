@@ -8,6 +8,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
+import com.ysxsoft.imtalk.widget.dialog.GiftBagDialog;
+import com.ysxsoft.imtalk.widget.dialog.SendGiftDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.plugin.IPluginModule;
@@ -32,7 +38,14 @@ public class GiftPlugin implements IPluginModule,IPluginRequestPermissionResultC
 
     @Override
     public void onClick(Fragment fragment, RongExtension rongExtension) {
-
+        SendGiftDialog sendGiftDialog=new SendGiftDialog(fragment.getActivity(),rongExtension.getTargetId());
+        sendGiftDialog.setOnSendGiftListener(new SendGiftDialog.OnSendGiftListener() {
+            @Override
+            public void onSendSuccess(@NotNull String from, @Nullable String to, @NotNull String giftId, @NotNull String giftNum) {
+                ToastUtils.showToast("from"+from+" to:"+to+" giftId:"+giftId+" giftNum:"+giftNum);
+            }
+        });
+        sendGiftDialog.show();
     }
 
     @Override
