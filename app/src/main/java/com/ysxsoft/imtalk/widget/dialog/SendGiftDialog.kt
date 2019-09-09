@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.view.Gravity
@@ -162,7 +163,7 @@ class SendGiftDialog : ABSDialog {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
-                            tv_gold.setText(t.data.money)
+                            tv_gold.setText(t.data.money+"金币")
                         }
                     }
 
@@ -212,6 +213,15 @@ class SendGiftDialog : ABSDialog {
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         params.width = ViewGroup.LayoutParams.MATCH_PARENT
         window.attributes = params
+
+        // 1.水平分页布局管理器
+        val layoutManager = PagerGridLayoutManager(2, 4, PagerGridLayoutManager.HORIZONTAL)
+        grid_view.setLayoutManager(layoutManager)
+
+        // 2.设置滚动辅助工具
+        val pageSnapHelper = PagerGridSnapHelper()
+        pageSnapHelper.attachToRecyclerView(grid_view)
+
         GiftData()
         userInfo()
     }
