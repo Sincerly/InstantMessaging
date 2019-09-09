@@ -8,10 +8,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.view.DressMallActivity;
 
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.plugin.IPluginModule;
 import io.rong.imkit.plugin.IPluginRequestPermissionResultCallback;
+import io.rong.imlib.model.Conversation;
 
 /**
  * Create By 胡
@@ -30,7 +32,10 @@ public class ZBPlugin implements IPluginModule,IPluginRequestPermissionResultCal
 
     @Override
     public void onClick(Fragment fragment, RongExtension rongExtension) {
-
+       String targetId = rongExtension.getTargetId();
+       Intent intent=new Intent(fragment.getActivity(),DressMallActivity.class);
+       intent.putExtra("targetId",targetId);
+       fragment.getActivity().startActivity(intent);
     }
 
     @Override

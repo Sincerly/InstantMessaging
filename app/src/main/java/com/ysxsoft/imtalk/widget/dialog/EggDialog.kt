@@ -23,6 +23,7 @@ import com.ysxsoft.imtalk.adapter.TimesAdapter
 import com.ysxsoft.imtalk.bean.AwardListDataBean
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.EggBean
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.NetWork
@@ -94,26 +95,14 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
 
             when (type) {
                 "1" -> {
-                   boxViewLayout.removeAllViews()
-                    gifDrawable!!.start(); //开始播放
-                    gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
-                    gifDrawable!!.reset()
                     ZdData()
                 }
 
                 "2" -> {
-                    boxViewLayout.removeAllViews()
-                    gifDrawable!!.start(); //开始播放
-                    gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
-                    gifDrawable!!.reset()
                     ZdData()
                 }
 
                 "3" -> {
-                    boxViewLayout.removeAllViews()
-                    gifDrawable!!.start(); //开始播放
-                    gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
-                    gifDrawable!!.reset()
                     ZdData()
                 }
                 "4" -> {
@@ -142,27 +131,34 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                     ZdData()
                                 }
                             } else if("1".equals(type)) {
+                                boxViewLayout.removeAllViews()
+                                gifDrawable!!.start(); //开始播放
+                                gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
+                                gifDrawable!!.reset()
                                 //砸1次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
-                                    showAnim(t.data.aw_pic)
+                                    showAnim(t!!.data[0].aw_pic)
                                 }, 3000)
                             }else if("2".equals(type)) {
+                                boxViewLayout.removeAllViews()
+                                gifDrawable!!.start(); //开始播放
+                                gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
+                                gifDrawable!!.reset()
                                 //砸10次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
-                                    showAnim(t.data.aw_pic)
+                                    for (bean in t!!.data) {
+                                        showAnim(bean!!.sg_pic)
+                                    }
                                 }, 3000)
                             }else{
+                                boxViewLayout.removeAllViews()
+                                gifDrawable!!.start(); //开始播放
+                                gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
+                                gifDrawable!!.reset()
+                                //砸蛋100次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
-                                    showAnim(t.data.aw_pic)
+                                    //跳转到列表
+
                                 }, 3000)
                             }
                         }

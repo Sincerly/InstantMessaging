@@ -1,5 +1,8 @@
 package com.ysxsoft.imtalk.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EggBean extends CommonBean {
 
 
@@ -7,13 +10,16 @@ public class EggBean extends CommonBean {
      * data : {"rid":35,"sg_name":"粉红火箭","aw_pic":"http://chitchat.rhhhyy.com/uploads/images/20190826/5771f0008c39479aebe64c8b83c7ffb8.png","aw_gif":"http://chitchat.rhhhyy.com/uploads/images/20190826/1b8e43cd206cbbf8ef9c04cbd2cfc3dd.gif"}
      */
 
-    private DataBean data;
+    List<DataBean> data;
 
-    public DataBean getData() {
+    public List<DataBean> getData() {
+        if (data == null) {
+            return new ArrayList<>();
+        }
         return data;
     }
 
-    public void setData(DataBean data) {
+    public void setData(List<DataBean> data) {
         this.data = data;
     }
 
@@ -29,6 +35,8 @@ public class EggBean extends CommonBean {
         private String sg_name;
         private String aw_pic;
         private String aw_gif;
+        private String sg_gif;
+        private String sg_pic;
 
         public int getRid() {
             return rid;
@@ -60,6 +68,22 @@ public class EggBean extends CommonBean {
 
         public void setAw_gif(String aw_gif) {
             this.aw_gif = aw_gif;
+        }
+
+        public String getSg_gif() {
+            return sg_gif == null ? "" : sg_gif;
+        }
+
+        public void setSg_gif(String sg_gif) {
+            this.sg_gif = sg_gif;
+        }
+
+        public String getSg_pic() {
+            return sg_pic == null ? "" : sg_pic;
+        }
+
+        public void setSg_pic(String sg_pic) {
+            this.sg_pic = sg_pic;
         }
     }
 }
