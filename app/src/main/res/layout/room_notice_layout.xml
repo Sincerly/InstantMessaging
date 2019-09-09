@@ -63,9 +63,10 @@
 
         <EditText
             android:id="@+id/ed_room_content"
-            style="@style/edittext_style"
+            android:background="@null"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:textSize="14sp"
             android:gravity="start"
             android:maxLength="300"
             android:hint="请输入公告内容"

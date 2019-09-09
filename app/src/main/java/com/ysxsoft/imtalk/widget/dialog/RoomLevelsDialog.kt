@@ -46,21 +46,38 @@ class RoomLevelsDialog : ABSDialog {
                 .subscribe(object :Action1<RoomStarBean>{
                     override fun call(t: RoomStarBean?) {
                         if (t!!.code==0){
-                            ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
-                            ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(1).icon,img_top2)
-                            ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(3).icon,img_top3)
-                            tv_top1_name.setText(t.data.get(0).nickname)
-                            tv_top2_name.setText(t.data.get(1).nickname)
-                            tv_top3_name.setText(t.data.get(2).nickname)
-                            tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
-                            tv_top2_id.setText("ID："+t.data.get(0).key_id.toString())
-                            tv_top3_id.setText("ID："+t.data.get(0).key_id.toString())
-                            tv_top2_NO.setText("距离前一名"+t.data.get(0).next_user.toString())
-                            tv_top3_NO.setText("距离前一名"+t.data.get(0).next_user.toString())
-//                            val data = t.data
-//                            data.removeAt(0)
-//                            data.removeAt(1)
-//                            data.removeAt(2)
+                            if (t.data.size==1){
+                                tv_top1_name.setText(t.data.get(0).nickname)
+                                tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
+                            }
+
+                            if (t.data.size==2) {
+                                tv_top1_name.setText(t.data.get(0).nickname)
+                                tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
+
+                                tv_top2_NO.setText("距离前一名" + t.data.get(1).next_user.toString())
+                                tv_top2_name.setText(t.data.get(1).nickname)
+                                tv_top2_id.setText("ID：" + t.data.get(1).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(1).icon, img_top2)
+                            }
+                            if (t.data.size==3) {
+                                tv_top1_name.setText(t.data.get(0).nickname)
+                                tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
+
+                                tv_top2_NO.setText("距离前一名" + t.data.get(1).next_user.toString())
+                                tv_top2_name.setText(t.data.get(1).nickname)
+                                tv_top2_id.setText("ID：" + t.data.get(1).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(1).icon, img_top2)
+
+                                tv_top3_name.setText(t.data.get(2).nickname)
+                                tv_top3_id.setText("ID：" + t.data.get(2).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(2).icon, img_top3)
+                                tv_top3_NO.setText("距离前一名" + t.data.get(2).next_user.toString())
+                            }
+
                             val adapter = RoomLevelsAdapter(BaseApplication.mContext!!)
                             recyclerView.layoutManager = LinearLayoutManager(BaseApplication.mContext)
                             recyclerView.adapter = adapter

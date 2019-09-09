@@ -70,6 +70,21 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+    override fun onRoomName(room_name: String?) {
+        //房间名称
+        updataTitle(room_name)
+    }
+
+    override fun onRoomLable(room_lable: String?) {
+        // 房间标签
+        updatRoomLable(room_lable)
+    }
+
+    override fun onRoomNotice(room_desc: String?) {
+        //房间通知的title
+        updataRoomTalk(room_desc)
+    }
+
     override fun onRoomEmj(p: Int, url: String) {
         //房间表情
         showPositionEmj(p, url)
@@ -264,7 +279,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("BGCHANG".equals(intent!!.action)) {
                 val bgId = intent.getStringExtra("bgId")
-                updateRoomBg(bgId)
+                val tagName = intent.getStringExtra("tagName")
+                val roomName = intent.getStringExtra("roomName")
+                if (!TextUtils.isEmpty(bgId)) {
+                    updateRoomBg(bgId)
+                }
+                if (!TextUtils.isEmpty(tagName)) {
+                    updatRoomLable(tagName)
+                }
+                if (!TextUtils.isEmpty(roomName)) {
+                    updataTitle(roomName)
+                }
             }
         }
     }
@@ -325,6 +350,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             })
             homeSettingDialog.show()
         }
+
         img_share.setOnClickListener {
             val friendDialog = ShareFriendDialog(mContext)
             friendDialog.setShareListener(object : ShareFriendDialog.ShareListener {
@@ -679,6 +705,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         updateRoomBg(detailRoomInfo!!.roomInfo.room_bg)
         //设置房间话题
         updataRoomTalk(detailRoomInfo!!.roomInfo.room_desc)
+        //设置房间标签
+        updatRoomLable(detailRoomInfo!!.roomInfo.room_label)
+        //设置房间标题
+        updataTitle(detailRoomInfo!!.roomInfo.room_name)
 
         //获取进入房间前的消息
         val messageList = detailRoomInfo!!.getMessageList()
@@ -795,14 +825,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid)) {
             chatroom_setting.setVisibility(View.VISIBLE)
             img_simle.visibility = View.VISIBLE
+            tv_music.visibility = View.VISIBLE
             tv_room.setOnClickListener {
-                startActivity(RoomNoticeActivity::class.java)
+                val intent = Intent(mContext, RoomNoticeActivity::class.java)
+                intent.putExtra("roomId", room_id)
+                startActivityForResult(intent, 1999)
+//                RoomNoticeActivity.startRoomNoticeActivity(mContext,room_id)
             }
         } else {
             chatroom_setting.setVisibility(View.GONE)
             img_simle.visibility = View.GONE
+            tv_music.visibility = View.GONE
             tv_room.setOnClickListener {
-                RoomNoticeDialog(mContext,room_id).show();
+                RoomNoticeDialog(mContext, room_id).show();
             }
         }
         // 初始化语音
@@ -826,19 +861,27 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     private fun updataRoomTalk(room_desc: String?) {
-        if (AuthManager.getInstance().currentUserId.equals(detailRoomInfo!!.roomInfo.uid)){
-            if (TextUtils.isEmpty(room_desc)){
+        if (AuthManager.getInstance().currentUserId.equals(detailRoomInfo!!.roomInfo.uid)) {
+            if (TextUtils.isEmpty(room_desc)) {
                 tv_room.setText("点击编辑房间话题")
-            }else{
+            } else {
                 tv_room.setText(room_desc)
             }
-        }else{
-            if (TextUtils.isEmpty(room_desc)){
+        } else {
+            if (TextUtils.isEmpty(room_desc)) {
                 tv_room.setText("")
-            }else{
+            } else {
                 tv_room.setText(room_desc)
             }
         }
+    }
+
+    private fun updatRoomLable(room_lable: String?) {
+        tv_lable.setText("#" + room_lable)
+    }
+
+    private fun updataTitle(room_name: String?) {
+        tv_title.setText(room_name)
     }
 
     private fun UpdataTips(micPositions: List<MicPositionsBean>, b: Boolean) {
@@ -980,8 +1023,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     //设置房间标题
     private fun updateRoomTitle(room_name: String?, room_num: String?, memcount: String) {
         updataRoomManager()
-        tv_title.setText(room_name)
-        tv_lable.setText("#" + detailRoomInfo!!.roomInfo.room_label)
         tv_id.setText("ID：" + room_num + "  " + memcount + "人在线")
         tv_sys_notice.setText("系统公告：" + detailRoomInfo!!.roomInfo.room_notice)
     }
@@ -1631,6 +1672,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val userId = data!!.getStringExtra("userId")
             JoinMic(userId, micPosition)
         }
+        if (requestCode == 1999 && resultCode == 1000) {
+            val room_desc = data!!.getStringExtra("room_desc")
+            updataRoomTalk(room_desc)
+        }
     }
 
     /**
@@ -1716,7 +1761,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
+                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
                                         detailRoomInfo = roomDetailInfo
@@ -1726,7 +1771,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                                 img_simle.visibility = View.GONE
                                             }
                                         }
-
                                         updateMicSeatState(roomDetailInfo.micPositions)
                                         val controlMessage = MicPositionControlMessage()
                                         controlMessage.setCmd(7)//下麦
@@ -1764,7 +1808,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
                 })
     }
-
 
     private fun joinChatRoom(roomId: String) {
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {

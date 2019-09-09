@@ -11,6 +11,8 @@ import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.string.room_name
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage
+import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage
+import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
@@ -142,7 +144,6 @@ class AddRoomActivity : BaseActivity() {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
                             if (!TextUtils.isEmpty(img_url)){
-
                                 val intent = Intent("BGCHANG")
                                 intent.putExtra("bgId",img_url)
                                 sendBroadcast(intent)
@@ -163,6 +164,52 @@ class AddRoomActivity : BaseActivity() {
                                     }
                                 });
                             }
+                            if (!TextUtils.isEmpty(tagName)){
+                                val intent = Intent("BGCHANG")
+                                intent.putExtra("tagName",tv_fj_bq.text.toString())
+                                sendBroadcast(intent)
+                                val roomLableChangedMessage = RoomLableChangedMessage()
+                                roomLableChangedMessage.roomLable=tv_fj_bq.text.toString()
+                                val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, roomLableChangedMessage)
+                                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                    override fun onAttached(p0: Message?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+
+                                    override fun onSuccess(p0: Message?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+
+                                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+                                });
+
+                            }
+                            if (!TextUtils.isEmpty(tv_fj_name.text.toString())){
+                                val intent = Intent("BGCHANG")
+                                intent.putExtra("roomName",tv_fj_name.text.toString())
+                                sendBroadcast(intent)
+                                val nameChangedMessage = RoomNameChangedMessage()
+                                nameChangedMessage.roomName=tv_fj_name.text.toString()
+                                val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, nameChangedMessage)
+                                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                    override fun onAttached(p0: Message?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+
+                                    override fun onSuccess(p0: Message?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+
+                                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+                                });
+
+
+                            }
+
                             finish()
                         }
                     }

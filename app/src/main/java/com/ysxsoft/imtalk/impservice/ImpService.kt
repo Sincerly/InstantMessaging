@@ -501,9 +501,8 @@ interface ImpService {
     @POST("index/ille_keywords")
     fun ille_keywords(): Observable<KeywordsBean>
 
-    @FormUrlEncoded
     @POST("Roomnew/getRoomInfo")
-    fun Roomnew(@Field("uid") uid: String, @Field("room_id") room_id: String): Observable<RoomnewBean>
+    fun Roomnew(@Query("room_id") room_id: String): Observable<RoomnewBean>
 
     @FormUrlEncoded
     @POST("Room/RoomUserList")

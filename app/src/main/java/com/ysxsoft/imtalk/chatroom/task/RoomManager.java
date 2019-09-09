@@ -13,7 +13,10 @@ import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomIsActiveMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomNoticeChangedMessage;
 import com.ysxsoft.imtalk.chatroom.model.BaseRoomInfo;
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo;
 import com.ysxsoft.imtalk.chatroom.model.MicBehaviorType;
@@ -776,6 +779,36 @@ public class RoomManager {
                                 public void run() {
                                     RoomGiftMessage content=new RoomGiftMessage(message.getContent().encode());
                                     roomEventlistener.onRoomGift(content.getPosition(),content.getToPosition(),content.getGiftUrl(),content.getStaticUrl());
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomNoticeChangedMessage){
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomNoticeChangedMessage content=new RoomNoticeChangedMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomNotice(content.getRoomDesc());
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomLableChangedMessage) {
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomLableChangedMessage content = new RoomLableChangedMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomLable(content.getRoomLable());
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomNameChangedMessage){
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomNameChangedMessage content = new RoomNameChangedMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomName(content.getRoomName());
                                 }
                             });
                         }

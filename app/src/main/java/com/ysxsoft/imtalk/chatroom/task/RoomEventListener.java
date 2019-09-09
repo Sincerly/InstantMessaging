@@ -98,4 +98,21 @@ public interface RoomEventListener {
      * @param staticUrl
      */
     void onRoomGift(int p,int toP,String giftUrl,String staticUrl);
+
+    /**
+     * 房间通知
+     */
+    void onRoomNotice(String room_desc);
+
+     /**
+     * 房间标签
+     */
+    void onRoomLable(String room_lable);
+    /**
+     * 房间名称
+     */
+    void onRoomName(String room_name);
+
+
+
 }
