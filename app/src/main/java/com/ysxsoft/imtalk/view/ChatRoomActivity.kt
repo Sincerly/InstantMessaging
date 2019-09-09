@@ -7,10 +7,8 @@ import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.support.annotation.RequiresApi
-import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPropertyAnimatorListener
-import android.telecom.ConnectionService
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
@@ -28,7 +26,6 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.ysxsoft.imtalk.R
-import com.ysxsoft.imtalk.appservice.FloatingDisplayService
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.HomeHLBean
@@ -51,7 +48,6 @@ import com.ysxsoft.imtalk.chatroom.task.role.Role
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetPlugReceiver
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetUtils
-import com.ysxsoft.imtalk.chatroom.utils.MyApplication
 import com.ysxsoft.imtalk.chatroom.widget.MicSeatView
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.music.CustomeWindow
@@ -63,7 +59,6 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
-import kotlinx.android.synthetic.main.room_tag_layout.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -82,7 +77,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onRoomGift(p: Int, toP: Int, giftUrl: String, staticUrl: String) {
         //房间动画
-        Log.e("tag","onRoomGift");
+        Log.e("tag", "onRoomGift");
         showPositionGift(p, toP, giftUrl, staticUrl)
     }
 
@@ -204,7 +199,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private var defaultMarginBottom: Int = 0
     var voiceDialog: SongVoiceDialog? = null
     var mydatabean: UserInfoBean? = null
-    var floatingDisplayService: FloatingDisplayService? = null
+    var bgChangBroadCast: BgChangBroadCast? = null
 
     /**
      * 监听来电状态进行房间的静音和禁麦操作
@@ -260,6 +255,18 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         initView()
         initRoom(room_id!!)
         initAudioOutputMode()
+        bgChangBroadCast = BgChangBroadCast()
+        val intentFilter = IntentFilter("BGCHANG")
+        registerReceiver(bgChangBroadCast, intentFilter)
+    }
+
+    inner class BgChangBroadCast : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if ("BGCHANG".equals(intent!!.action)) {
+                val bgId = intent.getStringExtra("bgId")
+                updateRoomBg(bgId)
+            }
+        }
     }
 
     private fun requestMyData() {
@@ -297,9 +304,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickSmall() {
-
-                    if (!Settings.canDrawOverlays(mContext)) {
-                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (!Settings.canDrawOverlays(mContext)) {
+                            startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
+                        } else {
+                            val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
+                            customeWindow.show()
+                            finish()
+                        }
                     } else {
                         val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
                         customeWindow.show()
@@ -313,9 +325,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             })
             homeSettingDialog.show()
         }
-
-        var a = 0;
-
         img_share.setOnClickListener {
             val friendDialog = ShareFriendDialog(mContext)
             friendDialog.setShareListener(object : ShareFriendDialog.ShareListener {
@@ -363,10 +372,16 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickSmall() {
-                    if (!Settings.canDrawOverlays(mContext)) {
-                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (!Settings.canDrawOverlays(mContext)) {
+                            startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
+                        } else {
+                            val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
+                            customeWindow.show()
+                            finish()
+                        }
                     } else {
-                        val customeWindow = CustomeWindow(BaseApplication.mContext!!,mydatabean!!.data.icon)
+                        val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
                         customeWindow.show()
                         finish()
                     }
@@ -442,14 +457,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val dialog = SmilDialog(mContext);
             dialog.setOnDialogListener(object : SmilDialog.OnSmileDialogListener {
                 override fun onClick(position: Int, url: String) {
-                    Log.e("tag","send");
+                    Log.e("tag", "send");
                     val message = RoomEmjMessage()
                     if (AuthManager.getInstance().currentUserId.equals(detailRoomInfo!!.roomInfo.uid)) {
-                        message.position = 8;//当前用户所在的麦位   TODO  当前用户所在的麦位  0
+                        message.position = 8;//当前用户所在的麦位
                     } else {
                         for (bean in detailRoomInfo!!.micPositions) {
                             if (AuthManager.getInstance().currentUserId.equals(bean.uid)) {
-                                message.position = bean.sort - 1;//当前用户所在的麦位   TODO  当前用户所在的麦位  0
+                                message.position = bean.sort - 1;//当前用户所在的麦位
                             }
                         }
                     }
@@ -470,12 +485,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     });
 
                     if (AuthManager.getInstance().currentUserId.equals(detailRoomInfo!!.roomInfo.uid)) {
-                        showPositionEmj(8, url);//TODO  当前用户所在的麦位  0
+                        showPositionEmj(8, url);
                     } else {
                         for (bean in detailRoomInfo!!.micPositions) {
                             if (AuthManager.getInstance().currentUserId.equals(bean.uid)) {
                                 //显示当前用户所在的麦位表情
-                                showPositionEmj(bean.sort - 1, url);//TODO  当前用户所在的麦位  0
+                                showPositionEmj(bean.sort - 1, url);
                             }
                         }
                     }
@@ -492,7 +507,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val giftBagDialog = GiftBagDialog(mContext, room_id!!)
             giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
                 override fun onClck(targetPosition: Int, toPosition: Int, pic: String, gifPic: String) {
-                    Log.d("tag","onClck:")
+                    Log.d("tag", "onClck:")
                     showPositionGift(targetPosition, toPosition, gifPic, pic)
                     val roomGiftMessage = RoomGiftMessage()
                     roomGiftMessage.position = targetPosition
@@ -502,15 +517,15 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, roomGiftMessage)
                     RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                         override fun onAttached(p0: Message?) {
-                            Log.d("tag","attached:"+ p0!!.content.toString())
+                            Log.d("tag", "attached:" + p0!!.content.toString())
                         }
 
                         override fun onSuccess(p0: Message?) {
-                            Log.d("tag", "onSuccess:"+ p0!!.content.toString())
+                            Log.d("tag", "onSuccess:" + p0!!.content.toString())
                         }
 
                         override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-                            Log.d("tag", "onError:"+ p0!!.content.toString())
+                            Log.d("tag", "onError:" + p0!!.content.toString())
                         }
                     });
                 }
@@ -662,6 +677,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         //设置房间背景
         updateRoomBg(detailRoomInfo!!.roomInfo.room_bg)
+        //设置房间话题
+        updataRoomTalk(detailRoomInfo!!.roomInfo.room_desc)
 
         //获取进入房间前的消息
         val messageList = detailRoomInfo!!.getMessageList()
@@ -771,20 +788,22 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 giveDialog.show()
             }
         }
-
         //更新麦位状态1
         updateMicSeatState(detailRoomInfo!!.getMicPositions())
-
 
         // 判断是否可以设置房间
         if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid)) {
             chatroom_setting.setVisibility(View.VISIBLE)
-            tv_room.setVisibility(View.VISIBLE)
             img_simle.visibility = View.VISIBLE
+            tv_room.setOnClickListener {
+                startActivity(RoomNoticeActivity::class.java)
+            }
         } else {
             chatroom_setting.setVisibility(View.GONE)
-            tv_room.setVisibility(View.GONE)
             img_simle.visibility = View.GONE
+            tv_room.setOnClickListener {
+                RoomNoticeDialog(mContext,room_id).show();
+            }
         }
         // 初始化语音
         roomManager!!.initRoomVoice(object : ResultCallback<Boolean> {
@@ -804,6 +823,22 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 showToastMessage("初始化语音失败" + errorCode)
             }
         })
+    }
+
+    private fun updataRoomTalk(room_desc: String?) {
+        if (AuthManager.getInstance().currentUserId.equals(detailRoomInfo!!.roomInfo.uid)){
+            if (TextUtils.isEmpty(room_desc)){
+                tv_room.setText("点击编辑房间话题")
+            }else{
+                tv_room.setText(room_desc)
+            }
+        }else{
+            if (TextUtils.isEmpty(room_desc)){
+                tv_room.setText("")
+            }else{
+                tv_room.setText(room_desc)
+            }
+        }
     }
 
     private fun UpdataTips(micPositions: List<MicPositionsBean>, b: Boolean) {
@@ -1587,8 +1622,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             if (!Settings.canDrawOverlays(this)) {
                 showToastMessage("授权失败")
             } else {
-                val customeWindow = CustomeWindow(BaseApplication.mContext!!,mydatabean!!.data.icon)
+                val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
                 customeWindow.show()
+                finish()
             }
         }
         if (requestCode == 1033 && resultCode == 1035) {
@@ -1680,7 +1716,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
                                         detailRoomInfo = roomDetailInfo
@@ -1804,11 +1840,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
             @RequiresApi(Build.VERSION_CODES.M)
             override fun clickSmall() {
-                if (FloatingDisplayService.isStarted) {
-                    return
-                }
-                if (!Settings.canDrawOverlays(mContext)) {
-                    startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (!Settings.canDrawOverlays(mContext)) {
+                        startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
+                    } else {
+                        val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
+                        customeWindow.show()
+                        finish()
+                    }
                 } else {
                     val customeWindow = CustomeWindow(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon)
                     customeWindow.show()
@@ -1835,7 +1874,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(headsetPlugReceiver)
-
+        unregisterReceiver(bgChangBroadCast)
         if (audioManager != null) {
             audioManager!!.setMode(AudioManager.MODE_NORMAL)
         }
@@ -1998,7 +2037,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         v.layoutParams = layoutParams
         f.addView(v)
 
-        if(giftImgUrl.endsWith(".gif")){
+        if (giftImgUrl.endsWith(".gif")) {
             //显示动态图
             Glide.with(this).asGif().listener(object : RequestListener<GifDrawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any, target: Target<GifDrawable>, isFirstResource: Boolean): Boolean {
@@ -2044,24 +2083,24 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                     val imageOffsetX = w / 2 - imgW / 2;
                                     val imageOffsetY = h / 2 - imgH / 2;
 
-                                    val startPosition=getPosition(position);
-                                    val endPosition=getPosition(toPosition);
-                                    val offsetX=endPosition[0]-startPosition[0];
-                                    val offsetY=endPosition[1]-startPosition[1];
+                                    val startPosition = getPosition(position);
+                                    val endPosition = getPosition(toPosition);
+                                    val offsetX = endPosition[0] - startPosition[0];
+                                    val offsetY = endPosition[1] - startPosition[1];
 
                                     val f = findViewById<FrameLayout>(android.R.id.content)
                                     val childView = View.inflate(mContext, R.layout.view_emj, null)
                                     val childImageView = childView.findViewById<ImageView>(R.id.gifView)
                                     Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
 
-                                    childView.x = (startPosition[0] +imageOffsetX).toFloat();
-                                    childView.y = (startPosition[1] +imageOffsetY).toFloat();
+                                    childView.x = (startPosition[0] + imageOffsetX).toFloat();
+                                    childView.y = (startPosition[1] + imageOffsetY).toFloat();
 
                                     val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
                                     childView.layoutParams = layoutParams
                                     f.addView(childView)
 
-                                    Log.e("tag","x:"+offsetX.toFloat()+" y:"+offsetY.toFloat())
+                                    Log.e("tag", "x:" + offsetX.toFloat() + " y:" + offsetY.toFloat())
                                     ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
                                         override fun onAnimationStart(view: View) {
                                         }
@@ -2095,7 +2134,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     return false
                 }
             }).diskCacheStrategy(DiskCacheStrategy.RESOURCE).load(giftImgUrl).into(giftImageView)
-        }else{
+        } else {
             //显示静态图
             Glide.with(this).load(giftImgUrl).into(giftImageView);
             giftImageView.postDelayed({
@@ -2113,24 +2152,24 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         val imageOffsetX = w / 2 - imgW / 2;
                         val imageOffsetY = h / 2 - imgH / 2;
 
-                        val startPosition=getPosition(position);
-                        val endPosition=getPosition(toPosition);
-                        val offsetX=endPosition[0]-startPosition[0];
-                        val offsetY=endPosition[1]-startPosition[1];
+                        val startPosition = getPosition(position);
+                        val endPosition = getPosition(toPosition);
+                        val offsetX = endPosition[0] - startPosition[0];
+                        val offsetY = endPosition[1] - startPosition[1];
 
                         val f = findViewById<FrameLayout>(android.R.id.content)
                         val childView = View.inflate(mContext, R.layout.view_emj, null)
                         val childImageView = childView.findViewById<ImageView>(R.id.gifView)
                         Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
 
-                        childView.x = (startPosition[0] +imageOffsetX).toFloat();
-                        childView.y = (startPosition[1] +imageOffsetY).toFloat();
+                        childView.x = (startPosition[0] + imageOffsetX).toFloat();
+                        childView.y = (startPosition[1] + imageOffsetY).toFloat();
 
                         val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
                         childView.layoutParams = layoutParams
                         f.addView(childView)
 
-                        Log.e("tag","x:"+offsetX.toFloat()+" y:"+offsetY.toFloat())
+                        Log.e("tag", "x:" + offsetX.toFloat() + " y:" + offsetY.toFloat())
                         ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
                             override fun onAnimationStart(view: View) {
                             }
@@ -2160,18 +2199,36 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val pos = IntArray(2)
         when (p) {
             -1 -> {
-                pos[0]=AppUtil.getScreenWidth(mContext)/2-DisplayUtils.dp2px(mContext,32);
-                pos[1]=AppUtil.getScreenHeight(mContext)/2
+                pos[0] = AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 32);
+                pos[1] = AppUtil.getScreenHeight(mContext) / 2
             }
-            0 -> {chatroom_mp_mic_1!!.getLocationOnScreen(pos)}
-            1 -> {chatroom_mp_mic_2.getLocationOnScreen(pos)}
-            2 -> {chatroom_mp_mic_3.getLocationOnScreen(pos)}
-            3 -> {chatroom_mp_mic_4.getLocationOnScreen(pos)}
-            4 -> {chatroom_mp_mic_5.getLocationOnScreen(pos)}
-            5 -> {chatroom_mp_mic_6.getLocationOnScreen(pos)}
-            6 -> {chatroom_mp_mic_7.getLocationOnScreen(pos)}
-            7 -> {chatroom_mp_mic_8.getLocationOnScreen(pos)}
-            8 -> {img_head.getLocationOnScreen(pos)}
+            0 -> {
+                chatroom_mp_mic_1!!.getLocationOnScreen(pos)
+            }
+            1 -> {
+                chatroom_mp_mic_2.getLocationOnScreen(pos)
+            }
+            2 -> {
+                chatroom_mp_mic_3.getLocationOnScreen(pos)
+            }
+            3 -> {
+                chatroom_mp_mic_4.getLocationOnScreen(pos)
+            }
+            4 -> {
+                chatroom_mp_mic_5.getLocationOnScreen(pos)
+            }
+            5 -> {
+                chatroom_mp_mic_6.getLocationOnScreen(pos)
+            }
+            6 -> {
+                chatroom_mp_mic_7.getLocationOnScreen(pos)
+            }
+            7 -> {
+                chatroom_mp_mic_8.getLocationOnScreen(pos)
+            }
+            8 -> {
+                img_head.getLocationOnScreen(pos)
+            }
         }
         return pos
     }

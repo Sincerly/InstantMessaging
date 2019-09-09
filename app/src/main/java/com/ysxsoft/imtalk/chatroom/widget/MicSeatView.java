@@ -109,7 +109,7 @@ public class MicSeatView extends FrameLayout {
             setMicSeatAvatar(micInfo.getIcon());
             if (currentUserId.equals(micUserId)) {
                 nameTv.setText(getResources().getText(R.string.me));
-                nameTv.setTextColor(getResources().getColor(R.color.blue));
+                nameTv.setTextColor(getResources().getColor(R.color.btn_color));
             } else {
                 nameTv.setText(micInfo.getNickname());
                 nameTv.setTextColor(getResources().getColor(R.color.white));
@@ -172,7 +172,9 @@ public class MicSeatView extends FrameLayout {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void init(int position) {
         micInfo = new MicPositionsBean();
-        micInfo.setIs_lock_wheat(String.valueOf(MicState.Idle.getValue()));
+        micInfo.setIs_lock_wheat("1");
+        micInfo.setIs_oc_wheat("0");//add
+        micInfo.setIs_wheat("0");//add
         micInfo.setSort(position);
         setMicSeatEmpty();
     }

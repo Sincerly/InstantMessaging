@@ -1,5 +1,6 @@
 package com.ysxsoft.imtalk.fragment
 
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
@@ -61,7 +62,7 @@ class MyDataGiftFragment : BaseFragment() {
         }
         tv_msg.setOnClickListener {
             //私信
-            RongIM.getInstance().startGroupChat(getActivity(), uid, "标题");
+            RongIM.getInstance().startGroupChat(getActivity(), uid, "");
         }
 
     }
@@ -103,11 +104,12 @@ class MyDataGiftFragment : BaseFragment() {
                             myGiftadapter = object : BaseQuickAdapter<SFGiftBean.DataBean.ListInfoBean, BaseViewHolder>(R.layout.my_gift_item_layout, t.data.listInfo) {
                                 override fun convert(helper: BaseViewHolder?, item: SFGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
-                                    helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
-                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
+//                                    helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
+                                    ImageLoadUtil.GlideGoodsImageLoad(mContext,item.pic,helper.getView<ImageView>(R.id.img_tupian)!!)
+                                    helper.getView<TextView>(R.id.tv_jb)!!.setText(item.gold + "金币")
                                 }
                             }
-                            recyclerView1.layoutManager = LinearLayoutManager(mContext)
+                            recyclerView1.layoutManager = GridLayoutManager(mContext,3)
                             recyclerView1.adapter = myGiftadapter
                         }
                     }

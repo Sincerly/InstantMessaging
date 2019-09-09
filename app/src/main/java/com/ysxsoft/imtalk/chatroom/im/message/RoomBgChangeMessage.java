@@ -18,14 +18,14 @@ import io.rong.imlib.model.MessageContent;
 @MessageTag(value = "SM:RBgNtfyMsg", flag = MessageTag.NONE)
 public class RoomBgChangeMessage extends MessageContent {
     private final static String TAG = RoomBgChangeMessage.class.getSimpleName();
-    private int bgId;
+    private String bgId;
 
     public RoomBgChangeMessage(byte[] data) {
         String jsonStr = null;
         try {
             jsonStr = new String(data, "UTF-8");
             JSONObject jsonObj = new JSONObject(jsonStr);
-            setBgId(jsonObj.optInt("bgId"));
+            setBgId(jsonObj.optString("bgId"));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -33,18 +33,30 @@ public class RoomBgChangeMessage extends MessageContent {
         }
     }
 
-    public int getBgId() {
+    public String getBgId() {
         return bgId;
     }
 
-    public void setBgId(int bgId) {
+    public void setBgId(String bgId) {
         this.bgId = bgId;
     }
 
     @Override
     public byte[] encode() {
-        return new byte[0];
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("bgId", getBgId());
+            byte[] bytes = jsonObject.toString().getBytes("UTF-8");
+            return bytes;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
+    public RoomBgChangeMessage(){}
 
     @Override
     public int describeContents() {
@@ -53,11 +65,11 @@ public class RoomBgChangeMessage extends MessageContent {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.bgId);
+        dest.writeString(this.bgId);
     }
 
     protected RoomBgChangeMessage(Parcel in) {
-        this.bgId = in.readInt();
+        this.bgId = in.readString();
     }
 
     public static final Creator<RoomBgChangeMessage> CREATOR = new Creator<RoomBgChangeMessage>() {

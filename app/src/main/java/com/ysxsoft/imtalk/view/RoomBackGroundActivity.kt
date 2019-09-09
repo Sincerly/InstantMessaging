@@ -35,11 +35,13 @@ class RoomBackGroundActivity:BaseActivity(){
         tv_title_right.setOnClickListener {
             val intent = Intent()
             intent.putExtra("img_id",img_id)
+            intent.putExtra("img_url",img_url)
             setResult(1,intent)
             finish()
         }
     }
     var img_id:String?=null
+    var img_url:String?=null
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
                 .RoomBg()
@@ -54,7 +56,8 @@ class RoomBackGroundActivity:BaseActivity(){
                             adapter.addAll(t.data)
                             adapter.setOnItemClickListener(object :RoomBackGroundAdapter.OnItemClickListener{
                                 override fun OnClick(position: Int) {
-                                    img_id = adapter.dataList.get(position).bg_url
+                                    img_url = adapter.dataList.get(position).bg_url
+                                    img_id = adapter.dataList.get(position).id
                                     adapter.setSelect(position)
                                 }
                             })

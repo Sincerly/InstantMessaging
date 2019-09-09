@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.IBinder
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -335,7 +336,9 @@ class HomeFragment : BaseFragment(), OnBannerListener {
     private fun CreateRoom() {
         RoomManager.getInstance().createRoom(SpUtils.getSp(mContext, "uid"), object : ResultCallback<CreateRoomResult> {
             override fun onSuccess(result: CreateRoomResult?) {
-                if (!checkPermissions()) return
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (!checkPermissions()) return
+                }
                 // 标记正在进入房间
                 isJoiningRoom = true
                 if (!TextUtils.isEmpty(result!!.roomInfo.room_id))

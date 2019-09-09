@@ -746,8 +746,7 @@ public class RoomManager {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-//                                    roomEventlistener.onRoomBgChanged(bgChangeMessage.getBgId());
-                                    roomEventlistener.onRoomBgChanged(currentRoom.getRoomInfo().getRoom_bg());
+                                    roomEventlistener.onRoomBgChanged(bgChangeMessage.getBgId());
                                 }
                             });
                         }

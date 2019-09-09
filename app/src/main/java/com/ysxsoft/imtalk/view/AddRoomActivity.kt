@@ -4,18 +4,25 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.string.room_name
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.dialog.RoomNameDialog
+import io.rong.imlib.IRongCallback
+import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_add_room.*
+import kotlinx.android.synthetic.main.room_tag_layout.*
 import kotlinx.android.synthetic.main.title_layout.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -125,8 +132,6 @@ class AddRoomActivity : BaseActivity() {
         paramsMap.put("room_gift_tx", room_gift_tx.toString())
         paramsMap.put("room_is_fair", room_is_fair.toString())
         paramsMap.put("room_pure", room_pure.toString())
-        paramsMap.put("room_desc", "")
-        paramsMap.put("room_content", "")
         val body = RetrofitUtil.createJsonRequest(paramsMap)
         NetWork.getService(ImpService::class.java)
                 .setRoomInfo(body)
@@ -134,7 +139,30 @@ class AddRoomActivity : BaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<CommonBean> {
                     override fun call(t: CommonBean?) {
-                        if (t!!.code == 0) {
+                        showToastMessage(t!!.msg)
+                        if (t.code == 0) {
+                            if (!TextUtils.isEmpty(img_url)){
+
+                                val intent = Intent("BGCHANG")
+                                intent.putExtra("bgId",img_url)
+                                sendBroadcast(intent)
+                                val bgChangeMessage = RoomBgChangeMessage()
+                                bgChangeMessage.bgId=img_url
+                                val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, bgChangeMessage)
+                                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                    override fun onAttached(p0: Message?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+
+                                    override fun onSuccess(p0: Message?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+
+                                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                        Log.d("tag",p0!!.content.toString())
+                                    }
+                                });
+                            }
                             finish()
                         }
                     }
@@ -142,6 +170,7 @@ class AddRoomActivity : BaseActivity() {
     }
 
     var img_id: String? = null
+    var img_url: String? = null
     var tagName: String? = null
     var tabid: String? = null
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -149,6 +178,7 @@ class AddRoomActivity : BaseActivity() {
             when (resultCode) {
                 1 -> {
                     img_id = data!!.getStringExtra("img_id")
+                    img_url = data!!.getStringExtra("img_url")
                 }
                 1854 -> {
                     tabid = data!!.getStringExtra("tabid")
