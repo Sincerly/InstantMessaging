@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -187,8 +188,16 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 //                helper.getView<ImageView>(R.id.ivAvatar).displayRes(R.mipmap.icon_def)
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                 helper.getView<TextView>(R.id.tv_name).text = item.room_name + "===" + item.room_id
-                helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
-                helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
+                if (TextUtils.isEmpty(item.label_name)){
+                    helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
+                }else{
+                    helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                }
+                if (TextUtils.isEmpty(item.memCount)){
+                    helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
+                }else{
+                    helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
+                }
                 helper.itemView.setOnClickListener {
                     //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                     joinChatRoom(item.room_id.toString())
@@ -263,8 +272,17 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeRoomBean.DataBean.RoomListBean) {
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                 helper.getView<TextView>(R.id.tv_name).text = item.room_name
-                helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
-                helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
+
+                if (TextUtils.isEmpty(item.label_name)){
+                    helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
+                }else{
+                    helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                }
+                if (TextUtils.isEmpty(item.memCount)){
+                    helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
+                }else{
+                    helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
+                }
                 helper.itemView.setOnClickListener {
                     //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                     joinChatRoom(item.room_id.toString())

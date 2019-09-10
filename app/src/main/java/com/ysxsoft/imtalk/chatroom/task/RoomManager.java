@@ -448,7 +448,9 @@ public class RoomManager {
             List<String> userList = new ArrayList<>();
             if (currentRoom == null) return userList;
             // 加入房主
-            userList.add(currentRoom.getRoomInfo().getUid());
+            if (currentRoom.getRoomInfo()!=null){
+                userList.add(currentRoom.getRoomInfo().getUid());
+            }
             List<MicPositionsBean> micPositions = currentRoom.getMicPositions();
             if (micPositions != null) {
                 // 加入麦位上可发言的用户
@@ -644,7 +646,7 @@ public class RoomManager {
                                         public void run() {
                                             roomEventlistener.onMessageEvent(message);
                                             roomEventlistener.onRoomMemberChange(memCount);
-                                            roomEventlistener.onRoomMemberKickChange(memCount);
+                                            roomEventlistener.onRoomMemberKickChange(memberChangedMessage.getTargetUserId());
                                         }
                                     });
                                 }

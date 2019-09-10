@@ -18,7 +18,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 
 import com.ysxsoft.imtalk.R
-import com.ysxsoft.imtalk.appservice.MyService
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.RoomMusicListBean
@@ -29,7 +28,6 @@ import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.displayRes
 import kotlinx.android.synthetic.main.fragment_my_song_book.*
-import kotlinx.android.synthetic.main.fragment_my_song_book.view.*
 import kotlinx.android.synthetic.main.include_my_song_book_empty.*
 import kotlinx.android.synthetic.main.include_onlyrecyclerview.*
 import rx.Observer
@@ -99,8 +97,9 @@ class MySongBookFragment : BaseFragment() {
                 helper.getView<TextView>(R.id.tvSongName)!!.setText(item!!.music_name)
                 helper.getView<TextView>(R.id.tvName)!!.setText(item.a_name)
                 helper.itemView.setOnClickListener {
-                   position = helper.adapterPosition
-                    startService()
+                    position = helper.adapterPosition
+                    startService(item.music_url)
+
                 }
             }
         }
@@ -108,8 +107,9 @@ class MySongBookFragment : BaseFragment() {
         recyclerView.adapter = adapter
     }
 
-    private fun startService() {
+    private fun startService(music_url: String) {
         val intent = Intent(mContext, PlayMusicService::class.java)
+        intent.putExtra("music_url",music_url)
         activity!!.bindService(intent, connection, BIND_AUTO_CREATE)
     }
 
@@ -121,8 +121,16 @@ class MySongBookFragment : BaseFragment() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val myBind = service as (PlayMusicService.MyBind)
             playMusicService = myBind.service
-            playMusicService!!.setData(lists,position)
+            playMusicService!!.setData(lists, position)
         }
+    }
+
+    open fun Next() {
+        playMusicService!!.next()
+    }
+
+    open fun Pause() {
+        playMusicService!!.pause()
     }
 
     private fun DelMusic(roomId: String?, id: Int) {

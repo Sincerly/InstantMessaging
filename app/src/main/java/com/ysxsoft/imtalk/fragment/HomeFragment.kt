@@ -36,6 +36,7 @@ import com.ysxsoft.imtalk.view.*
 import com.ysxsoft.imtalk.widget.CircleImageView
 import com.ysxsoft.imtalk.widget.UniversalItemDecoration
 import kotlinx.android.synthetic.main.fm_home.*
+import org.w3c.dom.Text
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -141,7 +142,12 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                             adapter1 = object : BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_home_recommend, roomLists0) {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<ImageView>(R.id.ivPhoto))
-                                    helper.getView<TextView>(R.id.tvContent).setText("#" + item.label_name + "  " + item.room_name)
+
+                                    if (TextUtils.isEmpty(item.label_name)){
+                                        helper.getView<TextView>(R.id.tvContent).setText("#" + "暂无"+ "  " + item.room_name)
+                                    }else{
+                                        helper.getView<TextView>(R.id.tvContent).setText("#" + item.label_name+ "  " + item.room_name)
+                                    }
 
                                     helper.itemView.setOnClickListener {
                                         //                                        ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
@@ -164,8 +170,16 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<CircleImageView>(R.id.ivAvatar))
                                     helper.getView<TextView>(R.id.tv_name).setText(item.room_name)
-                                    helper.getView<TextView>(R.id.tv_Tag).setText(item.label_name)
-                                    helper.getView<TextView>(R.id.tv_Online).setText(item.memCount + "人在线")
+                                    if (TextUtils.isEmpty(item.label_name)){
+                                        helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
+                                    }else{
+                                        helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                                    }
+                                    if (TextUtils.isEmpty(item.memCount)){
+                                        helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
+                                    }else{
+                                        helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
+                                    }
                                     helper.itemView.setOnClickListener {
                                         //                                        ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                                         joinChatRoom(item.room_id.toString(), false)
@@ -336,12 +350,13 @@ class HomeFragment : BaseFragment(), OnBannerListener {
     private fun CreateRoom() {
         RoomManager.getInstance().createRoom(SpUtils.getSp(mContext, "uid"), object : ResultCallback<CreateRoomResult> {
             override fun onSuccess(result: CreateRoomResult?) {
+                if(result==null) return
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     if (!checkPermissions()) return
                 }
                 // 标记正在进入房间
                 isJoiningRoom = true
-                if (!TextUtils.isEmpty(result!!.roomInfo.room_id))
+                if (!TextUtils.isEmpty(result.roomInfo.room_id))
                     joinChatRoom(result.roomInfo.room_id, true)
             }
 

@@ -18,49 +18,11 @@ public class Linker extends Role {
 
     public Linker() {
     }
-
-    @Override
-    public List<MicBehaviorType> getBehaviorList(int micPosition) {
-        MicPositionsBean micPositionInfo = getMicInfoByPosition(micPosition);
-        List<MicBehaviorType> behaviorList = new ArrayList<>();
-        String currentUserId = AuthManager.getInstance().getCurrentUserId();
-        if (micPositionInfo != null && currentUserId != null) {
-            String micState = micPositionInfo.getIs_wheat();
-            String micUserId = micPositionInfo.getUid();
-
-            // 当麦位上没有用户且非锁麦下课进行跳麦
-            if (TextUtils.isEmpty(micUserId) && !"0".equals(micState)) {
-                behaviorList.add(MicBehaviorType.JumpToMic);//跳麦
-            } else if (currentMicInfo.getSort()-1 == micPosition) {
-                behaviorList.add(MicBehaviorType.JumpDownMic);
-            }
-        }
-        return behaviorList;
-    }
-
-    @Override
-    public void perform(MicBehaviorType micBehaviorType, int targetPosition, String targetUserId, ResultCallback<Boolean> callback) {
-        RoomManager roomManager = RoomManager.getInstance();
-        switch (micBehaviorType) {
-            case JumpToMic:
-                if (currentMicInfo != null) {
-                    int fromPosition = currentMicInfo.getSort()-1;
-//                    roomManager.changeMicPosition(fromPosition, targetPosition, callback);
-                    break;
-                }
-            case JumpDownMic:
-//                roomManager.leaveMic(targetPosition, callback);
-                break;
-        }
-
-    }
-
     @Override
     public boolean hasVoiceChatPermission() {
         if (currentMicInfo != null) {
-            String state = currentMicInfo.getIs_lock_wheat();
             String is_oc_wheat = currentMicInfo.getIs_oc_wheat();
-            if (!"0".equals(state) && "0".equals(is_oc_wheat)) {//没锁麦 切没闭麦
+            if ("0".equals(is_oc_wheat)) {//没闭麦
                 return true;
             }
         }

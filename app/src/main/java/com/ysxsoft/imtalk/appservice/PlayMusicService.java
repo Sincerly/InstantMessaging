@@ -26,37 +26,79 @@ public class PlayMusicService extends Service {
     private MediaPlayer mediaPlayer;
     private List<RoomMusicListBean.DataBean> musics = new ArrayList<>();
     private int position = 0;
-    private boolean isRunning=false;
+    private boolean isRunning = false;
+    private String url;
 
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        String url = intent.getStringExtra("music_url");
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(this, Uri.parse(url));
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.prepareAsync();//异步准备
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    Log.e("tag", "onPrepared");
+                    mediaPlayer.start();//开始播放
+                }
+            });
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    //播放完成
+                    Log.e("tag", "资源已释放!");
+                    next();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return new MyBind();
     }
 
-    public class MyBind extends Binder {
+    public class MyBind extends Binder implements IMusicService{
         public PlayMusicService getService() {
             return PlayMusicService.this;
+        }
+
+        @Override
+        public void onPlay() {
+            start();
+        }
+
+        @Override
+        public void onPause() {
+            pause();
+        }
+
+        @Override
+        public void onNext() {
+            next();
         }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-//        musicPlay("http://zhyuce.sanzhima.cn/uploads/files/20190115/fdbb543fafe710d32d3f71583c2196b4.mp3");
+        mediaPlayer = new MediaPlayer();
     }
 
     public void musicPlay(String url) {
-        isRunning=true;
+        this.url = url;
+        isRunning = true;
         try {
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(this,Uri.parse(url));
+//            if (mediaPlayer != null) {
+//                mediaPlayer.stop();
+//                mediaPlayer.release();
+//                mediaPlayer = null;
+//            }
+//            mediaPlayer = new MediaPlayer();
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(this, Uri.parse(url));
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepareAsync();//异步准备
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -82,27 +124,29 @@ public class PlayMusicService extends Service {
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
-            isRunning=false;
+            isRunning = false;
         }
     }
 
     /**
      * 判断是否运行
+     *
      * @return
      */
-    public boolean isRunning(){
+    public boolean isRunning() {
         return isRunning;
     }
 
-    public void setData(List<RoomMusicListBean.DataBean> m,int position) {
+    public void setData(List<RoomMusicListBean.DataBean> m, int position) {
         musics.clear();
         musics.addAll(m);
         if (musics != null && musics.size() > 0) {
             musicPlay(musics.get(position).getMusic_url());
         }
     }
+
     public void next() {
-        isRunning=true;
+        isRunning = true;
         position++;
         if (musics.size() > position) {
             musicPlay(musics.get(position).getMusic_url());
@@ -116,14 +160,14 @@ public class PlayMusicService extends Service {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
-            isRunning=false;
+            isRunning = false;
         }
     }
 
     public void start() {
         if (mediaPlayer != null) {
             mediaPlayer.start();
-            isRunning=true;
+            isRunning = true;
         }
     }
 
@@ -135,10 +179,10 @@ public class PlayMusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mediaPlayer != null) {
-            isRunning=false;
-            stop();
-        }
+//        if (mediaPlayer != null) {
+//            isRunning = false;
+//            stop();
+//        }
     }
 
 }

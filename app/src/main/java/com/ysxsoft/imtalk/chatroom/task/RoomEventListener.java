@@ -20,9 +20,9 @@ public interface RoomEventListener {
 
      /**
      * 房间人数发生变化
-     * @param memberCount
+     * @param uid
      */
-    void onRoomMemberKickChange(int memberCount);
+    void onRoomMemberKickChange(String uid);
 
 
     /**

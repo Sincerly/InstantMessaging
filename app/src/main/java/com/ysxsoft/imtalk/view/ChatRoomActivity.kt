@@ -9,6 +9,7 @@ import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPropertyAnimatorListener
+import android.support.v7.widget.AppCompatSeekBar
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
@@ -50,6 +51,7 @@ import com.ysxsoft.imtalk.chatroom.utils.HeadsetPlugReceiver
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetUtils
 import com.ysxsoft.imtalk.chatroom.widget.MicSeatView
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.music.AudioUtils
 import com.ysxsoft.imtalk.music.CustomeWindow
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.dialog.*
@@ -59,6 +61,7 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
+import kotlinx.android.synthetic.main.voice_dialog_layout.view.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -99,12 +102,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     /**
      * 被踢房间
      */
-    override fun onRoomMemberKickChange(memberCount: Int) {
-        updateRoomInfo()
-        updateRoomTitle(detailRoomInfo!!.roomInfo.room_name, detailRoomInfo!!.roomInfo.room_num, memberCount.toString())
-//        IMClient.getInstance().quitChatRoom(room_id, null)
-//        RtcClient.getInstance().quitRtcRoom(room_id, null)
-//        finish()
+    override fun onRoomMemberKickChange(uid: String) {
+        if (AuthManager.getInstance().currentUserId.equals(uid)) {
+            IMClient.getInstance().quitChatRoom(room_id, null)
+            RtcClient.getInstance().quitRtcRoom(room_id, null)
+            finish()
+        }
     }
 
     override fun onRoomMemberChange(memberCount: Int) {
@@ -426,6 +429,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         tv_music.setOnClickListener {
             voiceDialog = SongVoiceDialog(mContext)
+            val seekBar = voiceDialog!!.findViewById<AppCompatSeekBar>(R.id.seekBar)
+            seekBar.progress = AudioUtils.getCurrentAudioVolume(mContext)
+            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    AudioUtils.setAudioVolume(mContext, progress)
+                }
+            })
             voiceDialog!!.setSongVoiceListener(object : SongVoiceDialog.SongVoiceListener {
                 override fun StopSong() {
                     showToastMessage("停止音乐")
@@ -1356,7 +1372,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
-                                        detailRoomInfo = roomDetailInfo
+//                                        detailRoomInfo = roomDetailInfo
                                         updateMicSeatState(roomDetailInfo.micPositions)
                                         val controlMessage = MicPositionControlMessage()
                                         if ("1".equals(s)) {//闭麦
@@ -1386,7 +1402,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 }
 
                                 override fun onFail(errorCode: Int) {
-                                    showToastMessage("闭麦 - 开麦失败==")
                                 }
                             })
                         }
@@ -1419,7 +1434,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
-                                        detailRoomInfo = roomDetailInfo
+//                                        detailRoomInfo = roomDetailInfo
                                         updateMicSeatState(roomDetailInfo.micPositions)
                                         val controlMessage = MicPositionControlMessage()
                                         if ("1".equals(s)) {//锁麦
@@ -1449,7 +1464,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 }
 
                                 override fun onFail(errorCode: Int) {
-                                    showToastMessage("锁麦开麦失败")
                                 }
                             })
 
@@ -1703,10 +1717,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                             }
                                         }
 
-                                        detailRoomInfo!!.roomInfo.setMemCount(roomDetailInfo.roomInfo.getMemCount())
                                         updateMicSeatState(roomDetailInfo.micPositions)
-                                        updateRoomTitle(roomDetailInfo.roomInfo.room_name, roomDetailInfo.roomInfo.room_num, detailRoomInfo!!.roomInfo.memCount.toString())
-
                                         val controlMessage = MicPositionControlMessage()
                                         controlMessage.setCmd(6)//上麦
                                         controlMessage.targetUserId = userId
@@ -1761,11 +1772,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
-                                        detailRoomInfo = roomDetailInfo
-
                                         for (bean in roomDetailInfo.micPositions) {
                                             if (!AuthManager.getInstance().currentUserId.equals(bean.uid)) {
                                                 img_simle.visibility = View.GONE
