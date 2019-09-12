@@ -37,7 +37,9 @@ class Msg1Fragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter("RECEIVEMESSAGE")
-        myBroadcast = MyBroadcast()
+        if(myBroadcast==null){
+            myBroadcast = MyBroadcast()
+        }
         activity!!.registerReceiver(myBroadcast, intentFilter)
 
         mAdapter = MsgChatListAdapter(mContext)

@@ -1,7 +1,12 @@
 package com.ysxsoft.imtalk.view
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.bluetooth.BluetoothHeadset
 import android.content.*
+import android.graphics.Color
+import android.graphics.PixelFormat
 import android.media.AudioManager
 import android.net.Uri
 import android.os.*
@@ -26,6 +31,10 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.opensource.svgaplayer.SVGADrawable
+import com.opensource.svgaplayer.SVGAImageView
+import com.opensource.svgaplayer.SVGAParser
+import com.opensource.svgaplayer.SVGAVideoEntity
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
@@ -55,17 +64,25 @@ import com.ysxsoft.imtalk.music.AudioUtils
 import com.ysxsoft.imtalk.music.CustomeWindow
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.dialog.*
+import com.zhy.http.okhttp.OkHttpUtils
+import com.zhy.http.okhttp.callback.FileCallBack
 import io.rong.imkit.RongIM
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
+import kotlinx.android.synthetic.main.view_gift.*
 import kotlinx.android.synthetic.main.voice_dialog_layout.view.*
+import okhttp3.Call
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.lang.reflect.InvocationTargetException
+import java.net.URL
 import java.util.ArrayList
 
 /**
@@ -2055,7 +2072,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
 
                             override fun onAnimationCancel(view: View) {
-
                             }
                         })
                     }, 1 * delay.toLong())
@@ -2080,168 +2096,413 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         viewMap.put(position, v);
     }
 
-    fun showPositionGift(position: Int, toPosition: Int, giftImgUrl: String, staticImgUrl: String) {
-        val f = findViewById<FrameLayout>(android.R.id.content)
-        val v = View.inflate(mContext, R.layout.view_gift, null)
-        val giftImageView = v.findViewById<ImageView>(R.id.giftView)
+    fun showPositionGiftWindowManager(position: Int, toPosition: Int, giftImgUrl: String, staticImgUrl: String) {
+        val manager = mContext!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val params = WindowManager.LayoutParams()
+        params.width = WindowManager.LayoutParams.MATCH_PARENT
+        params.height = WindowManager.LayoutParams.MATCH_PARENT
+        params.format = PixelFormat.TRANSPARENT
 
-        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        v.layoutParams = layoutParams
-        f.addView(v)
+        val svgaImageView = SVGAImageView(this)
+        svgaImageView.setBackgroundColor(Color.TRANSPARENT)
+        val parser = SVGAParser(this)
+        val layoutParams = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        svgaImageView.layoutParams = layoutParams
+        manager.addView(svgaImageView, params)
+        //        parser.decodeFromAssets("hj.svga", object : SVGAParser.ParseCompletion {
+//            override fun onComplete(videoItem: SVGAVideoEntity) {
+//                svgaImageView.setVideoItem(videoItem)
+//                svgaImageView.stepToFrame(0, true)
+//            }
+//
+//            override fun onError() {
+//            }
+//        })
+
+    }
+
+    fun showPositionGift(position: Int, toPosition: Int, giftImgUrl: String, staticImgUrl: String) {
+
+        val f = findViewById<FrameLayout>(android.R.id.content)
+
 
         if (giftImgUrl.endsWith(".gif")) {
-            //显示动态图
-            Glide.with(this).asGif().listener(object : RequestListener<GifDrawable> {
-                override fun onLoadFailed(e: GlideException?, model: Any, target: Target<GifDrawable>, isFirstResource: Boolean): Boolean {
-                    return false
-                }
+            val giftImgUrl = "http://chitchat.rhhhyy.com/mengjing.svga"
+            //显示View
+            val svgaImageView = SVGAImageView(this)
+            val parser = SVGAParser(this)
+            f.addView(svgaImageView)
+            //加载svga
+            val SDPATH = Environment.getExternalStorageDirectory().absolutePath + "/" + AppUtil.getCurrentPageName(mContext) + "/svags/"
+            val file = File(SDPATH)
+            if (!file.exists()) {
+                file.mkdirs()
+            }
+            val index = giftImgUrl!!.lastIndexOf("/")
+            val destFileName = giftImgUrl.substring(index, giftImgUrl.length)
+            val downloadFile = File(SDPATH + destFileName)
+            if (!downloadFile.exists()) {
+                Log.e("tag", "动画不存在,进行下载！downloadFile:" + downloadFile)
+                //文件不存在进行下载
+                downloadGift(giftImgUrl, object : OnDownLoadComplteListener {
+                    override fun complete(path: String?) {
+                        runOnUiThread(Runnable {
+                            //播放动画
+                            val inputStream = FileInputStream(downloadFile)
+                            parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
+                                override fun onComplete(videoItem: SVGAVideoEntity) {
+                                    svgaImageView.setVideoItem(videoItem)
+//                                  val s = videoItem.frames / videoItem.FPS
+                                    svgaImageView.stepToFrame(0, true)
+                                    val s = videoItem.frames / videoItem.FPS
+                                    Log.e("tag", "数据时长:" + s);
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        //8秒后结束
+                                        svgaImageView.stopAnimation()
+                                        f.removeView(svgaImageView)
+                                        //移除之后创建分开View
+                                        val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
+                                        val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
+                                        for (i in 0..8) {
+                                            val childImageView = ImageView(mContext)
+                                            Glide.with(mContext).load(staticImgUrl).into(childImageView)
+                                            val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+                                            childImageView.layoutParams = layoutParams;
+                                            childImageView.x = halfWidth
+                                            childImageView.y = halfHeight
+                                            f.addView(childImageView)
 
-                override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                    try {
-                        val gifStateField = GifDrawable::class.java.getDeclaredField("state")
-                        gifStateField.isAccessible = true
-                        val gifStateClass = Class.forName("com.bumptech.glide.load.resource.gif.GifDrawable\$GifState")
-                        val gifFrameLoaderField = gifStateClass.getDeclaredField("frameLoader")
-                        gifFrameLoaderField.isAccessible = true
-                        val gifFrameLoaderClass = Class.forName("com.bumptech.glide.load.resource.gif.GifFrameLoader")
-                        val gifDecoderField = gifFrameLoaderClass.getDeclaredField("gifDecoder")
-                        gifDecoderField.isAccessible = true
-                        val gifDecoderClass = Class.forName("com.bumptech.glide.gifdecoder.GifDecoder")
-                        val gifDecoder = gifDecoderField.get(gifFrameLoaderField.get(gifStateField.get(resource)))
-                        val getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", Int::class.javaPrimitiveType!!)
-                        getDelayMethod.isAccessible = true
-                        //设置只播放一次
-                        resource.setLoopCount(1)
-                        //获得总帧数
-                        val count = resource.frameCount
-                        var delay = 0
-                        for (i in 0 until count) {
-                            //计算每一帧所需要的时间进行累加
-                            delay += getDelayMethod.invoke(gifDecoder, i) as Int
-                        }
-                        giftImageView.postDelayed({
-                            ViewCompat.animate(giftImageView).scaleX(0f).scaleY(0f).alpha(0f).setDuration(300).setListener(object : ViewPropertyAnimatorListener {
-                                override fun onAnimationStart(view: View) {
+                                            val startPosition = getPosition(position)
+                                            val endPosition = getPosition(i)
+                                            val offsetX = endPosition[0] - startPosition[0]+DisplayUtils.dp2px(mContext,10)
+                                            val offsetY = endPosition[1] - startPosition[1]+DisplayUtils.dp2px(mContext,5)
 
+                                            ViewCompat.animate(childImageView)
+                                                    .translationXBy(offsetX.toFloat())
+                                                    .translationYBy(offsetY.toFloat())
+                                                    .setDuration(800)
+                                                    .setListener(object : ViewPropertyAnimatorListener {
+                                                        override fun onAnimationStart(view: View) {
+                                                        }
+
+                                                        override fun onAnimationEnd(view: View) {
+                                                            //动画结束后删除大礼物图
+                                                            f.removeView(childImageView)
+                                                        }
+
+                                                        override fun onAnimationCancel(view: View) {
+                                                        }
+                                                    })
+                                        }
+                                    }, 8000)
                                 }
 
-                                override fun onAnimationEnd(view: View) {
-                                    //动画结束后删除大礼物图
-                                    f.removeView(v)
-                                    val w = chatroom_mp_mic_1.width;
-                                    val h = chatroom_mp_mic_1.height;
-                                    val imgW = DisplayUtils.dp2px(mContext, 44);
-                                    val imgH = DisplayUtils.dp2px(mContext, 44);
-                                    val imageOffsetX = w / 2 - imgW / 2;
-                                    val imageOffsetY = h / 2 - imgH / 2;
-
-                                    val startPosition = getPosition(position);
-                                    val endPosition = getPosition(toPosition);
-                                    val offsetX = endPosition[0] - startPosition[0];
-                                    val offsetY = endPosition[1] - startPosition[1];
-
-                                    val f = findViewById<FrameLayout>(android.R.id.content)
-                                    val childView = View.inflate(mContext, R.layout.view_emj, null)
-                                    val childImageView = childView.findViewById<ImageView>(R.id.gifView)
-                                    Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
-
-                                    childView.x = (startPosition[0] + imageOffsetX).toFloat();
-                                    childView.y = (startPosition[1] + imageOffsetY).toFloat();
-
-                                    val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
-                                    childView.layoutParams = layoutParams
-                                    f.addView(childView)
-
-                                    Log.e("tag", "x:" + offsetX.toFloat() + " y:" + offsetY.toFloat())
-                                    ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
-                                        override fun onAnimationStart(view: View) {
-                                        }
-
-                                        override fun onAnimationEnd(view: View) {
-                                            //动画结束后删除大礼物图
-                                            f.removeView(childView)
-                                        }
-
-                                        override fun onAnimationCancel(view: View) {
-                                        }
-                                    })
+                                override fun onError() {
+                                    Log.e("tag", "异常")
                                 }
-
-                                override fun onAnimationCancel(view: View) {
-
-                                }
-                            })
-                        }, delay.toLong())
-                    } catch (e: NoSuchFieldException) {
-                        e.printStackTrace()
-                    } catch (e: ClassNotFoundException) {
-                        e.printStackTrace()
-                    } catch (e: IllegalAccessException) {
-                        e.printStackTrace()
-                    } catch (e: NoSuchMethodException) {
-                        e.printStackTrace()
-                    } catch (e: InvocationTargetException) {
-                        e.printStackTrace()
-                    }
-                    return false
-                }
-            }).diskCacheStrategy(DiskCacheStrategy.RESOURCE).load(giftImgUrl).into(giftImageView)
-        } else {
-            //显示静态图
-            Glide.with(this).load(giftImgUrl).into(giftImageView);
-            giftImageView.postDelayed({
-                ViewCompat.animate(giftImageView).scaleX(0f).scaleY(0f).alpha(0f).setDuration(300).setListener(object : ViewPropertyAnimatorListener {
-                    override fun onAnimationStart(view: View) {
-                    }
-
-                    override fun onAnimationEnd(view: View) {
-                        //动画结束后删除大礼物图
-                        f.removeView(v)
-                        val w = chatroom_mp_mic_1.width;
-                        val h = chatroom_mp_mic_1.height;
-                        val imgW = DisplayUtils.dp2px(mContext, 44);
-                        val imgH = DisplayUtils.dp2px(mContext, 44);
-                        val imageOffsetX = w / 2 - imgW / 2;
-                        val imageOffsetY = h / 2 - imgH / 2;
-
-                        val startPosition = getPosition(position);
-                        val endPosition = getPosition(toPosition);
-                        val offsetX = endPosition[0] - startPosition[0];
-                        val offsetY = endPosition[1] - startPosition[1];
-
-                        val f = findViewById<FrameLayout>(android.R.id.content)
-                        val childView = View.inflate(mContext, R.layout.view_emj, null)
-                        val childImageView = childView.findViewById<ImageView>(R.id.gifView)
-                        Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
-
-                        childView.x = (startPosition[0] + imageOffsetX).toFloat();
-                        childView.y = (startPosition[1] + imageOffsetY).toFloat();
-
-                        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
-                        childView.layoutParams = layoutParams
-                        f.addView(childView)
-
-                        Log.e("tag", "x:" + offsetX.toFloat() + " y:" + offsetY.toFloat())
-                        ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
-                            override fun onAnimationStart(view: View) {
-                            }
-
-                            override fun onAnimationEnd(view: View) {
-                                //动画结束后删除大礼物图
-                                f.removeView(childView)
-                            }
-
-                            override fun onAnimationCancel(view: View) {
-                            }
+                            }, true)
                         })
                     }
+                })
+                return
+            } else {
+                Log.e("tag", "动画存在,直接显示！downloadFile:" + downloadFile)
+                //直接显示
+                try {
+                    val inputStream = FileInputStream(downloadFile)
+                    parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
+                        override fun onComplete(videoItem: SVGAVideoEntity) {
+                            svgaImageView.setVideoItem(videoItem)
+//                                val s = videoItem.frames / videoItem.FPS
+                            svgaImageView.stepToFrame(0, true)
+                            val s = videoItem.frames / videoItem.FPS
+                            Log.e("tag", "数据时长:" + s);
 
-                    override fun onAnimationCancel(view: View) {
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                //8秒后结束
+                                svgaImageView.stopAnimation()
+                                f.removeView(svgaImageView)
+                                //移除之后创建分开View
+                                val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
+                                val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
+                                for (i in 0..8) {
+                                    val childImageView = ImageView(mContext)
+                                    Glide.with(mContext).load(staticImgUrl).into(childImageView)
+                                    val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+                                    childImageView.layoutParams = layoutParams;
+                                    childImageView.x = halfWidth
+                                    childImageView.y = halfHeight
+                                    f.addView(childImageView)
 
+                                    val startPosition = getPosition(position)
+                                    val endPosition = getPosition(i)
+                                    val offsetX = endPosition[0] - startPosition[0]+DisplayUtils.dp2px(mContext,10)
+                                    val offsetY = endPosition[1] - startPosition[1]+DisplayUtils.dp2px(mContext,5)
+
+                                    ViewCompat.animate(childImageView)
+                                            .translationXBy(offsetX.toFloat())
+                                            .translationYBy(offsetY.toFloat())
+                                            .setDuration(800)
+                                            .setListener(object : ViewPropertyAnimatorListener {
+                                                override fun onAnimationStart(view: View) {
+                                                }
+
+                                                override fun onAnimationEnd(view: View) {
+                                                    //动画结束后删除大礼物图
+                                                    f.removeView(childImageView)
+                                                }
+
+                                                override fun onAnimationCancel(view: View) {
+                                                }
+                                            })
+                                }
+                            }, 8000)
+                        }
+
+                        override fun onError() {
+                        }
+                    }, true)
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                }
+            }
+        } else {
+            //静态图
+            val imageView = ImageView(this)
+            val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+            imageView.layoutParams = layoutParams;
+            Glide.with(mContext).load(giftImgUrl).into(imageView)
+            f.addView(imageView)
+            val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
+            imageView.x = halfWidth
+            val valueAnimator = ValueAnimator.ofFloat(0f, 1f)
+            valueAnimator.addUpdateListener { animation ->
+                val value = animation.animatedValue as Float
+                val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
+                imageView.y = halfHeight * value
+            }
+            valueAnimator.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    super.onAnimationEnd(animation)
+                    f.removeView(imageView)
+                    //移除之后创建分开View
+                    val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
+                    val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
+                    for (i in 0..8) {
+                        val childImageView = ImageView(mContext)
+                        Glide.with(mContext).load(staticImgUrl).into(childImageView)
+                        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+                        childImageView.layoutParams = layoutParams;
+                        childImageView.x = halfWidth
+                        childImageView.y = halfHeight
+                        f.addView(childImageView)
+
+                        val startPosition = getPosition(position)
+                        val endPosition = getPosition(i)
+                        val offsetX = endPosition[0] - startPosition[0]+DisplayUtils.dp2px(mContext,10)
+                        val offsetY = endPosition[1] - startPosition[1]+DisplayUtils.dp2px(mContext,5)
+
+                        ViewCompat.animate(childImageView)
+                                .translationXBy(offsetX.toFloat())
+                                .translationYBy(offsetY.toFloat())
+                                .setDuration(800)
+                                .setListener(object : ViewPropertyAnimatorListener {
+                                    override fun onAnimationStart(view: View) {
+                                    }
+
+                                    override fun onAnimationEnd(view: View) {
+                                        //动画结束后删除大礼物图
+                                        f.removeView(childImageView)
+                                    }
+
+                                    override fun onAnimationCancel(view: View) {
+                                    }
+                                })
+                    }
+                }
+            })
+            valueAnimator.repeatCount = 0
+            valueAnimator.duration = 800
+            valueAnimator.start()
+        }
+//        if (giftImgUrl.endsWith(".gif")) {
+//            //显示动态图
+//            Glide.with(this).asGif().listener(object : RequestListener<GifDrawable> {
+//                override fun onLoadFailed(e: GlideException?, model: Any, target: Target<GifDrawable>, isFirstResource: Boolean): Boolean {
+//                    return false
+//                }
+//
+//                override fun onResourceReady(resource: GifDrawable, model: Any, target: Target<GifDrawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+//                    try {
+//                        val gifStateField = GifDrawable::class.java.getDeclaredField("state")
+//                        gifStateField.isAccessible = true
+//                        val gifStateClass = Class.forName("com.bumptech.glide.load.resource.gif.GifDrawable\$GifState")
+//                        val gifFrameLoaderField = gifStateClass.getDeclaredField("frameLoader")
+//                        gifFrameLoaderField.isAccessible = true
+//                        val gifFrameLoaderClass = Class.forName("com.bumptech.glide.load.resource.gif.GifFrameLoader")
+//                        val gifDecoderField = gifFrameLoaderClass.getDeclaredField("gifDecoder")
+//                        gifDecoderField.isAccessible = true
+//                        val gifDecoderClass = Class.forName("com.bumptech.glide.gifdecoder.GifDecoder")
+//                        val gifDecoder = gifDecoderField.get(gifFrameLoaderField.get(gifStateField.get(resource)))
+//                        val getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", Int::class.javaPrimitiveType!!)
+//                        getDelayMethod.isAccessible = true
+//                        //设置只播放一次
+//                        resource.setLoopCount(1)
+//                        //获得总帧数
+//                        val count = resource.frameCount
+//                        var delay = 0
+//                        for (i in 0 until count) {
+//                            //计算每一帧所需要的时间进行累加
+//                            delay += getDelayMethod.invoke(gifDecoder, i) as Int
+//                        }
+//                        giftImageView.postDelayed({
+//                            ViewCompat.animate(giftImageView).scaleX(0f).scaleY(0f).alpha(0f).setDuration(300).setListener(object : ViewPropertyAnimatorListener {
+//                                override fun onAnimationStart(view: View) {
+//
+//                                }
+//
+//                                override fun onAnimationEnd(view: View) {
+//                                    //动画结束后删除大礼物图
+//                                    f.removeView(v)
+//                                    val w = chatroom_mp_mic_1.width;
+//                                    val h = chatroom_mp_mic_1.height;
+//                                    val imgW = DisplayUtils.dp2px(mContext, 44);
+//                                    val imgH = DisplayUtils.dp2px(mContext, 44);
+//                                    val imageOffsetX = w / 2 - imgW / 2;
+//                                    val imageOffsetY = h / 2 - imgH / 2;
+//
+//                                    val startPosition = getPosition(position);
+//                                    val endPosition = getPosition(toPosition);
+//                                    val offsetX = endPosition[0] - startPosition[0];
+//                                    val offsetY = endPosition[1] - startPosition[1];
+//
+//                                    val f = findViewById<FrameLayout>(android.R.id.content)
+//                                    val childView = View.inflate(mContext, R.layout.view_emj, null)
+//                                    val childImageView = childView.findViewById<ImageView>(R.id.gifView)
+//                                    Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
+//
+//                                    childView.x = (startPosition[0] + imageOffsetX).toFloat();
+//                                    childView.y = (startPosition[1] + imageOffsetY).toFloat();
+//
+//                                    val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
+//                                    childView.layoutParams = layoutParams
+//                                    f.addView(childView)
+//
+//                                    Log.e("tag", "x:" + offsetX.toFloat() + " y:" + offsetY.toFloat())
+//                                    ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
+//                                        override fun onAnimationStart(view: View) {
+//                                        }
+//
+//                                        override fun onAnimationEnd(view: View) {
+//                                            //动画结束后删除大礼物图
+//                                            f.removeView(childView)
+//                                        }
+//
+//                                        override fun onAnimationCancel(view: View) {
+//                                        }
+//                                    })
+//                                }
+//
+//                                override fun onAnimationCancel(view: View) {
+//
+//                                }
+//                            })
+//                        }, delay.toLong())
+//                    } catch (e: NoSuchFieldException) {
+//                        e.printStackTrace()
+//                    } catch (e: ClassNotFoundException) {
+//                        e.printStackTrace()
+//                    } catch (e: IllegalAccessException) {
+//                        e.printStackTrace()
+//                    } catch (e: NoSuchMethodException) {
+//                        e.printStackTrace()
+//                    } catch (e: InvocationTargetException) {
+//                        e.printStackTrace()
+//                    }
+//                    return false
+//                }
+//            }).diskCacheStrategy(DiskCacheStrategy.RESOURCE).load(giftImgUrl).into(giftImageView)
+//        } else {
+//            //显示静态图
+//            Glide.with(this).load(giftImgUrl).into(giftImageView);
+//            giftImageView.postDelayed({
+//                ViewCompat.animate(giftImageView).scaleX(0f).scaleY(0f).alpha(0f).setDuration(300).setListener(object : ViewPropertyAnimatorListener {
+//                    override fun onAnimationStart(view: View) {
+//                    }
+//
+//                    override fun onAnimationEnd(view: View) {
+//                        //动画结束后删除大礼物图
+//                        f.removeView(v)
+//                        val w = chatroom_mp_mic_1.width;
+//                        val h = chatroom_mp_mic_1.height;
+//                        val imgW = DisplayUtils.dp2px(mContext, 44);
+//                        val imgH = DisplayUtils.dp2px(mContext, 44);
+//                        val imageOffsetX = w / 2 - imgW / 2;
+//                        val imageOffsetY = h / 2 - imgH / 2;
+//
+//                        val startPosition = getPosition(position);
+//                        val endPosition = getPosition(toPosition);
+//                        val offsetX = endPosition[0] - startPosition[0];
+//                        val offsetY = endPosition[1] - startPosition[1];
+//
+//                        val f = findViewById<FrameLayout>(android.R.id.content)
+//                        val childView = View.inflate(mContext, R.layout.view_emj, null)
+//                        val childImageView = childView.findViewById<ImageView>(R.id.gifView)
+//                        Glide.with(mContext).load(staticImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(childImageView)
+//
+//                        childView.x = (startPosition[0] + imageOffsetX).toFloat();
+//                        childView.y = (startPosition[1] + imageOffsetY).toFloat();
+//
+//                        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 44), DisplayUtils.dp2px(mContext, 44))
+//                        childView.layoutParams = layoutParams
+//                        f.addView(childView)
+//
+//                        Log.e("tag", "x:" + offsetX.toFloat() + " y:" + offsetY.toFloat())
+//                        ViewCompat.animate(childView).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setDuration(1000).setListener(object : ViewPropertyAnimatorListener {
+//                            override fun onAnimationStart(view: View) {
+//                            }
+//
+//                            override fun onAnimationEnd(view: View) {
+//                                //动画结束后删除大礼物图
+//                                f.removeView(childView)
+//                            }
+//
+//                            override fun onAnimationCancel(view: View) {
+//                            }
+//                        })
+//                    }
+//
+//                    override fun onAnimationCancel(view: View) {
+//
+//                    }
+//                })
+//            }, 2000)
+//        }
+    }
+
+    private fun downloadGift(url: String?, listener: OnDownLoadComplteListener) {
+        val SDPATH = Environment.getExternalStorageDirectory().absolutePath + "/" + AppUtil.getCurrentPageName(mContext) + "/svags/"
+        val index = url!!.lastIndexOf("/")
+        val destFileName = url.substring(index, url.length)
+        OkHttpUtils.get()
+                .url(url)
+                .build()
+                .execute(object : FileCallBack(SDPATH, destFileName) {
+                    override fun onError(call: Call, e: Exception, id: Int) {
+                    }
+
+                    override fun inProgress(progress: Float, total: Long, id: Int) {}
+
+                    override fun onResponse(file: File, id: Int) {
+                        if (listener != null) {
+                            listener.complete(file.path);
+                        }
                     }
                 })
-            }, 2000)
-        }
+    }
+
+    interface OnDownLoadComplteListener {
+        fun complete(path: String?);
     }
 
     /**

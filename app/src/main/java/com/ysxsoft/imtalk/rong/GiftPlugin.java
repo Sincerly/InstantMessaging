@@ -6,9 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
+import com.ysxsoft.imtalk.im.message.PrivateGiftMessage;
 import com.ysxsoft.imtalk.widget.dialog.GiftBagDialog;
 import com.ysxsoft.imtalk.widget.dialog.SendGiftDialog;
 
@@ -16,10 +18,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import io.rong.imkit.RongExtension;
+import io.rong.imkit.RongIM;
 import io.rong.imkit.plugin.IPluginModule;
 import io.rong.imkit.plugin.IPluginRequestPermissionResultCallback;
 import io.rong.imkit.plugin.image.PictureSelectorActivity;
 import io.rong.imkit.utilities.PermissionCheckUtil;
+import io.rong.imlib.IRongCallback;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
 
 /**
  * Create By 胡
@@ -43,6 +50,27 @@ public class GiftPlugin implements IPluginModule,IPluginRequestPermissionResultC
             @Override
             public void onSendSuccess(@NotNull String from, @Nullable String to, @NotNull String giftId, @NotNull String giftNum) {
                 ToastUtils.showToast("from"+from+" to:"+to+" giftId:"+giftId+" giftNum:"+giftNum);
+                PrivateGiftMessage message=new PrivateGiftMessage();
+                message.setGiftNum(giftNum);
+                message.setGiftName("测试");
+                message.setGiftUrl("http://www.baidu.com/a.png");
+
+                RongIMClient.getInstance().sendMessage(Conversation.ConversationType.PRIVATE,rongExtension.getTargetId(),message, null, null, new IRongCallback.ISendMessageCallback() {
+                    @Override
+                    public void onAttached(Message message) {
+                        Log.e("tag","onAttached");
+                    }
+
+                    @Override
+                    public void onSuccess(Message message) {
+                        Log.e("tag","onSuccess:"+message.toString());
+                    }
+
+                    @Override
+                    public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                        Log.e("tag","onError:");
+                    }
+                });
             }
         });
         sendGiftDialog.show();

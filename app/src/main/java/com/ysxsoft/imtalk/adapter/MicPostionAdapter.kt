@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -21,17 +22,16 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
     override val layoutId: Int
         get() = R.layout.mic_postion_layout
 
-    var click=-1
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideHeadImageLoad(mContext, bean.icon, holder.getView<CircleImageView>(R.id.img_head)!!)
         if (position == 0) holder.getView<TextView>(R.id.tv_NO)!!.setText("房主") else holder.getView<TextView>(R.id.tv_NO)!!.setText(bean.sort.toString())
-        if (click==position){
+        if (bean.isChoosed) {
             holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundResource(R.drawable.btn_cir_bg)
         }
 
         holder.itemView.setOnClickListener {
-            if (onClickListener!=null){
+            if (onClickListener != null) {
                 onClickListener!!.onClick(position)
             }
         }
@@ -53,12 +53,13 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
 
     }
 
-    interface OnClickListener{
+    interface OnClickListener {
         fun onClick(position: Int)
     }
-    private var onClickListener: OnClickListener?=null
-    fun setOnClickListener(onClickListener: OnClickListener){
-        this.onClickListener=onClickListener
+
+    private var onClickListener: OnClickListener? = null
+    fun setOnClickListener(onClickListener: OnClickListener) {
+        this.onClickListener = onClickListener
     }
 
     private var checkInterface: CheckInterface? = null
@@ -73,7 +74,6 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
     }
 
     fun setSelect(position: Int) {
-        click=position
         notifyDataSetChanged()
     }
 

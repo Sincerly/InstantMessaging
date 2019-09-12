@@ -106,8 +106,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                     ZdData()
                 }
                 "4" -> {
-                    gifDrawable!!.start(); //开始播放
-                    gifDrawable!!.reset()
+
                     ZdData()
                 }
             }
@@ -128,7 +127,14 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                         if (t.code == 0) {
                             if ("4".equals(type)) {
                                 if (isClick) {
-                                    ZdData()
+                                    boxViewLayout.removeAllViews()
+                                    gifDrawable!!.start(); //开始播放
+                                    gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
+                                    gifDrawable!!.reset()
+                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                        showAnim(t!!.data[0].aw_pic)
+                                        ZdData()
+                                    }, 3000)
                                 }
                             } else if("1".equals(type)) {
                                 boxViewLayout.removeAllViews()

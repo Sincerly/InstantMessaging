@@ -17,6 +17,8 @@ import com.ysxsoft.imtalk.chatroom.task.ThreadManager
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication
 import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog
+import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
+import com.ysxsoft.imtalk.im.provider.PrivateGiftProvider
 import io.rong.imkit.RongIM
 import io.rong.imlib.RongIMClient
 import org.litepal.LitePal
@@ -89,8 +91,14 @@ class BaseApplication : MyApplication() {
                 UserInfo(userId, "", Uri.parse(""))
             }
         }, true)
+
+        initMessageAndTemplate();
     }
 
+    fun initMessageAndTemplate(){
+        RongIM.registerMessageType(PrivateGiftMessage::class.java)
+        RongIM.registerMessageTemplate(PrivateGiftProvider())
+    }
 
     fun setMyExtensionModule() {
         val moduleList = RongExtensionManager.getInstance().extensionModules

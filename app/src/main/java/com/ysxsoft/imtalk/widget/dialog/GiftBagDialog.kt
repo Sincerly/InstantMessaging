@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.widget.dialog
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import com.gcssloop.widget.PagerGridLayoutManager
@@ -251,6 +252,13 @@ class GiftBagDialog : ABSDialog {
                                     mwuid = micPostionAdapter!!.dataList.get(position).uid.toString()
                                     toPosition = micPostionAdapter!!.dataList.get(position).sort
                                     micPostionAdapter!!.setSelect(position)
+                                }
+                            })
+                            micPostionAdapter!!.setCheckInterface(object :MicPostionAdapter.CheckInterface{
+                                override fun checkGroup(position: Int, isChecked: Boolean) {
+                                    val bean = micPostionAdapter!!.dataList.get(position)
+                                    bean.isChoosed = !bean.isChoosed;
+                                    micPostionAdapter!!.notifyDataSetChanged()
                                 }
                             })
                         }
