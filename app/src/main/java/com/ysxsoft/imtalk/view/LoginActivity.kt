@@ -81,16 +81,11 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    private fun UMQQLoglin(share_media: SHARE_MEDIA) {
-        val authorize = UMShareAPI.get(mContext).isAuthorize(this@LoginActivity, share_media)
-        if (authorize) {
-            UMShareAPI.get(mContext).deleteOauth(this@LoginActivity, share_media, authListener)
-        } else {
-            UMShareAPI.get(mContext).doOauthVerify(this@LoginActivity, share_media, authListener)
-        }
+    private fun UMQQLoglin(share_media: SHARE_MEDIA?) {
+        UMShareAPI.get(mContext).getPlatformInfo(this@LoginActivity, share_media, authListener)
     }
 
-    internal var authListener: UMAuthListener = object : UMAuthListener {
+    var authListener = object : UMAuthListener {
         override fun onStart(platform: SHARE_MEDIA) {
             SocializeUtils.safeShowDialog(dialog)
         }
@@ -167,7 +162,8 @@ class LoginActivity : BaseActivity() {
                                                 }
                                                 SpUtils.saveSp(mContext, "uid", t.data.userInfo.uid.toString())
                                                 com.ysxsoft.imtalk.chatroom.utils.SpUtils.saveSp(mContext, "uid", t.data.userInfo.uid.toString())
-                                                startActivity(MainActivity::class.java)
+//                                                startActivity(MainActivity::class.java)
+                                                startActivity(ImprovingDataActivity::class.java)
                                             }
 
                                             override fun onError(errorCode: RongIMClient.ErrorCode) {
@@ -254,7 +250,7 @@ class LoginActivity : BaseActivity() {
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
+    override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         UMShareAPI.get(this).onSaveInstanceState(outState)
     }

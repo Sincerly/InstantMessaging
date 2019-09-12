@@ -2,14 +2,33 @@ package com.ysxsoft.imtalk.view
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.mipmap.myself
+import com.ysxsoft.imtalk.appservice.PlayMusicService
+import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.bean.RoomLockBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
+import com.ysxsoft.imtalk.chatroom.im.IMClient
+import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
+import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
+import com.ysxsoft.imtalk.chatroom.task.ResultCallback
+import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.fragment.*
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
+import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
+import io.rong.imlib.IRongCallback
+import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.my_data_layout.*
 import kotlinx.android.synthetic.main.w_translation_title_layout.*
 import rx.Observer
@@ -38,13 +57,19 @@ class MyDataActivity : BaseActivity() {
     private var tagP = "0"
     var uid: String? = null
     var myself: String? = null
+    var room: String? = null
+    var is_room: String? = null
     var mydatagiftfragment = MyDataGiftFragment()
     var mydatacarfragment = MyDataCarFragment()
     var mydatafragment = MyDataFragment()
+    var bean: UserInfoBean.DataBean? = null
+    var mybean: UserInfoBean.DataBean? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         uid = intent.getStringExtra("uid")
         myself = intent.getStringExtra("myself")
+        room = intent.getStringExtra("room")
+        is_room = intent.getStringExtra("is_room")
         if ("myself".equals(myself)) {
             tv_za_ta.visibility = View.GONE
             tv_t_room.visibility = View.GONE
@@ -68,7 +93,30 @@ class MyDataActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        requestMySelfData()
         requestData()
+    }
+
+    private fun requestMySelfData() {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(AuthManager.getInstance().currentUserId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            mybean = t.data
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
     }
 
     private fun requestData() {
@@ -82,6 +130,7 @@ class MyDataActivity : BaseActivity() {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
+                            bean = t.data
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_head)
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID:" + t.data.tt_id)
@@ -151,7 +200,154 @@ class MyDataActivity : BaseActivity() {
             tagP = "2"
             replaceFragment()
         }
+        tv_za_ta.setOnClickListener {
+            //Ta 所在的房间
+            if (TextUtils.equals("room", room)) {
+                showToastMessage("已经和对方在同一个房间")
+                return@setOnClickListener
+            }
+            if (TextUtils.equals("SearchActivity",myself)){
+                roomLock(bean!!.now_roomId.toString())
+            }else{
+                joinChatRoom(bean!!.now_roomId,"")
+            }
+        }
 
+        tv_t_room.setOnClickListener {
+            //Ta创建的房间
+            if (TextUtils.equals("is_room", is_room)) {
+                finish()
+                return@setOnClickListener
+            }
+            if (TextUtils.equals("SearchActivity",myself)){
+                roomLock(bean!!.roomId.toString())
+            }else{
+                quiteRoom(AuthManager.getInstance().currentUserId, "1")
+            }
+        }
+    }
+
+    /**
+     * 退出房间
+     */
+    private fun quiteRoom(uid: String, kick: String) {
+        val message = RoomMemberChangedMessage()
+        message.setCmd(2)//离开房间
+        message.targetUserId = uid
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mybean!!.nickname, Uri.parse(mybean!!.icon))
+        val obtain = Message.obtain(bean!!.now_roomId, Conversation.ConversationType.CHATROOM, message)
+
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+                Log.d("tag", p0!!.content.toString())
+            }
+
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(uid, kick, bean!!.now_roomId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                            }
+
+                            override fun onNext(t: CommonBean?) {
+                                showToastMessage(t!!.msg)
+                                if (t.code == 0) {
+                                    IMClient.getInstance().quitChatRoom(bean!!.now_roomId, null)
+                                    RtcClient.getInstance().quitRtcRoom(bean!!.now_roomId, null)
+//                                    joinChatRoom(bean!!.roomId)
+                                    roomLock(bean!!.roomId.toString())
+                                    finish()
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
+            }
+
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                Log.d("tag", p0!!.content.toString())//23409
+            }
+        });
+    }
+    fun roomLock(roomId: String) {
+        val map = HashMap<String, String>()
+        map.put("room_id", roomId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .room_lock(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<RoomLockBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RoomLockBean?) {
+                        if (t!!.code == 0) {
+                            RoomManager.getInstance().getRoomDetailInfo1(roomId,object :ResultCallback<DetailRoomInfo>{
+                                override fun onSuccess(result: DetailRoomInfo?) {
+                                    if (result!=null){
+                                        if (AuthManager.getInstance().currentUserId.equals(result.roomInfo.uid)){
+                                            joinChatRoom(bean!!.roomId,"")
+                                        }else{
+                                            var roomLock = t.data
+                                            if (roomLock==1){
+                                                val roomLockDialog = RoomLockDialog(mContext)
+                                                roomLockDialog.setEdClickListener(object : RoomLockDialog.EdClickListener{
+                                                    override fun setData(string: String) {
+                                                        joinChatRoom(bean!!.roomId,string)
+                                                    }
+                                                })
+                                                roomLockDialog.show()
+                                            }else{
+                                                joinChatRoom(bean!!.roomId,"")
+                                            }
+                                        }
+                                    }
+                                }
+
+                                override fun onFail(errorCode: Int) {
+                                }
+                            })
+                        }
+                    }
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
+    fun joinChatRoom(roomId: String,lock_pwd:String) {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId,lock_pwd, object : ResultCallback<DetailRoomInfo> {
+            override fun onSuccess(result: DetailRoomInfo?) {
+                val message = RoomMemberChangedMessage()
+                message.setCmd(1)
+                message.targetUserId = SpUtils.getSp(mContext, "uid")
+                message.targetPosition = -1
+                message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mybean!!.nickname, Uri.parse(mybean!!.icon))
+                val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
+                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                    override fun onAttached(p0: Message?) {
+                        Log.d("tag", p0!!.content.toString())
+                    }
+
+                    override fun onSuccess(p0: Message?) {
+                        Log.d("tag", p0!!.content.toString())
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mybean!!.nickname, mybean!!.icon)
+                    }
+
+                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                        Log.d("tag", p0!!.content.toString())
+                    }
+                });
+            }
+
+            override fun onFail(errorCode: Int) {
+
+            }
+        })
     }
 
     private var currentFragment: BaseFragment? = null

@@ -20,13 +20,17 @@ import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.music.CustomeWindow
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.BannerDetailActivity
 import com.ysxsoft.imtalk.view.ChatRoomActivity
 import com.ysxsoft.imtalk.widget.banner.GlideImageLoader
+import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
@@ -159,10 +163,10 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             adapterRecommend1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_recommend, roomLists!!.subList(0, 3)) {
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name + "===" + item.room_id
+                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name /*+ "  " + item.room_id*/
                     helper.itemView.setOnClickListener {
                         //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                        joinChatRoom(item.room_id.toString())
+                        roomLock(item.room_id.toString())
                     }
                 }
             }
@@ -172,10 +176,10 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             adapterRecommend1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_recommend, roomLists) {
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name + "===" + item.room_id
+                    helper.getView<TextView>(R.id.tv_Content).text = item.room_name /*+ "  " + item.room_id*/
                     helper.itemView.setOnClickListener {
                         //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                        joinChatRoom(item.room_id.toString())
+                        roomLock(item.room_id.toString())
                     }
                 }
             }
@@ -187,7 +191,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
 //                helper.getView<ImageView>(R.id.ivAvatar).displayRes(R.mipmap.icon_def)
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                helper.getView<TextView>(R.id.tv_name).text = item.room_name + "===" + item.room_id
+                helper.getView<TextView>(R.id.tv_name).text = item.room_name /*+ "  " + item.room_id*/
                 if (TextUtils.isEmpty(item.label_name)){
                     helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
                 }else{
@@ -200,7 +204,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 }
                 helper.itemView.setOnClickListener {
                     //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                    joinChatRoom(item.room_id.toString())
+                    roomLock(item.room_id.toString())
                 }
             }
         }
@@ -261,7 +265,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 helper.getView<TextView>(R.id.tv_Content).text = item.room_name
                 helper.itemView.setOnClickListener {
                     //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                    joinChatRoom(item.room_id.toString())
+                    roomLock(item.room_id.toString())
                 }
             }
         }
@@ -285,7 +289,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 }
                 helper.itemView.setOnClickListener {
                     //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                    joinChatRoom(item.room_id.toString())
+                    roomLock(item.room_id.toString())
                 }
             }
         }
@@ -301,8 +305,8 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
         }
     }
 
-    fun joinChatRoom(roomId: String) {
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
+    fun joinChatRoom(roomId: String,lock_pwd:String) {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId,lock_pwd, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
@@ -331,6 +335,55 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             }
         })
     }
+
+    fun roomLock(roomId: String) {
+        val map = HashMap<String, String>()
+        map.put("room_id", roomId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .room_lock(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<RoomLockBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RoomLockBean?) {
+                        if (t!!.code == 0) {
+
+                            RoomManager.getInstance().getRoomDetailInfo1(roomId,object :ResultCallback<DetailRoomInfo>{
+                                override fun onSuccess(result: DetailRoomInfo?) {
+                                    if (result!=null){
+                                        if (AuthManager.getInstance().currentUserId.equals(result.roomInfo.uid)){
+                                            joinChatRoom(roomId,"")
+                                        }else{
+                                            var roomLock = t.data
+                                            if (roomLock==1){
+                                                val roomLockDialog = RoomLockDialog(mContext)
+                                                roomLockDialog.setEdClickListener(object :RoomLockDialog.EdClickListener{
+                                                    override fun setData(string: String) {
+                                                        joinChatRoom(roomId,string)
+                                                    }
+                                                })
+                                                roomLockDialog.show()
+                                            }else{
+                                                joinChatRoom(roomId,"")
+                                            }
+                                        }
+                                    }
+                                }
+
+                                override fun onFail(errorCode: Int) {
+                                }
+                            })
+                        }
+                    }
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
+
 
     companion object {
         @JvmStatic

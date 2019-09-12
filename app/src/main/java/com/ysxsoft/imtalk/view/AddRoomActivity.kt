@@ -13,11 +13,16 @@ import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage
+import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.ResultCallback
+import com.ysxsoft.imtalk.chatroom.task.RoomManager
+import com.ysxsoft.imtalk.download.DownloadManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
 import com.ysxsoft.imtalk.widget.dialog.RoomNameDialog
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
@@ -48,6 +53,7 @@ class AddRoomActivity : BaseActivity() {
 
     var room_id: String? = null
     var room_name: String? = null
+    var room_pwd: String? = null
     var is_lock: Int? = 0
     var room_gift_tx: Int? = 0
     var room_is_fair: Int? = 0
@@ -61,8 +67,48 @@ class AddRoomActivity : BaseActivity() {
         setLightStatusBar(true)
         initStatusBar(topView)
         initView()
+        requestRoomInfo()
     }
 
+    private fun requestRoomInfo() {
+        RoomManager.getInstance().getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
+            override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
+                if (roomDetailInfo != null) {
+                    tv_fj_bq.setText(roomDetailInfo.roomInfo.room_label)
+                    if ("0".equals(roomDetailInfo.roomInfo.is_lock)) {//上锁
+                        switch_ss.isChecked = false
+                    } else {
+                        switch_ss.isChecked = true
+                        roomLockDialog!!.dismiss()
+                    }
+
+                    if ("0".equals(roomDetailInfo.roomInfo.room_gift_tx)) {//礼物特效
+                        switch_tx.isChecked = false
+                    } else {
+                        switch_tx.isChecked = true
+                    }
+
+                    if ("0".equals(roomDetailInfo.roomInfo.room_is_fair)) {//公屏
+                        switch_gp.isChecked = false
+                    } else {
+                        switch_gp.isChecked = true
+                    }
+
+                    if ("0".equals(roomDetailInfo.roomInfo.room_pure)) {//纯净
+                        switch_ms.isChecked = false
+                    } else {
+                        switch_ms.isChecked = true
+                    }
+                }
+            }
+
+            override fun onFail(errorCode: Int) {
+                showToastMessage("更新房间失败==" + errorCode)
+            }
+        })
+    }
+
+    var roomLockDialog: RoomLockDialog? = null
     private fun initView() {
         setBackVisibily()
         setTitle("房间设置")
@@ -77,10 +123,26 @@ class AddRoomActivity : BaseActivity() {
             })
             roomNameDialog.show()
         }
-
         //房间上锁
         switch_ss.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
-            if (isChecked) is_lock = 1 else is_lock = 0
+            if (isChecked) {
+                roomLockDialog = RoomLockDialog(mContext)
+                roomLockDialog!!.setEdClickListener(object : RoomLockDialog.EdClickListener {
+                    override fun setData(string: String) {
+                        if (!TextUtils.isEmpty(string)) {
+                            is_lock = 1
+                            room_pwd = string
+                            switch_ss.isChecked = true
+                        } else {
+                            is_lock = 0
+                            switch_ss.isChecked = false
+                        }
+                    }
+                })
+                roomLockDialog!!.show()
+            } else {
+                is_lock = 0
+            }
         }
         //房间标签
         ll_fj_bq.setOnClickListener {
@@ -126,9 +188,12 @@ class AddRoomActivity : BaseActivity() {
         paramsMap.put("uid", SpUtils.getSp(mContext, "uid"))
         paramsMap.put("room_id", room_id!!)
         paramsMap.put("room_name", tv_fj_name.text.toString())
-        paramsMap.put("lock_pwd", "")
+        paramsMap.put("is_lock", is_lock.toString())
+        if (is_lock != 0) {
+            paramsMap.put("lock_pwd", room_pwd!!)
+        }
         paramsMap.put("label_name", tv_fj_bq.text.toString())
-        if(!TextUtils.isEmpty(img_id)) {
+        if (!TextUtils.isEmpty(img_id)) {
             paramsMap.put("room_bg", img_id!!)
         }
         paramsMap.put("room_gift_tx", room_gift_tx.toString())
@@ -143,67 +208,67 @@ class AddRoomActivity : BaseActivity() {
                     override fun call(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
-                            if (!TextUtils.isEmpty(img_url)){
+                            if (!TextUtils.isEmpty(img_url)) {
                                 val intent = Intent("BGCHANG")
-                                intent.putExtra("bgId",img_url)
+                                intent.putExtra("bgId", img_url)
                                 sendBroadcast(intent)
                                 val bgChangeMessage = RoomBgChangeMessage()
-                                bgChangeMessage.bgId=img_url
+                                bgChangeMessage.bgId = img_url
                                 val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, bgChangeMessage)
                                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                                     override fun onAttached(p0: Message?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
 
                                     override fun onSuccess(p0: Message?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
 
                                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
                                 });
                             }
-                            if (!TextUtils.isEmpty(tagName)){
+                            if (!TextUtils.isEmpty(tagName)) {
                                 val intent = Intent("BGCHANG")
-                                intent.putExtra("tagName",tv_fj_bq.text.toString())
+                                intent.putExtra("tagName", tv_fj_bq.text.toString())
                                 sendBroadcast(intent)
                                 val roomLableChangedMessage = RoomLableChangedMessage()
-                                roomLableChangedMessage.roomLable=tv_fj_bq.text.toString()
+                                roomLableChangedMessage.roomLable = tv_fj_bq.text.toString()
                                 val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, roomLableChangedMessage)
                                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                                     override fun onAttached(p0: Message?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
 
                                     override fun onSuccess(p0: Message?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
 
                                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
                                 });
 
                             }
-                            if (!TextUtils.isEmpty(tv_fj_name.text.toString())){
+                            if (!TextUtils.isEmpty(tv_fj_name.text.toString())) {
                                 val intent = Intent("BGCHANG")
-                                intent.putExtra("roomName",tv_fj_name.text.toString())
+                                intent.putExtra("roomName", tv_fj_name.text.toString())
                                 sendBroadcast(intent)
                                 val nameChangedMessage = RoomNameChangedMessage()
-                                nameChangedMessage.roomName=tv_fj_name.text.toString()
+                                nameChangedMessage.roomName = tv_fj_name.text.toString()
                                 val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, nameChangedMessage)
                                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                                     override fun onAttached(p0: Message?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
 
                                     override fun onSuccess(p0: Message?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
 
                                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
-                                        Log.d("tag",p0!!.content.toString())
+                                        Log.d("tag", p0!!.content.toString())
                                     }
                                 });
 

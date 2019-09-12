@@ -27,6 +27,8 @@ import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.net.model.CreateRoomResult
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.com.GallerySnapHelper
@@ -35,6 +37,7 @@ import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.*
 import com.ysxsoft.imtalk.widget.CircleImageView
 import com.ysxsoft.imtalk.widget.UniversalItemDecoration
+import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
 import kotlinx.android.synthetic.main.fm_home.*
 import org.w3c.dom.Text
 import rx.Observer
@@ -143,15 +146,15 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<ImageView>(R.id.ivPhoto))
 
-                                    if (TextUtils.isEmpty(item.label_name)){
-                                        helper.getView<TextView>(R.id.tvContent).setText("#" + "暂无"+ "  " + item.room_name)
-                                    }else{
-                                        helper.getView<TextView>(R.id.tvContent).setText("#" + item.label_name+ "  " + item.room_name)
+                                    if (TextUtils.isEmpty(item.label_name)) {
+                                        helper.getView<TextView>(R.id.tvContent).setText("#" + "暂无" + "  " + item.room_name)
+                                    } else {
+                                        helper.getView<TextView>(R.id.tvContent).setText("#" + item.label_name + "  " + item.room_name)
                                     }
 
                                     helper.itemView.setOnClickListener {
                                         //                                        ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                                        joinChatRoom(item.room_id.toString(), false)
+                                        roomLock(item.room_id.toString())
                                     }
                                 }
                             }
@@ -170,19 +173,19 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<CircleImageView>(R.id.ivAvatar))
                                     helper.getView<TextView>(R.id.tv_name).setText(item.room_name)
-                                    if (TextUtils.isEmpty(item.label_name)){
-                                        helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
-                                    }else{
+                                    if (TextUtils.isEmpty(item.label_name)) {
+                                        helper.getView<TextView>(R.id.tv_Tag).text = "#" + "暂无"
+                                    } else {
                                         helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
                                     }
-                                    if (TextUtils.isEmpty(item.memCount)){
+                                    if (TextUtils.isEmpty(item.memCount)) {
                                         helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
-                                    }else{
+                                    } else {
                                         helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                                     }
                                     helper.itemView.setOnClickListener {
                                         //                                        ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                                        joinChatRoom(item.room_id.toString(), false)
+                                        roomLock(item.room_id.toString())
                                     }
                                 }
                             }
@@ -317,7 +320,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         //嗨爆聊天
         cardView.setOnClickListener {
             //            ChatRoomActivity.starChatRoomActivity(mContext, room_id!!)
-            joinChatRoom(room_id!!, false)
+            joinChatRoom(room_id!!, "")
         }
     }
 
@@ -350,14 +353,14 @@ class HomeFragment : BaseFragment(), OnBannerListener {
     private fun CreateRoom() {
         RoomManager.getInstance().createRoom(SpUtils.getSp(mContext, "uid"), object : ResultCallback<CreateRoomResult> {
             override fun onSuccess(result: CreateRoomResult?) {
-                if(result==null) return
+                if (result == null) return
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     if (!checkPermissions()) return
                 }
                 // 标记正在进入房间
                 isJoiningRoom = true
                 if (!TextUtils.isEmpty(result.roomInfo.room_id))
-                    joinChatRoom(result.roomInfo.room_id, true)
+                    joinChatRoom(result.roomInfo.room_id, "")
             }
 
             override fun onFail(errorCode: Int) {
@@ -366,9 +369,9 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         })
     }
 
-    private fun joinChatRoom(roomId: String, isCreate: Boolean) {
+    private fun joinChatRoom(roomId: String, isCreate: String) {
         showToastMessage(R.string.toast_joining_room)
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
             }
@@ -377,6 +380,53 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
             }
         })
+    }
+
+    fun roomLock(roomId: String) {
+        val map = HashMap<String, String>()
+        map.put("room_id", roomId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .room_lock(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<RoomLockBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RoomLockBean?) {
+                        if (t!!.code == 0) {
+                            RoomManager.getInstance().getRoomDetailInfo1(roomId, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(result: DetailRoomInfo?) {
+                                    if (result != null) {
+                                        if (AuthManager.getInstance().currentUserId.equals(result.roomInfo.uid)) {
+                                            joinChatRoom(roomId, "")
+                                        } else {
+                                            var roomLock = t.data
+                                            if (roomLock == 1) {
+                                                val roomLockDialog = RoomLockDialog(mContext)
+                                                roomLockDialog.setEdClickListener(object : RoomLockDialog.EdClickListener {
+                                                    override fun setData(string: String) {
+                                                        joinChatRoom(roomId, string)
+                                                    }
+                                                })
+                                                roomLockDialog.show()
+                                            } else {
+                                                joinChatRoom(roomId, "")
+                                            }
+                                        }
+                                    }
+                                }
+
+                                override fun onFail(errorCode: Int) {
+                                }
+                            })
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
     }
 
     /**

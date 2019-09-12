@@ -85,7 +85,7 @@ class SearchActivity:BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val uid = mDataAdapter!!.dataList.get(position).uid.toString()
-            MyDataActivity.startMyDataActivity(mContext,uid,"2")
+            MyDataActivity.startMyDataActivity(mContext,uid,"SearchActivity")
         }
 
         //设置底部加载颜色

@@ -1,12 +1,15 @@
 package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
+import android.content.Intent
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.RoomMwUserBean
 import com.ysxsoft.imtalk.bean.UserInfo
+import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.view.MyDataActivity
 import com.ysxsoft.imtalk.widget.ABSDialog
 import kotlinx.android.synthetic.main.give_dialog_layout.*
 import rx.Observer
@@ -19,7 +22,9 @@ import rx.schedulers.Schedulers
  * 送礼物
  */
 class GiveDialog : ABSDialog {
+    var uid:String?=null
     constructor(mContext: Context, userId: String, room_id: String) : super(mContext) {
+        uid=userId
         requestData(userId, room_id)
     }
 
@@ -62,6 +67,21 @@ class GiveDialog : ABSDialog {
     }
 
     override fun initView() {
+        img_head.setOnClickListener {
+//            MyDataActivity.startMyDataActivity(this@GiveDialog.context,uid!!,"")
+            val intent = Intent(this@GiveDialog.context, MyDataActivity::class.java)
+            if (uid!!.equals(RoomManager.getInstance().currentRoomInfo!!.roomInfo.uid)){//点击的是房主头像
+                intent.putExtra("uid",uid)
+                intent.putExtra("is_room","is_room")
+            }else{
+                intent.putExtra("uid",uid)
+            }
+            intent.putExtra("myself","")
+            intent.putExtra("room","room")
+            this@GiveDialog.context.startActivity(intent)
+
+        }
+
         img_cancle.setOnClickListener {
             dismiss()
         }

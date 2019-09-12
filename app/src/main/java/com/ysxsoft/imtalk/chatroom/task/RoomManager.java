@@ -124,7 +124,7 @@ public class RoomManager {
      * @param roomId
      * @param callBack
      */
-    public void joinRoom(final String uid, final String roomId, final ResultCallback<DetailRoomInfo> callBack) {
+    public void joinRoom(final String uid, final String roomId,final String lock_pwd, final ResultCallback<DetailRoomInfo> callBack) {
         /*
          * 加入房间前进行初始化房间保证可以监听到对应房间的消息，再加入 IM 的聊天室，最后进行API服务器服加入聊天室请求
          * 防止API服务器请求延迟丢失对应聊天室的消息
@@ -134,7 +134,7 @@ public class RoomManager {
         imClient.joinChatRoom(roomId, new ResultCallback<String>() {
             @Override
             public void onSuccess(final String roomId) {
-                request.joinRoom(uid, roomId, new HandleRequestWrapper<DetailRoomInfo, DetailRoomInfo>(callBack) {
+                request.joinRoom(uid, roomId,lock_pwd, new HandleRequestWrapper<DetailRoomInfo, DetailRoomInfo>(callBack) {
                     @Override
                     public DetailRoomInfo handleRequestResult(DetailRoomInfo dataResult) {
                         if (dataResult != null) {
@@ -243,20 +243,6 @@ public class RoomManager {
         request.getChatRoomDetail(roomId, new HandleRequestWrapper<DetailRoomInfo, DetailRoomInfo>(callBack) {
             @Override
             public DetailRoomInfo handleRequestResult(DetailRoomInfo dataResult) {
-
-                synchronized (roomLock) {
-                    /*
-                     * 当现在已加入房间且与获取的房间 id 相同时更新房间人数和房间人员
-                     */
-                    if (currentRoom != null && dataResult != null) {
-                        if (currentRoom.getRoomInfo().getRoom_id().equals(dataResult.getRoomInfo().getRoom_id())) {
-                            currentRoom.getRoomInfo().setMemCount(dataResult.getRoomInfo().getMemCount());
-                            currentRoom.setAudiences(dataResult.getAudiences());
-                            currentRoom.setMicPositions(dataResult.getMicPositions());
-                            currentRoom.setAdminListInfo(dataResult.getAdminListInfo());//2019-8-10 add
-                        }
-                    }
-                }
                 return dataResult;
             }
         });

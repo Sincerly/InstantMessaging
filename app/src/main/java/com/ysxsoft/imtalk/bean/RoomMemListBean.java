@@ -90,6 +90,25 @@ public class RoomMemListBean {
             private String is_room;
             private String is_admin;
 
+            public String getRole() {
+                return role;
+            }
+
+            public void setRole(String role) {
+                this.role = role;
+            }
+
+            public String getCount() {
+                return count;
+            }
+
+            public void setCount(String count) {
+                this.count = count;
+            }
+
+            private String role;
+            private String count;
+
             public String getUid() {
                 return uid;
             }
