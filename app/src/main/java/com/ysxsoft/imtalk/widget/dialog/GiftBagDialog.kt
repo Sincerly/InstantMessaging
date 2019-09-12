@@ -257,7 +257,7 @@ class GiftBagDialog : ABSDialog {
                             micPostionAdapter!!.setCheckInterface(object :MicPostionAdapter.CheckInterface{
                                 override fun checkGroup(position: Int, isChecked: Boolean) {
                                     val bean = micPostionAdapter!!.dataList.get(position)
-                                    bean.isChoosed = !bean.isChoosed;
+                                    bean.isChoosed = isChecked;
                                     micPostionAdapter!!.notifyDataSetChanged()
                                 }
                             })

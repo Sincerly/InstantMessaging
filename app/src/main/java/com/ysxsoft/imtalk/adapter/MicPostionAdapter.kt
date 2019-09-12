@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import com.ysxsoft.imtalk.R
@@ -28,6 +29,8 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
         if (position == 0) holder.getView<TextView>(R.id.tv_NO)!!.setText("房主") else holder.getView<TextView>(R.id.tv_NO)!!.setText(bean.sort.toString())
         if (bean.isChoosed) {
             holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundResource(R.drawable.btn_cir_bg)
+        }else{
+            holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundDrawable(null);
         }
 
         holder.itemView.setOnClickListener {
@@ -36,20 +39,25 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
             }
         }
 
-
         var cb_box = holder.getView<CheckBox>(R.id.cb_box)
         if (bean.isChoosed()) {
             cb_box!!.setChecked(true)
         } else {
             cb_box!!.setChecked(false)
         }
-        cb_box.setOnClickListener(View.OnClickListener { v ->
-            bean.setChoosed((v as CheckBox).isChecked)
-            if (checkInterface != null) {
-                checkInterface!!.checkGroup(position, v.isChecked)
+//        cb_box.setOnClickListener(View.OnClickListener { v ->
+//            bean.setChoosed((v as CheckBox).isChecked)
+//            if (checkInterface != null) {
+//                checkInterface!!.checkGroup(position, v.isChecked)
+//            }
+//        })
+        cb_box.setOnCheckedChangeListener(object:CompoundButton.OnCheckedChangeListener{
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                if (checkInterface != null) {
+                    checkInterface!!.checkGroup(position, isChecked)
+                }
             }
         })
-
 
     }
 

@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.chatroom.task;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.IMClient;
@@ -573,6 +574,7 @@ public class RoomManager {
             synchronized (roomLock) {
                 Conversation.ConversationType conversationType = message.getConversationType();
                 if (conversationType == Conversation.ConversationType.CHATROOM) {
+                    Log.e("tag","onReceived:"+message.getContent());
                     if (currentRoom == null) return false;
                     //判断chatRoomID
                     String targetId = message.getTargetId();

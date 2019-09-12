@@ -2286,16 +2286,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 //            override fun onError() {
 //            }
 //        })
-
     }
 
     fun showPositionGift(position: Int, toPosition: Int, giftImgUrl: String, staticImgUrl: String) {
-
         val f = findViewById<FrameLayout>(android.R.id.content)
-
-
-        if (giftImgUrl.endsWith(".gif")) {
-            val giftImgUrl = "http://chitchat.rhhhyy.com/mengjing.svga"
+        if (giftImgUrl.endsWith(".svga")) {
+            //val giftImgUrl = "http://chitchat.rhhhyy.com/mengjing.svga"
             //显示View
             val svgaImageView = SVGAImageView(this)
             val parser = SVGAParser(this)
@@ -2342,12 +2338,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                                             val startPosition = getPosition(position)
                                             val endPosition = getPosition(i)
-                                            val offsetX = endPosition[0] - startPosition[0]+DisplayUtils.dp2px(mContext,10)
-                                            val offsetY = endPosition[1] - startPosition[1]+DisplayUtils.dp2px(mContext,5)
+                                            val childOffsetX = endPosition[0] - halfWidth+DisplayUtils.dp2px(mContext,10)
+                                            val childOffsetY = endPosition[1] - halfHeight+DisplayUtils.dp2px(mContext,5)
 
                                             ViewCompat.animate(childImageView)
-                                                    .translationXBy(offsetX.toFloat())
-                                                    .translationYBy(offsetY.toFloat())
+                                                    .translationXBy(childOffsetX.toFloat())
+                                                    .translationYBy(childOffsetY.toFloat())
                                                     .setDuration(800)
                                                     .setListener(object : ViewPropertyAnimatorListener {
                                                         override fun onAnimationStart(view: View) {
@@ -2404,12 +2400,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                                     val startPosition = getPosition(position)
                                     val endPosition = getPosition(i)
-                                    val offsetX = endPosition[0] - startPosition[0]+DisplayUtils.dp2px(mContext,10)
-                                    val offsetY = endPosition[1] - startPosition[1]+DisplayUtils.dp2px(mContext,5)
+                                    val childOffsetX = endPosition[0] - halfWidth+DisplayUtils.dp2px(mContext,10)
+                                    val childOffsetY = endPosition[1] - halfHeight+DisplayUtils.dp2px(mContext,5)
 
                                     ViewCompat.animate(childImageView)
-                                            .translationXBy(offsetX.toFloat())
-                                            .translationYBy(offsetY.toFloat())
+                                            .translationXBy(childOffsetX.toFloat())
+                                            .translationYBy(childOffsetY.toFloat())
                                             .setDuration(800)
                                             .setListener(object : ViewPropertyAnimatorListener {
                                                 override fun onAnimationStart(view: View) {
@@ -2441,13 +2437,24 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             imageView.layoutParams = layoutParams;
             Glide.with(mContext).load(giftImgUrl).into(imageView)
             f.addView(imageView)
-            val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
-            imageView.x = halfWidth
             val valueAnimator = ValueAnimator.ofFloat(0f, 1f)
+            val w = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
+            val h = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
             valueAnimator.addUpdateListener { animation ->
                 val value = animation.animatedValue as Float
-                val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
-                imageView.y = halfHeight * value
+                if(position==-1){
+                    //不在麦位上 从顶部到中间 再分到对应的人
+                    imageView.x = w
+                    imageView.y = h * value
+                }else{
+                    //在麦上 从麦位到中间 再分到对应的人
+                    val startPosition = getPosition(position)
+                    val offsetX=(w-startPosition[0])*value;
+                    val offsetY=(h-startPosition[1])*value;
+
+                    imageView.x=startPosition[0]+offsetX;
+                    imageView.y=startPosition[1]+offsetY;
+                }
             }
             valueAnimator.addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -2456,6 +2463,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     //移除之后创建分开View
                     val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
                     val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
+
                     for (i in 0..8) {
                         val childImageView = ImageView(mContext)
                         Glide.with(mContext).load(staticImgUrl).into(childImageView)
@@ -2467,12 +2475,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                         val startPosition = getPosition(position)
                         val endPosition = getPosition(i)
-                        val offsetX = endPosition[0] - startPosition[0]+DisplayUtils.dp2px(mContext,10)
-                        val offsetY = endPosition[1] - startPosition[1]+DisplayUtils.dp2px(mContext,5)
+                        val childOffsetX = endPosition[0] - halfWidth+DisplayUtils.dp2px(mContext,10)
+                        val childOffsetY = endPosition[1] - halfHeight+DisplayUtils.dp2px(mContext,5)
 
+                        Log.e("tag","halfWidth:"+halfWidth+"i:"+i+"position:"+position+"endPosition[0]:"+endPosition[0]+"endPosition[1]:"+endPosition[1]+" startPosition[0]:"+startPosition[0]+"startPosition[1]:"+startPosition[1]+"offsetX:"+childOffsetX+"offsetY:"+childOffsetY);
                         ViewCompat.animate(childImageView)
-                                .translationXBy(offsetX.toFloat())
-                                .translationYBy(offsetY.toFloat())
+                                .translationXBy(childOffsetX.toFloat())
+                                .translationYBy(childOffsetY.toFloat())
                                 .setDuration(800)
                                 .setListener(object : ViewPropertyAnimatorListener {
                                     override fun onAnimationStart(view: View) {
