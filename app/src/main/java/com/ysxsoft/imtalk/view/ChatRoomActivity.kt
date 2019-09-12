@@ -121,8 +121,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
      */
     override fun onRoomMemberKickChange(uid: String) {
         if (AuthManager.getInstance().currentUserId.equals(uid)) {
-            IMClient.getInstance().quitChatRoom(room_id, null)
-            RtcClient.getInstance().quitRtcRoom(room_id, null)
+            roomManager!!.clearRoomInfo(room_id)
             finish()
         }
     }
@@ -1669,8 +1668,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             override fun onNext(t: CommonBean?) {
                                 showToastMessage(t!!.msg)
                                 if (t.code == 0) {
-                                    IMClient.getInstance().quitChatRoom(room_id, null)
-                                    RtcClient.getInstance().quitRtcRoom(room_id, null)
+                                    roomManager!!.clearRoomInfo(room_id)
                                     val intent = Intent(mContext, PlayMusicService::class.java)
                                     stopService(intent)
                                     finish()
