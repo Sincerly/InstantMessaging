@@ -14,7 +14,6 @@ import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -26,10 +25,16 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.umeng.socialize.ShareAction
+import com.umeng.socialize.UMShareListener
+import com.umeng.socialize.bean.SHARE_MEDIA
+import com.umeng.socialize.media.UMImage
+import com.umeng.socialize.media.UMWeb
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.HomeHLBean
+import com.ysxsoft.imtalk.bean.ShareUserBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
 import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter
 import com.ysxsoft.imtalk.chatroom.im.IMClient
@@ -45,6 +50,8 @@ import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.chatroom.task.RoomEventListener
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
+import com.ysxsoft.imtalk.chatroom.task.role.Linker
+import com.ysxsoft.imtalk.chatroom.task.role.Listener
 import com.ysxsoft.imtalk.chatroom.task.role.Role
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetPlugReceiver
@@ -61,12 +68,12 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
-import kotlinx.android.synthetic.main.voice_dialog_layout.view.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.lang.reflect.InvocationTargetException
-import java.util.ArrayList
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Create By 胡
@@ -104,7 +111,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
      */
     override fun onRoomMemberKickChange(uid: String) {
         if (AuthManager.getInstance().currentUserId.equals(uid)) {
-            roomManager!!.clearRoomInfo(room_id)
+            IMClient.getInstance().quitChatRoom(room_id, null)
+            RtcClient.getInstance().quitRtcRoom(room_id, null)
             finish()
         }
     }
@@ -216,6 +224,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private var defaultMarginBottom: Int = 0
     var voiceDialog: SongVoiceDialog? = null
     var mydatabean: UserInfoBean? = null
+    var shareBean: ShareUserBean.DataBean? = null
     var bgChangBroadCast: BgChangBroadCast? = null
 
     /**
@@ -275,6 +284,32 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         bgChangBroadCast = BgChangBroadCast()
         val intentFilter = IntentFilter("BGCHANG")
         registerReceiver(bgChangBroadCast, intentFilter)
+        ShareData()
+    }
+
+    private fun ShareData() {
+        val map = HashMap<String, String>()
+        map.put("uid",AuthManager.getInstance().currentUserId)
+        map.put("room_id",room_id!!)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .share_user(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object :Observer<ShareUserBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: ShareUserBean?) {
+                        if (t!!.code==0){
+                            shareBean = t.data
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     inner class BgChangBroadCast : BroadcastReceiver() {
@@ -357,28 +392,23 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val friendDialog = ShareFriendDialog(mContext)
             friendDialog.setShareListener(object : ShareFriendDialog.ShareListener {
                 override fun myself() {
-//                    showPositionGift(-1, a, "http://chitchat.rhhhyy.com/uploads/images/20190906/07511341808b21d60475931e8eaaf252.gif", "http://chitchat.rhhhyy.com/uploads/images/20190826/9cad09a166ffae62066263a0ea0a777d.png")
-//                    a++;
-//                    if (a == 9) {
-//                        a = 0;
-//                    }
                     showToastMessage("站内分享")
                 }
 
                 override fun Wechat() {
-                    showToastMessage("微信")
+                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.WEIXIN)
                 }
 
                 override fun pyq() {
-                    showToastMessage("朋友圈")
+                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.WEIXIN_CIRCLE)
                 }
 
                 override fun qqZone() {
-                    showToastMessage("QQ空间")
+                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.QZONE)
                 }
 
                 override fun QQ() {
-                    showToastMessage("QQ")
+                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.QQ)
                 }
             })
             friendDialog.show()
@@ -460,29 +490,26 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         img_send_msg.setOnClickListener {
             ll_isShow.visibility = View.GONE
-            chatroom_et_chat_input.visibility = View.VISIBLE
+            ll_send.visibility = View.VISIBLE
+        }
+        tv_send.setOnClickListener {
+            val msg = chatroom_et_chat_input.text.toString().trim()
+            if (!TextUtils.isEmpty(msg)) {
+                roomManager!!.sendChatRoomMessage(msg, SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, mydatabean!!.data.icon);
+            }
+            hideInputKeyboard();
+            chatroom_et_chat_input.setText("");
+
         }
 
-        chatroom_et_chat_input.setOnKeyListener { v, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN) {
-                //业务代码
-                val msg = chatroom_et_chat_input.text.toString().trim()
-                if (!TextUtils.isEmpty(msg)) {
-                    roomManager!!.sendChatRoomMessage(msg, SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, mydatabean!!.data.icon);
-                }
-                hideInputKeyboard();
-                chatroom_et_chat_input.setText("");
-                return@setOnKeyListener true
-            }
-            return@setOnKeyListener false
-        }
 
         chatroom_setting.setOnClickListener {
             AddRoomActivity.starAddRoomActivity(mContext, room_id!!, tv_title.text.toString())
         }
 
         chatroom_iv_sound_control.setOnClickListener {
-            OnLineActivity.starOnLineActivity(mContext, room_id!!)
+//            OnLineActivity.starOnLineActivity(mContext, room_id!!)
+            OnlineListActivity.starOnlineListActivity(mContext, room_id!!)
         }
 
         img_gold_egg.setOnClickListener {
@@ -587,6 +614,18 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         enableKeyboardStateListener(true)
     }
 
+    private fun ShareUrl(nickname: String, desc: String, icon: String, url: String, platform: SHARE_MEDIA) {
+        val umWeb = UMWeb(url)
+        umWeb.title=nickname
+        umWeb.setThumb(UMImage(mContext,icon))
+        umWeb.description=desc
+        ShareAction(this@ChatRoomActivity)
+                .withMedia(umWeb)
+                .setPlatform(platform)
+                .setCallback(shareListener)
+                .share()
+    }
+
     //请求嗨聊的接口数据
     private fun RandomTalk() {
         NetWork.getService(ImpService::class.java)
@@ -600,7 +639,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: HomeHLBean?) {
                         if (t!!.code == 0) {
-                            joinChatRoom(t.data.room_id.toString())
+                            RandomQuiteRoom(SpUtils.getSp(mContext, "uid"), "1",t.data.room_id.toString())
                         }
                     }
 
@@ -852,6 +891,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             img_simle.visibility = View.GONE
             tv_music.visibility = View.GONE
             tv_room.setOnClickListener {
+                RoomNoticeDialog(mContext, room_id).show();
+            }
+            if (!TextUtils.isEmpty(detailRoomInfo!!.roomInfo.room_content)){
                 RoomNoticeDialog(mContext, room_id).show();
             }
         }
@@ -1239,6 +1281,25 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
         } else { //非房主  点击控麦位
             if ("0".equals(userId)) {
+                val currentRole = roomManager!!.currentRole
+
+                if (currentRole is Listener) {
+                    JoinMic(AuthManager.getInstance().currentUserId, micPosition)
+                } else if ((currentRole is Linker) && (preMicPosition != -1)) {
+                    JumpMic(AuthManager.getInstance().currentUserId, preMicPosition,micPosition)
+                }
+
+/*                when (currentRole) {
+                    Listener() -> {
+                        JoinMic(AuthManager.getInstance().currentUserId, micPosition)
+                    }
+                    Linker() -> {
+                        if (preMicPosition != -1) {
+                            ExitMic(AuthManager.getInstance().currentUserId, preMicPosition)
+                            JoinMic(AuthManager.getInstance().currentUserId, micPosition)
+                        }
+                    }
+                }
                 val seatMicDialog = UpperSeatMicDialog(mContext)
                 seatMicDialog.findViewById<TextView>(R.id.tv_btsm).visibility = View.GONE
                 seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).visibility = View.GONE
@@ -1261,7 +1322,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                 })
-                seatMicDialog.show()
+                seatMicDialog.show()*/
             } else { //非房主
                 if ((SpUtils.getSp(mContext, "uid")).equals(userId)) { //麦位是自己
                     val seatMicDialog = UpperSeatMicDialog(mContext)
@@ -1281,6 +1342,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                         override fun BTSMclick(view: TextView) {
                             OnLineActivity.starOnLineActivity(mContext, detailRoomInfo!!.roomInfo.room_id)
+//                            OnlineListActivity.starOnlineListActivity(mContext, detailRoomInfo!!.roomInfo.room_id)
                         }
 
                         override fun CSMclick(view: TextView) {
@@ -1349,6 +1411,65 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
+    private fun JumpMic(userId: String?, mic: Int, tomicPosition: Int) {
+        NetWork.getService(ImpService::class.java)
+                .upDownWheat(userId!!, room_id!!, mic.toString(), "2")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        if (t!!.code == 0) {
+                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
+                                    if (roomDetailInfo != null) {
+                                        detailRoomInfo = roomDetailInfo
+                                        for (bean in roomDetailInfo.micPositions) {
+                                            if (!AuthManager.getInstance().currentUserId.equals(bean.uid)) {
+                                                img_simle.visibility = View.GONE
+                                            }
+                                        }
+                                        updateMicSeatState(roomDetailInfo.micPositions)
+                                        val controlMessage = MicPositionControlMessage()
+                                        controlMessage.setCmd(7)//下麦
+                                        controlMessage.targetUserId = userId
+                                        controlMessage.micPositions = roomDetailInfo.micPositions
+                                        controlMessage.targetPosition = mic
+
+                                        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, controlMessage)
+
+                                        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                            override fun onAttached(p0: Message?) {
+                                                Log.d("tag===", p0!!.content.toString())
+                                            }
+
+                                            override fun onSuccess(p0: Message?) {
+                                                JoinMic(userId, tomicPosition)
+                                            }
+
+                                            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                                Log.d("tag===", p0!!.content.toString())
+                                            }
+                                        });
+                                    }
+                                }
+
+                                override fun onFail(errorCode: Int) {
+                                }
+                            })
+
+
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+    }
+
     /**
      * 闭麦 - 开麦
      */
@@ -1368,10 +1489,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
-//                                        detailRoomInfo = roomDetailInfo
                                         updateMicSeatState(roomDetailInfo.micPositions)
                                         val controlMessage = MicPositionControlMessage()
                                         if ("1".equals(s)) {//闭麦
@@ -1430,7 +1550,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                            roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
 //                                        detailRoomInfo = roomDetailInfo
@@ -1651,7 +1771,53 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             override fun onNext(t: CommonBean?) {
                                 showToastMessage(t!!.msg)
                                 if (t.code == 0) {
-                                    roomManager!!.clearRoomInfo(room_id)
+                                    IMClient.getInstance().quitChatRoom(room_id, null)
+                                    RtcClient.getInstance().quitRtcRoom(room_id, null)
+                                    val intent = Intent(mContext, PlayMusicService::class.java)
+                                    stopService(intent)
+                                    finish()
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
+            }
+
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                Log.d("tag", p0!!.content.toString())//23409
+            }
+        });
+    }
+
+    private fun RandomQuiteRoom(uid: String, kick: String, toString: String){
+        val message = RoomMemberChangedMessage()
+        message.setCmd(2)//离开房间
+        message.targetUserId = uid
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), nikeName, Uri.parse(icon))
+        val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
+
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+                Log.d("tag", p0!!.content.toString())
+            }
+
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(uid, kick, room_id!!)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                            }
+
+                            override fun onNext(t: CommonBean?) {
+                                showToastMessage(t!!.msg)
+                                if (t.code == 0) {
+                                    IMClient.getInstance().quitChatRoom(room_id, null)
+                                    RtcClient.getInstance().quitRtcRoom(room_id, null)
+                                    joinChatRoom(toString)
                                     val intent = Intent(mContext, PlayMusicService::class.java)
                                     stopService(intent)
                                     finish()
@@ -1690,10 +1856,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
+    var preMicPosition = -1
     /**
      * 加入麦位
      */
     private fun JoinMic(userId: String, mic: Int) {
+        preMicPosition = mic
         NetWork.getService(ImpService::class.java)
                 .upDownWheat(userId, room_id!!, mic.toString(), "1")
                 .subscribeOn(Schedulers.io())
@@ -1708,7 +1876,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
                                         detailRoomInfo = roomDetailInfo
-
                                         for (bean in roomDetailInfo.micPositions) {
                                             if (AuthManager.getInstance().currentUserId.equals(bean.uid)) {
                                                 img_simle.visibility = View.VISIBLE
@@ -1773,6 +1940,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                                     if (roomDetailInfo != null) {
+                                        detailRoomInfo = roomDetailInfo
                                         for (bean in roomDetailInfo.micPositions) {
                                             if (!AuthManager.getInstance().currentUserId.equals(bean.uid)) {
                                                 img_simle.visibility = View.GONE
@@ -1817,7 +1985,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     private fun joinChatRoom(roomId: String) {
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, "",object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
 
                 val message = RoomMemberChangedMessage()
@@ -1856,7 +2024,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val currentFocus = currentFocus
         if (currentFocus != null) {
             ll_isShow.visibility = View.VISIBLE
-            chatroom_et_chat_input.visibility = View.GONE
+            ll_send.visibility = View.GONE
 
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
@@ -2282,4 +2450,21 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
         return pos
     }
+
+    var shareListener=object :UMShareListener{
+        override fun onResult(p0: SHARE_MEDIA?) {
+            showToastMessage("分享成功")
+        }
+
+        override fun onCancel(p0: SHARE_MEDIA?) {
+            showToastMessage("分享取消了")
+        }
+
+        override fun onError(p0: SHARE_MEDIA?, p1: Throwable?) {
+        }
+
+        override fun onStart(p0: SHARE_MEDIA?) {
+        }
+    }
+
 }

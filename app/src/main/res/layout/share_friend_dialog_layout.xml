@@ -30,6 +30,7 @@
             android:drawableTop="@mipmap/myself"
             android:gravity="center"
             android:text="站内分享"
+            android:visibility="gone"
             android:textSize="13sp" />
 
         <TextView

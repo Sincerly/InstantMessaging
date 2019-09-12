@@ -570,5 +570,13 @@ interface ImpService {
     @POST("Room/oc_wheat")
     fun oc_wheat(@Body body: RequestBody): Observable<CommonBean>
 
+    //判断房间是否上锁
+    @POST("Roomnew/room_lock")
+    fun room_lock(@Body body: RequestBody): Observable<RoomLockBean>
+
+ //判断房间是否上锁
+    @POST("share/share_user")
+    fun share_user(@Body body: RequestBody): Observable<ShareUserBean>
+
 
 }

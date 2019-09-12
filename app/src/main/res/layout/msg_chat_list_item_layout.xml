@@ -59,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="right"
+                android:visibility="invisible"
                 app:layout_constraintRight_toRightOf="parent"
                 tools:text="09:20" />
         </LinearLayout>

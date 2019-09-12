@@ -61,7 +61,7 @@ public class MicSeatView extends FrameLayout {
             @Override
             public void onClick(View view) {
                 if (mOnImageClickLitener != null) {
-                    mOnImageClickLitener.onImageClick(view, micInfo.getSort()-1);
+                    mOnImageClickLitener.onImageClick(view, micInfo.getSort() - 1);
                 }
             }
         });
@@ -82,7 +82,7 @@ public class MicSeatView extends FrameLayout {
                 } else {
                     tv_room_manager.setVisibility(View.GONE);
                 }
-            }else {
+            } else {
                 tv_room_manager.setVisibility(View.GONE);
             }
         } else {
@@ -99,7 +99,7 @@ public class MicSeatView extends FrameLayout {
         String currentUserId = AuthManager.getInstance().getCurrentUserId();
 
         // 麦位是否为空状态
-        if ((TextUtils.equals("0", micUserId))&&(!"0".equals(state))&&"0".equals(micInfo.getIs_wheat())) {
+        if ((TextUtils.equals("0", micUserId)) && (!"0".equals(state)) && "0".equals(micInfo.getIs_wheat())) {
             setMicSeatEmpty();
             // 麦位是否被锁定
         } else if ("0".equals(state)) {
@@ -107,13 +107,15 @@ public class MicSeatView extends FrameLayout {
             // 麦位有用户
         } else if (!TextUtils.isEmpty(micUserId) && !TextUtils.equals("0", micUserId)) {
             setMicSeatAvatar(micInfo.getIcon());
-            if (currentUserId.equals(micUserId)) {
-                nameTv.setText(getResources().getText(R.string.me));
-                nameTv.setTextColor(getResources().getColor(R.color.btn_color));
-            } else {
-                nameTv.setText(micInfo.getNickname());
-                nameTv.setTextColor(getResources().getColor(R.color.white));
-            }
+            nameTv.setText(micInfo.getNickname());
+            nameTv.setTextColor(getResources().getColor(R.color.white));
+//            if (currentUserId.equals(micUserId)) {
+//                nameTv.setText(getResources().getText(R.string.me));
+//                nameTv.setTextColor(getResources().getColor(R.color.btn_color));
+//            } else {
+//                nameTv.setText(micInfo.getNickname());
+//                nameTv.setTextColor(getResources().getColor(R.color.white));
+//            }
         }
 
         // 麦位是否被禁麦
@@ -186,7 +188,7 @@ public class MicSeatView extends FrameLayout {
      */
     public int getPosition() {
         if (micInfo != null) {
-            return micInfo.getSort()-1;
+            return micInfo.getSort() - 1;
         }
         return -1;
     }

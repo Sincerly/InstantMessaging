@@ -114,7 +114,7 @@ class HouseFragment : BaseFragment() {
                 if (!checkPermissions()) return
                 // 标记正在进入房间
                 if (!TextUtils.isEmpty(result!!.roomInfo.room_id))
-                    joinChatRoom(result.roomInfo.room_id, true)
+                    joinChatRoom(result.roomInfo.room_id, "")
             }
 
             override fun onFail(errorCode: Int) {
@@ -123,9 +123,9 @@ class HouseFragment : BaseFragment() {
         })
     }
 
-    private fun joinChatRoom(roomId: String, isCreate: Boolean) {
+    private fun joinChatRoom(roomId: String, isCreate: String) {
         showToastMessage(R.string.toast_joining_room)
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate,object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
             }

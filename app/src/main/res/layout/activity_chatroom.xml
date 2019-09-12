@@ -300,7 +300,7 @@
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:textSize="12sp"
-        tools:text="哈哈哈"/>
+        tools:text="哈哈哈" />
 
     <!-- 聊天列表 -->
     <ListView
@@ -329,30 +329,45 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/chatroom_et_chat_input"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="8dp"
-            android:background="@drawable/translation50_shape"
-            android:hint="一起聊天吧～"
-            android:imeOptions="actionSend"
-            android:inputType="text"
-            android:maxLines="1"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            android:textSize="13sp"
-            android:visibility="gone" />
+        <LinearLayout
+            android:id="@+id/ll_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/chatroom_et_chat_input"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/translation50_shape"
+                android:hint="一起聊天吧～"
+                android:imeOptions="actionSend"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_send"
+                style="@style/btn_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="发送" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_isShow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/img_send_msg"
@@ -384,8 +399,8 @@
                 android:layout_height="32dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
-                android:visibility="gone"
-                android:src="@mipmap/img_simle" />
+                android:src="@mipmap/img_simle"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/chatroom_iv_sound_control"

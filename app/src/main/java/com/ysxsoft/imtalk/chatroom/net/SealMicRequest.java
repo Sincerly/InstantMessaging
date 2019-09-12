@@ -70,10 +70,11 @@ public class SealMicRequest {
      * @param roomId
      * @param callBack
      */
-    public void joinRoom(String uid,String roomId, RequestCallBack<DetailRoomInfo> callBack) {
+    public void joinRoom(String uid,String roomId,String lock_pwd, RequestCallBack<DetailRoomInfo> callBack) {
         HashMap<String, String> paramsMap = new HashMap<>();
         paramsMap.put("uid", uid);
         paramsMap.put("room_id", roomId);
+        paramsMap.put("lock_pwd", lock_pwd);
         RequestBody body = RetrofitUtil.createJsonRequest(paramsMap);
         mService.joinChatRoom(body).enqueue(new CallBackWrapper<>(callBack));
     }
