@@ -8,6 +8,8 @@ import android.view.Gravity
 import android.view.ViewGroup
 import com.gcssloop.widget.PagerGridLayoutManager
 import com.gcssloop.widget.PagerGridSnapHelper
+import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.GridBageAdpater
 import com.ysxsoft.imtalk.adapter.GridGiftAdpater
@@ -38,6 +40,7 @@ class GiftBagDialog : ABSDialog {
     var gift_id: String? = null
     var gift_num: String? = null
     var roomId: String? = null
+    var gifname: String? = null
     var gifurl: String? = null
     var num = 0
     var giftbage = 1
@@ -63,7 +66,7 @@ class GiftBagDialog : ABSDialog {
         }
 
         tv_zs.setOnClickListener {
-            if (TextUtils.isEmpty(mwuid) || "0".equals(mwuid)) {
+            if ("".equals(mwJson)||"[]".equals(mwJson)) {
                 ToastUtils.showToast(this@GiftBagDialog.context, "赠送人不能为空")
                 return@setOnClickListener
             }
@@ -88,12 +91,16 @@ class GiftBagDialog : ABSDialog {
 
     val uidList = ArrayList<String>()
     private fun sendGift() {
+        if(mwJson==null){
+            ToastUtils.showToast(context,"请选择赠送的人")
+            return
+        }
         val map = HashMap<String, String>()
         map.put("type", giftbage.toString())
         map.put("gift_id", giftid.toString())
         map.put("gift_num", gift_num.toString())
         map.put("room_id", roomId!!)
-        map.put("income_gift_uid", mwuid!!)
+        map.put("income_gift_uid", mwJson!!)
         map.put("uid", SpUtils.getSp(this@GiftBagDialog.context, "uid"))
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
@@ -106,45 +113,74 @@ class GiftBagDialog : ABSDialog {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
+                            uidList.clear()
                             for (bean in micPositons!!) {
                                 uidList.add(bean.uid.toString())
                             }
                             if (onGiftListener != null) {
+                                val data= ArrayList<Int>()
+                                var fromPosition=-1;//默认不在麦位上
                                 for (bean in micPositons!!) {
-                                    if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {//自己在麦位
-                                        val sort = bean.sort
-                                        if (sort == 0 && toPosition != 0) {//自己是房主    送其他人
-                                            onGiftListener!!.onClck(8, toPosition-1, pic!!, gifurl!!)
-                                        } else if (sort == 0 && toPosition == 0){ //房主送房主
-                                            onGiftListener!!.onClck(8, 8, pic!!, gifurl!!)
-                                        }else{
-                                            if (toPosition == 0) {//送房主
-                                                onGiftListener!!.onClck(sort - 1, 8, pic!!, gifurl!!)
-                                            } else {
-                                                onGiftListener!!.onClck(sort - 1, toPosition-1, pic!!, gifurl!!)
+                                    val sort = bean.sort
+                                    if(!bean.isChoosed){
+                                        if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
+                                            if(sort==0){
+                                                //自己是房主
+                                                fromPosition=8;
+                                            }else{
+                                                fromPosition=sort-1;
                                             }
                                         }
                                     }
-                                }
+                                    data.clear()
 
-                                if (!uidList.contains(AuthManager.getInstance().currentUserId)) {//自己没在麦位上
-                                    if (toPosition == 0) {//送房主
-                                        onGiftListener!!.onClck(-1, 8, pic!!, gifurl!!)
-                                    } else {//送其他人
-                                        onGiftListener!!.onClck(-1, toPosition-1, pic!!, gifurl!!)
+                                    for (bean in micPositons!!) {
+                                        if(bean.isChoosed){
+                                            val sort = bean.sort
+                                            if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
+                                            }else{
+                                                if(sort==0){
+                                                    //加入房主
+                                                    data.add(8)
+                                                }else{
+                                                    //加入其它用户
+                                                    data.add(sort-1)
+                                                }
+                                            }
+                                        }
                                     }
+//                                    if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {//自己在麦位
+//                                        val sort = bean.sort
+//                                        if (sort == 0 && toPosition != 0) {//自己是房主    送其他人
+//                                            onGiftListener!!.onClck(8, toPosition - 1, pic!!, gifurl!!)
+//                                        } else if (sort == 0 && toPosition == 0) { //房主送房主
+//                                            onGiftListener!!.onClck(8, 8, pic!!, gifurl!!)
+//                                        } else {
+//                                            if (toPosition == 0) {//送房主
+//                                                onGiftListener!!.onClck(sort - 1, 8, pic!!, gifurl!!)
+//                                            } else {
+//                                                onGiftListener!!.onClck(sort - 1, toPosition - 1, pic!!, gifurl!!)
+//                                            }
+//                                        }
+//                                    }
                                 }
+//                                if (!uidList.contains(AuthManager.getInstance().currentUserId)) {//自己没在麦位上
+//                                    if (toPosition == 0) {//送房主
+//                                        onGiftListener!!.onClck(-1, 8, pic!!, gifurl!!)
+//                                    } else {//送其他人
+//                                        onGiftListener!!.onClck(-1, toPosition - 1, pic!!, gifurl!!)
+//                                    }
+//                                }
+                                onGiftListener!!.onClck(fromPosition,data,pic!!,micPositons!!,gifurl!!,gifname!!,gift_num!!)
                             }
-                        }else{
-                            ToastUtils.showToast(this@GiftBagDialog.context,t.msg)
+                        } else {
+                            ToastUtils.showToast(this@GiftBagDialog.context, t.msg)
                         }
                     }
 
                     override fun onCompleted() {
                     }
                 })
-
-
     }
 
     var bageId: String? = null
@@ -168,7 +204,9 @@ class GiftBagDialog : ABSDialog {
                                 override fun onBage(position: Int) {
                                     giftid = bageAdpater.dataList.get(position).id.toString()
                                     gifurl = bageAdpater.dataList.get(position).aw_gif
+                                    gifname = bageAdpater.dataList.get(position).aw_name
                                     pic = bageAdpater.dataList.get(position).aw_images
+                                    //TODO: Sincerly ：缺少数量？
                                     bageAdpater.setSelect(position)
                                 }
                             })
@@ -189,7 +227,7 @@ class GiftBagDialog : ABSDialog {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
-                            tv_gold.setText(t.data.money)
+                            tv_user_gold.setText(t.data.money)
                         }
                     }
 
@@ -219,6 +257,7 @@ class GiftBagDialog : ABSDialog {
                                     giftid = giftAdpater.dataList.get(position).id.toString()
                                     pic = giftAdpater.dataList.get(position).pic
                                     gifurl = giftAdpater.dataList.get(position).gif_pic
+                                    gifname = giftAdpater.dataList.get(position).name
                                     giftAdpater.setSelect(position)
                                 }
                             })
@@ -227,7 +266,7 @@ class GiftBagDialog : ABSDialog {
                 })
     }
 
-    var mwuid: String? = null
+    var mwJson:String?=null
     var toPosition = -2
     var micPositons: List<RoomMicListBean.DataBean>? = null
     var micPostionAdapter: MicPostionAdapter? = null
@@ -249,18 +288,41 @@ class GiftBagDialog : ABSDialog {
                             micPostionAdapter!!.addAll(t.data)
                             micPostionAdapter!!.setOnClickListener(object : MicPostionAdapter.OnClickListener {
                                 override fun onClick(position: Int) {
-                                    mwuid = micPostionAdapter!!.dataList.get(position).uid.toString()
-                                    toPosition = micPostionAdapter!!.dataList.get(position).sort
-                                    micPostionAdapter!!.setSelect(position)
-                                }
-                            })
-                            micPostionAdapter!!.setCheckInterface(object :MicPostionAdapter.CheckInterface{
-                                override fun checkGroup(position: Int, isChecked: Boolean) {
+                                    //循环获取
+                                    val uid=AuthManager.getInstance().currentUserId;
+                                    val data=micPostionAdapter!!.dataList.get(position);
+                                    if(data!!.uid.toString().equals(uid)){
+                                        ToastUtils.showToast(context,"不能送礼物给自己!")
+                                        return
+                                    }
+                                    if(data!!.uid==0){
+                                        ToastUtils.showToast(context,"选择麦位无人!")
+                                        return
+                                    }
+
+                                    //mwuid = micPostionAdapter!!.dataList.get(position).uid.toString()
+                                    //toPosition = micPostionAdapter!!.dataList.get(position).sort
                                     val bean = micPostionAdapter!!.dataList.get(position)
-                                    bean.isChoosed = isChecked;
+                                    bean.isChoosed = !bean.isChoosed;
+
+                                    val micData= ArrayList<String>()
+                                    for (bean in micPositons!!) {
+                                        if(bean.isChoosed){
+                                            micData.add(bean.uid.toString())
+                                        }
+                                    }
+                                    val gson=Gson();
+                                    mwJson=gson.toJson(micData);//选择的麦位用户id数组
                                     micPostionAdapter!!.notifyDataSetChanged()
                                 }
                             })
+//                            micPostionAdapter!!.setCheckInterface(object :MicPostionAdapter.CheckInterface{
+//                                override fun checkGroup(position: Int, isChecked: Boolean) {
+//                                    val bean = micPostionAdapter!!.dataList.get(position)
+//                                    bean.isChoosed = isChecked;
+//                                    micPostionAdapter!!.notifyDataSetChanged()
+//                                }
+//                            })
                         }
                     }
                 })
@@ -294,7 +356,7 @@ class GiftBagDialog : ABSDialog {
     }
 
     interface OnGiftListener {
-        fun onClck(targetPosition: Int, toPosition: Int, pic: String, gifPic: String)
+        fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String,dataList:List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String)
     }
 
     private var onGiftListener: OnGiftListener? = null

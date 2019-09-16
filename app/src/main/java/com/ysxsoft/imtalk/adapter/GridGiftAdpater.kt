@@ -15,37 +15,44 @@ import com.ysxsoft.imtalk.utils.ImageLoadUtil
  *Create By 胡
  *on 2019/8/26 0026
  */
-class GridGiftAdpater(mContext: Context):ListBaseAdapter<DressMallBean.DataBean>(mContext){
+class GridGiftAdpater(mContext: Context) : ListBaseAdapter<DressMallBean.DataBean>(mContext) {
     override val layoutId: Int
         get() = R.layout.gift_item_layout
-    var click=-1
+
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
-        ImageLoadUtil.GlideGoodsImageLoad(mContext,bean.pic,holder.getView<ImageView>(R.id.img_gift)!!)
+        ImageLoadUtil.GlideGoodsImageLoad(mContext, bean.pic, holder.getView<ImageView>(R.id.img_gift)!!)
         holder.getView<TextView>(R.id.tv_name)!!.setText(bean.name)
-        holder.getView<TextView>(R.id.tv_gold)!!.setText(bean.gold+"金币")
-        if (click==position) {
+        holder.getView<TextView>(R.id.tv_gold)!!.setText(bean.gold + "金币")
+        if (bean.isSelect) {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.drawable.theme_fragme)
-        }/*else{
-            holder.getView<LinearLayout>(R.id.ll_bg)!!.visibility=View.GONE
-        }*/
+        } else {
+            holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.color.transparent)
+        }
         holder.itemView.setOnClickListener {
-            if (onClickListener!=null){
+            if (onClickListener != null) {
                 onClickListener!!.onGift(position)
             }
         }
     }
 
-    interface OnClickListener{
+    interface OnClickListener {
         fun onGift(position: Int)
     }
-    private var onClickListener: OnClickListener?=null
-    fun setOnClickListener(onClickListener: OnClickListener){
-        this.onClickListener=onClickListener
+
+    private var onClickListener: OnClickListener? = null
+    fun setOnClickListener(onClickListener: OnClickListener) {
+        this.onClickListener = onClickListener
     }
 
     fun setSelect(position: Int) {
-        click=position
+        val bean = mDataList!!.get(position);
+        bean!!.isSelect = !bean!!.isSelect;
+        for (item in mDataList) {
+            if (!item.id.toString().equals(bean.id.toString())) {
+                item.isSelect=false;
+            }
+        }
         notifyDataSetChanged()
     }
 

@@ -82,7 +82,7 @@
             android:textColor="@color/btn_color" />
 
         <TextView
-            android:id="@+id/tv_gold"
+            android:id="@+id/tv_user_gold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

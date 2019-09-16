@@ -5,8 +5,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.ysxsoft.imtalk.bean.RoomPublicGiftMessageBean;
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.IMClient;
+import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionGiftValueMessage;
@@ -20,6 +23,7 @@ import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNoticeChangedMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomPublicGiftMessage;
 import com.ysxsoft.imtalk.chatroom.model.BaseRoomInfo;
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo;
 import com.ysxsoft.imtalk.chatroom.model.MicBehaviorType;
@@ -573,10 +577,10 @@ public class RoomManager {
     private class RoomMessageListener implements RongIMClient.OnReceiveMessageListener {
         @Override
         public boolean onReceived(final Message message, int i) {
+            Log.e("tag","onReceived:"+new Gson().toJson(message.getContent()));
             synchronized (roomLock) {
                 Conversation.ConversationType conversationType = message.getConversationType();
                 if (conversationType == Conversation.ConversationType.CHATROOM) {
-                    Log.e("tag","onReceived:"+message.getContent());
                     if (currentRoom == null) return false;
                     //判断chatRoomID
                     String targetId = message.getTargetId();
@@ -801,6 +805,65 @@ public class RoomManager {
                                 public void run() {
                                     RoomNameChangedMessage content = new RoomNameChangedMessage(message.getContent().encode());
                                     roomEventlistener.onRoomName(content.getRoomName());
+                                }
+                            });
+                        }
+                    }else if(message.getContent() instanceof GiftChatMessage){
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(currentRoom!=null&&currentRoom.getMessageList()!=null){
+                                        currentRoom.getMessageList().add(message);
+                                    }
+                                    if (roomEventlistener != null) {
+                                        threadManager.runOnUIThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                roomEventlistener.onMessageEvent(message);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    return true;
+                }else if(conversationType == Conversation.ConversationType.PRIVATE){
+                    if(message.getContent() instanceof RoomPublicGiftMessage){
+                        final RoomEventListener roomEventlistener = currentRoomEventListener;
+                        Log.e("tag","收到礼物公屏消息");
+                        //礼物公屏Message
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomPublicGiftMessage msg=new RoomPublicGiftMessage(message.getContent().encode());
+                                    //送礼人昵称，头像，收礼人昵称，头像，礼物图片，礼物数量
+                                    RoomPublicGiftMessageBean messageBean=new RoomPublicGiftMessageBean();
+                                    messageBean.setSendName(msg.getSendName());
+                                    messageBean.setSendIcon(msg.getSendIcon());
+                                    messageBean.setSlName(msg.getSlName());
+                                    messageBean.setSlIcon(msg.getSlIcon());
+                                    messageBean.setGiftPic(msg.getGiftPic());
+                                    messageBean.setGiftNums(msg.getGiftNums());
+                                    roomEventlistener.onGiftMessage(messageBean);
+                                    if (roomEventlistener != null) {
+                                        GiftChatMessage giftChatMessage=new GiftChatMessage();
+                                        //礼物名称
+                                        giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
+                                        giftChatMessage.setGiftPic(msg.getGiftPic());
+                                        giftChatMessage.setGiftNum(msg.getGiftNums());
+                                        giftChatMessage.setName(msg.getSendName());
+                                        giftChatMessage.setToName(msg.getSlName());
+                                        threadManager.runOnUIThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, giftChatMessage);
+                                                roomEventlistener.onMessageEvent(o);//保存消息
+                                            }
+                                        });
+                                    }
                                 }
                             });
                         }
