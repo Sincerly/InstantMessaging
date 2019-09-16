@@ -9,6 +9,7 @@ import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.IMClient;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.MicPositionGiftValueMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
@@ -125,7 +126,7 @@ public class RoomManager {
      * @param roomId
      * @param callBack
      */
-    public void joinRoom(final String uid, final String roomId,final String lock_pwd, final ResultCallback<DetailRoomInfo> callBack) {
+    public void joinRoom(final String uid, final String roomId, final String lock_pwd, final ResultCallback<DetailRoomInfo> callBack) {
         /*
          * 加入房间前进行初始化房间保证可以监听到对应房间的消息，再加入 IM 的聊天室，最后进行API服务器服加入聊天室请求
          * 防止API服务器请求延迟丢失对应聊天室的消息
@@ -135,7 +136,7 @@ public class RoomManager {
         imClient.joinChatRoom(roomId, new ResultCallback<String>() {
             @Override
             public void onSuccess(final String roomId) {
-                request.joinRoom(uid, roomId,lock_pwd, new HandleRequestWrapper<DetailRoomInfo, DetailRoomInfo>(callBack) {
+                request.joinRoom(uid, roomId, lock_pwd, new HandleRequestWrapper<DetailRoomInfo, DetailRoomInfo>(callBack) {
                     @Override
                     public DetailRoomInfo handleRequestResult(DetailRoomInfo dataResult) {
                         if (dataResult != null) {
@@ -435,7 +436,7 @@ public class RoomManager {
             List<String> userList = new ArrayList<>();
             if (currentRoom == null) return userList;
             // 加入房主
-            if (currentRoom.getRoomInfo()!=null){
+            if (currentRoom.getRoomInfo() != null) {
                 userList.add(currentRoom.getRoomInfo().getUid());
             }
             List<MicPositionsBean> micPositions = currentRoom.getMicPositions();
@@ -443,7 +444,7 @@ public class RoomManager {
                 // 加入麦位上可发言的用户
                 for (MicPositionsBean micInfo : micPositions) {
                     String state = micInfo.getIs_wheat();
-                    if (!"0".equals(state) && !"0".equals(micInfo.getUid())&&!"0".equals(micInfo.getIs_lock_wheat())) {
+                    if (!"0".equals(state) && !"0".equals(micInfo.getUid()) && !"0".equals(micInfo.getIs_lock_wheat())) {
                         userList.add(micInfo.getUid());
                     }
                 }
@@ -752,37 +753,37 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomEmjMessage) {
+                    } else if (message.getContent() instanceof RoomEmjMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    RoomEmjMessage content=new RoomEmjMessage(message.getContent().encode());
-                                    roomEventlistener.onRoomEmj(content.getPosition(),content.getImageUrl());
+                                    RoomEmjMessage content = new RoomEmjMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomEmj(content.getPosition(), content.getImageUrl());
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomGiftMessage) {
+                    } else if (message.getContent() instanceof RoomGiftMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    RoomGiftMessage content=new RoomGiftMessage(message.getContent().encode());
-                                    roomEventlistener.onRoomGift(content.getPosition(),content.getToPosition(),content.getGiftUrl(),content.getStaticUrl());
+                                    RoomGiftMessage content = new RoomGiftMessage(message.getContent().encode());
+                                    roomEventlistener.onRoomGift(content.getPosition(), content.getToPosition(), content.getGiftUrl(), content.getStaticUrl());
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomNoticeChangedMessage){
+                    } else if (message.getContent() instanceof RoomNoticeChangedMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    RoomNoticeChangedMessage content=new RoomNoticeChangedMessage(message.getContent().encode());
+                                    RoomNoticeChangedMessage content = new RoomNoticeChangedMessage(message.getContent().encode());
                                     roomEventlistener.onRoomNotice(content.getRoomDesc());
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomLableChangedMessage) {
+                    } else if (message.getContent() instanceof RoomLableChangedMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
@@ -792,7 +793,7 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomNameChangedMessage){
+                    } else if (message.getContent() instanceof RoomNameChangedMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
@@ -802,7 +803,19 @@ public class RoomManager {
                                 }
                             });
                         }
+                    } else if (message.getContent() instanceof MicPositionGiftValueMessage) {
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MicPositionGiftValueMessage content = new MicPositionGiftValueMessage(message.getContent().encode());
+                                    roomEventlistener.onGiftValue(content.getCmd(), content.getMicPositions(), content.getHouseOwnerValue());
+                                }
+                            });
+                        }
                     }
+
+
                     return true;
                 }
                 return false;

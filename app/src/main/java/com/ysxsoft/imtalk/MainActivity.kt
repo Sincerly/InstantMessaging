@@ -6,22 +6,22 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.luck.picture.lib.immersive.LightStatusBarUtils.setLightStatusBar
 import com.luck.picture.lib.permissions.RxPermissions
-import com.ysxsoft.imtalk.chatroom.utils.log.SLog
 import com.ysxsoft.imtalk.fragment.*
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.dialog.QDDialog
 import io.reactivex.functions.Consumer
-import io.rong.imlib.RongIMClient
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-import android.os.Build.VERSION.SDK_INT
-import android.support.v4.app.ActivityCompat
 import android.text.TextUtils
+import com.ysxsoft.imtalk.bean.QdSignListBean
+import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.utils.NetWork
 import org.litepal.LitePal
-import org.litepal.tablemanager.Connector
+import rx.Observer
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 
 class MainActivity : BaseActivity() {
@@ -34,7 +34,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LitePal.getDatabase()
-        QDDialog(mContext).show()
+
         RxPermissions(this).request(Manifest.permission.CAMERA,
                 Manifest.permission.READ_PHONE_STATE,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -56,11 +56,36 @@ class MainActivity : BaseActivity() {
                         }
                     }
                 })
-        if (!TextUtils.isEmpty(SpUtils.getSp(mContext,"chat_token"))){
-            loginToIM(SpUtils.getSp(mContext,"chat_token"))
+        if (!TextUtils.isEmpty(SpUtils.getSp(mContext, "chat_token"))) {
+            loginToIM(SpUtils.getSp(mContext, "chat_token"))
         }
         setLightStatusBar(true)
         initView()
+        requestData()
+    }
+
+    private fun requestData() {
+        NetWork.getService(ImpService::class.java)
+                .SignList(SpUtils.getSp(mContext, "uid"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object :Observer<QdSignListBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: QdSignListBean?) {
+                        if (t!!.code==0){
+                            if (t.data.is_signs==1){
+                                QDDialog(mContext).show()
+                            }
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
     }
 
     private fun initView() {
@@ -71,7 +96,7 @@ class MainActivity : BaseActivity() {
         fragments.add(MyFragment())
         val adapter = MyViewPagerAdapter(supportFragmentManager)
         vp_content.adapter = adapter
-        vp_content.offscreenPageLimit=5
+        vp_content.offscreenPageLimit = 5
         rg_home.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 R.id.rb_home -> {
@@ -110,7 +135,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode!=123) {
+        if (requestCode != 123) {
 //            showToastMessage("权限没开通，部分功能不能使用")
         }
     }

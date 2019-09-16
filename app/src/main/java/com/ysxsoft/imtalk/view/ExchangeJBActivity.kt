@@ -39,6 +39,7 @@ class ExchangeJBActivity : BaseActivity() {
     }
 
     var money: String? = null
+    var thbl: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //exchange_jb_item_layout
@@ -61,6 +62,7 @@ class ExchangeJBActivity : BaseActivity() {
                 .subscribe(object : Action1<DiamondBean> {
                     override fun call(t: DiamondBean?) {
                         if (t!!.code == 0) {
+                            thbl = t.data.thbl
                             tv_current_jb.setText(t.data.now_money)
                             tv_zs.setText(t.data.diamonds)
                             tv_ratio.setText("," + t.data.dh_desc)
@@ -82,6 +84,7 @@ class ExchangeJBActivity : BaseActivity() {
             }
             ed_num.setText(tv_current_jb.text.toString().trim())
         }
+        ed_num.setHint("请输入钻石数量")
         ed_num.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }
@@ -92,7 +95,7 @@ class ExchangeJBActivity : BaseActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!TextUtils.isEmpty(s) && !"0".equals(s)) {
                     val decimal = BigDecimal(s.toString())
-                    val dec = BigDecimal("10")
+                    val dec = BigDecimal(thbl!!.split(".")[0])
                     val divide = decimal.multiply(dec)
                     tv_zs.setText(divide.toString())
                     tv_ok.isEnabled = true

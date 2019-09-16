@@ -120,6 +120,7 @@ class LoginActivity : BaseActivity() {
                     sb.append(key).append(" : ").append(map[key]).append("\n")
                 }
                 val jsonObject = JSONObject(map)
+                Log.d("tag===",jsonObject.toString())
                 try {
                     val openid = jsonObject.getString("uid")
                     val nickname = jsonObject.getString("name")
@@ -131,7 +132,7 @@ class LoginActivity : BaseActivity() {
                     map1.put("openid", openid)
                     map1.put("nickname", nickname)
                     map1.put("icon", avatar)
-                    if ("男".equals(sex)) {
+                    if ("0".equals(sex)) {
                         map1.put("sex", "1")
                     } else {
                         map1.put("sex", "2")
@@ -162,8 +163,9 @@ class LoginActivity : BaseActivity() {
                                                 }
                                                 SpUtils.saveSp(mContext, "uid", t.data.userInfo.uid.toString())
                                                 com.ysxsoft.imtalk.chatroom.utils.SpUtils.saveSp(mContext, "uid", t.data.userInfo.uid.toString())
-//                                                startActivity(MainActivity::class.java)
-                                                startActivity(ImprovingDataActivity::class.java)
+                                                startActivity(MainActivity::class.java)
+//                                                startActivity(ImprovingDataActivity::class.java)
+                                                finish()
                                             }
 
                                             override fun onError(errorCode: RongIMClient.ErrorCode) {
@@ -207,6 +209,7 @@ class LoginActivity : BaseActivity() {
                     }
 
                     override fun onNext(t: LoginBean?) {
+                        showToastMessage(t!!.msg)
                         if (t!!.code == 0) {
                             RongIM.connect(t.data.chat_token, object : RongIMClient.ConnectCallback() {
                                 override fun onTokenIncorrect() {
@@ -214,7 +217,6 @@ class LoginActivity : BaseActivity() {
                                 }
 
                                 override fun onSuccess(s: String) {
-                                    showToastMessage(R.string.toast_login_success);
                                     SpUtils.saveSp(mContext, "token", t.data.token)
                                     if (!TextUtils.isEmpty(t.data.chat_token) && t.data.chat_token != null) {
                                         SpUtils.saveSp(mContext, "chat_token", t.data.chat_token)
@@ -222,6 +224,7 @@ class LoginActivity : BaseActivity() {
                                     SpUtils.saveSp(mContext, "uid", t.data.uid.toString())
                                     com.ysxsoft.imtalk.chatroom.utils.SpUtils.saveSp(mContext, "uid", t.data.uid.toString())
                                     startActivity(MainActivity::class.java)
+                                    finish()
                                     SLog.d(TAG, "RongIMClient connect success")
                                 }
 

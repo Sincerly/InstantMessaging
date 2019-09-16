@@ -14,12 +14,14 @@ import io.rong.imlib.model.Message;
 public interface RoomEventListener {
     /**
      * 房间人数发生变化
+     *
      * @param memberCount
      */
     void onRoomMemberChange(int memberCount);
 
-     /**
+    /**
      * 房间人数发生变化
+     *
      * @param uid
      */
     void onRoomMemberKickChange(String uid);
@@ -85,34 +87,40 @@ public interface RoomEventListener {
 
     /**
      * 表情
+     *
      * @param p
      * @param url
      */
-    void onRoomEmj(int p,String url);
+    void onRoomEmj(int p, String url);
 
     /**
      * 礼物
+     *
      * @param p
      * @param toP
      * @param giftUrl
      * @param staticUrl
      */
-    void onRoomGift(int p,int toP,String giftUrl,String staticUrl);
+    void onRoomGift(int p, int toP, String giftUrl, String staticUrl);
 
     /**
      * 房间通知
      */
     void onRoomNotice(String room_desc);
 
-     /**
+    /**
      * 房间标签
      */
     void onRoomLable(String room_lable);
+
     /**
      * 房间名称
      */
     void onRoomName(String room_name);
 
-
+    /**
+     * 是否显示礼物值
+     */
+    void onGiftValue(int cmd, List<MicPositionsBean> micPositionInfoList, String houseOwnerValue);
 
 }

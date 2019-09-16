@@ -20,11 +20,11 @@ class LoginOutDialog(var mContext: Context):ABSDialog(mContext){
             dismiss()
         }
         tv_ok.setOnClickListener {
-            dismiss()
-            var instance = ActivityPageManager.getInstance();
-            instance!!.finishAllActivity();
-            SpUtils.deleteSp(mContext)
-            mContext.startActivity(Intent(mContext,LoginActivity::class.java))
+//            dismiss()
+//            var instance = ActivityPageManager.getInstance();
+//            instance!!.finishAllActivity();
+//            SpUtils.deleteSp(mContext)
+//            mContext.startActivity(Intent(mContext,LoginActivity::class.java))
         }
     }
 

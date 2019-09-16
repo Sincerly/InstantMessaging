@@ -1,5 +1,7 @@
 package com.ysxsoft.imtalk.bean;
 
+import java.util.List;
+
 /**
  * Create By 胡
  * on 2019/8/12 0012
@@ -9,7 +11,7 @@ public class ZSBankBean {
     /**
      * code : 0
      * msg : 获取成功！
-     * data : {"uid":"21","type":2,"diamond":"60.00","blv":"1.00","money":60,"bank_name":"招商银行（0011）"}
+     * data : {"bankList":[{"bank_id":17,"bank_name":"中国银行（1234）"}],"rs":{"uid":"54","type":2,"diamond":"0.00","blv":"1.00","money":0}}
      */
 
     private int code;
@@ -42,67 +44,109 @@ public class ZSBankBean {
 
     public static class DataBean {
         /**
-         * uid : 21
-         * type : 2
-         * diamond : 60.00
-         * blv : 1.00
-         * money : 60
-         * bank_name : 招商银行（0011）
+         * bankList : [{"bank_id":17,"bank_name":"中国银行（1234）"}]
+         * rs : {"uid":"54","type":2,"diamond":"0.00","blv":"1.00","money":0}
          */
 
-        private String uid;
-        private int type;
-        private String diamond;
-        private String blv;
-        private String money;
-        private String bank_name;
+        private RsBean rs;
+        private List<BankListBean> bankList;
 
-        public String getUid() {
-            return uid;
+        public RsBean getRs() {
+            return rs;
         }
 
-        public void setUid(String uid) {
-            this.uid = uid;
+        public void setRs(RsBean rs) {
+            this.rs = rs;
         }
 
-        public int getType() {
-            return type;
+        public List<BankListBean> getBankList() {
+            return bankList;
         }
 
-        public void setType(int type) {
-            this.type = type;
+        public void setBankList(List<BankListBean> bankList) {
+            this.bankList = bankList;
         }
 
-        public String getDiamond() {
-            return diamond;
+        public static class RsBean {
+            /**
+             * uid : 54
+             * type : 2
+             * diamond : 0.00
+             * blv : 1.00
+             * money : 0
+             */
+
+            private String uid;
+            private int type;
+            private String diamond;
+            private String blv;
+            private String money;
+
+            public String getUid() {
+                return uid;
+            }
+
+            public void setUid(String uid) {
+                this.uid = uid;
+            }
+
+            public int getType() {
+                return type;
+            }
+
+            public void setType(int type) {
+                this.type = type;
+            }
+
+            public String getDiamond() {
+                return diamond;
+            }
+
+            public void setDiamond(String diamond) {
+                this.diamond = diamond;
+            }
+
+            public String getBlv() {
+                return blv;
+            }
+
+            public void setBlv(String blv) {
+                this.blv = blv;
+            }
+
+            public String getMoney() {
+                return money;
+            }
+
+            public void setMoney(String money) {
+                this.money = money;
+            }
         }
 
-        public void setDiamond(String diamond) {
-            this.diamond = diamond;
-        }
+        public static class BankListBean {
+            /**
+             * bank_id : 17
+             * bank_name : 中国银行（1234）
+             */
 
-        public String getBlv() {
-            return blv;
-        }
+            private int bank_id;
+            private String bank_name;
 
-        public void setBlv(String blv) {
-            this.blv = blv;
-        }
+            public int getBank_id() {
+                return bank_id;
+            }
 
-        public String getMoney() {
-            return money;
-        }
+            public void setBank_id(int bank_id) {
+                this.bank_id = bank_id;
+            }
 
-        public void setMoney(String money) {
-            this.money = money;
-        }
+            public String getBank_name() {
+                return bank_name;
+            }
 
-        public String getBank_name() {
-            return bank_name;
-        }
-
-        public void setBank_name(String bank_name) {
-            this.bank_name = bank_name;
+            public void setBank_name(String bank_name) {
+                this.bank_name = bank_name;
+            }
         }
     }
 }

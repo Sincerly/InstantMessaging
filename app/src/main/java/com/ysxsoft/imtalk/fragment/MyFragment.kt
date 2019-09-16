@@ -1,10 +1,15 @@
 package com.ysxsoft.imtalk.fragment
 
 import android.content.Context
+import android.text.TextUtils
+import android.view.View
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.bean.GetRealInfoBean
 import com.ysxsoft.imtalk.bean.MFamilyBean
 import com.ysxsoft.imtalk.bean.UserInfo
 import com.ysxsoft.imtalk.bean.UserInfoBean
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
@@ -30,15 +35,44 @@ class MyFragment : BaseFragment() {
     override fun getLayoutResId(): Int {
         return R.layout.fm_my
     }
+
     private var fm_id: String? = null
     private var is_fmy: String? = null
+    private var bean: GetRealInfoBean.DataBean? = null
+    private var dataBean:UserInfoBean.DataBean?=null
     override fun onResume() {
         super.onResume()
         initStatusBar(topView)
+        img_back.visibility=View.GONE
         img_back.setImageResource(R.mipmap.sign_white)
         setTitle("我的")
         initView()
         requestData()
+        getData()
+    }
+    private fun getData() {
+        val map = HashMap<String, String>()
+        map.put("uid",AuthManager.getInstance().currentUserId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .get_real_info(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object :Observer<GetRealInfoBean>{
+                    override fun onError(e: Throwable?) {
+
+                    }
+
+                    override fun onNext(t: GetRealInfoBean?) {
+                        if("0".equals(t!!.code)){
+                            bean = t.data
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     private fun requestData() {
@@ -52,12 +86,13 @@ class MyFragment : BaseFragment() {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
+                            dataBean = t.data
                             val info = UserInfo()
-                            info.uid=t.data.uid
-                            info.icon=t.data.icon
-                            info.nikeName=t.data.nickname
-                            info.sex=t.data.sex
-                            info.zsl=t.data.user_level.toString()
+                            info.uid = t.data.uid
+                            info.icon = t.data.icon
+                            info.nikeName = t.data.nickname
+                            info.sex = t.data.sex
+                            info.zsl = t.data.user_level.toString()
                             val save = info.save()
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_logo)
                             tv_nick.setText(t.data.nickname)
@@ -75,11 +110,6 @@ class MyFragment : BaseFragment() {
 
     }
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-
-    }
-
     private fun initView() {
         img_back.setOnClickListener {
             startActivity(QDActivity::class.java)
@@ -91,10 +121,18 @@ class MyFragment : BaseFragment() {
 //            })
 //            dialog.show()
         }
+        ll_fans.setOnClickListener {
+//            startActivity(FansActivity::class.java)
+            FansActivity.startFansActivity(mContext,AuthManager.getInstance().currentUserId)
+        }
+        tv_foucs_on.setOnClickListener {
+//            startActivity(FouceOnActivity::class.java)
+            FouceOnActivity.startFouceOnActivity(mContext,AuthManager.getInstance().currentUserId)
+        }
 
         img_logo.setOnClickListener {
-//            startActivity(MyDataActivity::class.java)
-            MyDataActivity.startMyDataActivity(mContext,SpUtils.getSp(mContext,"uid"),"myself")
+            //            startActivity(MyDataActivity::class.java)
+            MyDataActivity.startMyDataActivity(mContext, SpUtils.getSp(mContext, "uid"), "myself")
         }
         //我的钱包
         tv1.setOnClickListener {
@@ -106,44 +144,53 @@ class MyFragment : BaseFragment() {
         }
         //实名认证
         tv3.setOnClickListener {
-            startActivity(SmrzActivity::class.java)
+            if (bean!!.is_real==0){
+                startActivity(SmrzActivity::class.java)
+            }else{
+                showToastMessage("已认证")
+            }
         }
         //我的家族
         tv4.setOnClickListener {
-//            startActivity(MyFamilyActivity::class.java)
+            //            startActivity(MyFamilyActivity::class.java)
             JzData()
         }
         //我的等级
         tv5.setOnClickListener {
             startActivity(MyDjActivity::class.java)
         }
+        tv6.visibility=View.GONE
         //我的邀请
         tv6.setOnClickListener {
             startActivity(InviteFriendActivity::class.java)
         }
         //设置
         tv7.setOnClickListener {
-            startActivity(SettingActivity::class.java)
+            if (dataBean!=null&&!TextUtils.isEmpty(dataBean!!.nickname)) {
+                SettingActivity.startSettingActivity(mContext, dataBean!!.now_roomId, dataBean!!.nickname, dataBean!!.icon)
+            }
+//            startActivity(SettingActivity::class.java)
         }
         ll_user_levles.setOnClickListener {
-            MyDjActivity.starMyDjActivity(mContext,"1")
+            MyDjActivity.starMyDjActivity(mContext, "1")
         }
         ll_ml_levels.setOnClickListener {
-            MyDjActivity.starMyDjActivity(mContext,"2")
+            MyDjActivity.starMyDjActivity(mContext, "2")
         }
     }
+
     private fun JzData() {
         NetWork.getService(ImpService::class.java)
-                .mFamily(SpUtils.getSp(mContext,"uid"))
+                .mFamily(SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<MFamilyBean> {
                     override fun call(t: MFamilyBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             fm_id = t.data.id
                             is_fmy = t.data.is_fmy
-                            MyFamilyActivity.startMyFamilyActivity(mContext,fm_id!!,is_fmy!!)
-                        }else{
+                            MyFamilyActivity.startMyFamilyActivity(mContext, fm_id!!, is_fmy!!)
+                        } else {
                             showToastMessage("您暂未加入任何家族")
                         }
                     }

@@ -51,6 +51,16 @@ public class QdSignListBean {
 
         private String sign_day;
         private String sign_descs;
+
+        public int getIs_signs() {
+            return is_signs;
+        }
+
+        public void setIs_signs(int is_signs) {
+            this.is_signs = is_signs;
+        }
+
+        private int is_signs;
         private List<SignListBean> sign_list;
 
         public String getSign_day() {

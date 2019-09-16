@@ -50,6 +50,7 @@ class MyDataGiftFragment : BaseFragment() {
         } else {
             ll_fs.visibility = View.VISIBLE
         }
+        fouceData()
         requestData()
         requestGiftData()
         initView()
@@ -58,7 +59,7 @@ class MyDataGiftFragment : BaseFragment() {
     private fun initView() {
         tv_fouce.setOnClickListener {
             //关注
-            fouceData()
+
         }
         tv_msg.setOnClickListener {
             //私信
@@ -78,7 +79,9 @@ class MyDataGiftFragment : BaseFragment() {
                     }
 
                     override fun onNext(t: FouceOnBean?) {
-                        showToastMessage(t!!.msg)
+                        if (t!!.code==0){
+//                            tv_fouce.setText("")
+                        }
                     }
 
                     override fun onCompleted() {
