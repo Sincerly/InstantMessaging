@@ -75,7 +75,7 @@
             android:layout_marginLeft="10dp"
             android:digits="@string/pwd_type"
             android:hint="输入密码"
-            android:inputType="numberPassword"
+            android:inputType="textPassword"
             android:singleLine="true" />
 
 

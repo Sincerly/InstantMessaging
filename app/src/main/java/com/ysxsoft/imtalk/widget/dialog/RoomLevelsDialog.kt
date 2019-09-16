@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Gravity
 import android.view.WindowManager
@@ -13,6 +14,7 @@ import com.ysxsoft.imtalk.utils.BaseApplication.Companion.mContext
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.ToastUtils
+import com.ysxsoft.imtalk.view.MyDataActivity
 import com.ysxsoft.imtalk.widget.ABSDialog
 import kotlinx.android.synthetic.main.room_level_dialog_layout.*
 import rx.android.schedulers.AndroidSchedulers
@@ -25,10 +27,10 @@ import rx.schedulers.Schedulers
  */
 class RoomLevelsDialog : ABSDialog {
     var type = 1
-    var roomid:String?=null
+    var roomid: String? = null
 
     constructor(mContext: Context, room_id: String?) : super(mContext) {
-        roomid=room_id
+        roomid = room_id
         val window = window
         window.setGravity(Gravity.BOTTOM)
         val params = window.attributes
@@ -40,32 +42,54 @@ class RoomLevelsDialog : ABSDialog {
 
     private fun rqeustData(mContext: Context) {
         NetWork.getService(ImpService::class.java)
-                .roomStar(type.toString(),roomid!!)
+                .roomStar(type.toString(), roomid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<RoomStarBean>{
+                .subscribe(object : Action1<RoomStarBean> {
                     override fun call(t: RoomStarBean?) {
-                        if (t!!.code==0){
-                            if (t.data.size==1){
+                        if (t!!.code == 0) {
+                            if (t.data.size == 1) {
                                 tv_top1_name.setText(t.data.get(0).nickname)
-                                tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
-                                ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
+                                tv_top1_id.setText("ID：" + t.data.get(0).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(0).icon, img_top1)
+                                img_top1.setOnClickListener {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", t.data.get(0).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
+                                }
+
                             }
 
-                            if (t.data.size==2) {
+                            if (t.data.size == 2) {
                                 tv_top1_name.setText(t.data.get(0).nickname)
-                                tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
-                                ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
+                                tv_top1_id.setText("ID：" + t.data.get(0).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(0).icon, img_top1)
 
                                 tv_top2_NO.setText("距离前一名" + t.data.get(1).next_user.toString())
                                 tv_top2_name.setText(t.data.get(1).nickname)
                                 tv_top2_id.setText("ID：" + t.data.get(1).key_id.toString())
                                 ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(1).icon, img_top2)
+                                img_top1.setOnClickListener {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", t.data.get(0).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
+                                }
+                                img_top2.setOnClickListener {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", t.data.get(1).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
+                                }
                             }
-                            if (t.data.size==3) {
+                            if (t.data.size == 3) {
                                 tv_top1_name.setText(t.data.get(0).nickname)
-                                tv_top1_id.setText("ID："+t.data.get(0).key_id.toString())
-                                ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.get(0).icon,img_top1)
+                                tv_top1_id.setText("ID：" + t.data.get(0).key_id.toString())
+                                ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(0).icon, img_top1)
 
                                 tv_top2_NO.setText("距离前一名" + t.data.get(1).next_user.toString())
                                 tv_top2_name.setText(t.data.get(1).nickname)
@@ -76,15 +100,46 @@ class RoomLevelsDialog : ABSDialog {
                                 tv_top3_id.setText("ID：" + t.data.get(2).key_id.toString())
                                 ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.get(2).icon, img_top3)
                                 tv_top3_NO.setText("距离前一名" + t.data.get(2).next_user.toString())
+                                img_top1.setOnClickListener {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", t.data.get(0).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
+                                }
+                                img_top2.setOnClickListener {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", t.data.get(1).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
+                                }
+                                img_top3.setOnClickListener {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", t.data.get(2).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
+                                }
                             }
 
                             val adapter = RoomLevelsAdapter(BaseApplication.mContext!!)
                             recyclerView.layoutManager = LinearLayoutManager(BaseApplication.mContext)
                             recyclerView.adapter = adapter
                             adapter.addAll(t.data)
+                            adapter.setOnClickRoomLevelsListener(object :RoomLevelsAdapter.OnClickRoomLevelsListener{
+                                override fun onClick(position: Int) {
+                                    val intent = Intent(this@RoomLevelsDialog.context, MyDataActivity::class.java)
+                                    intent.putExtra("uid", adapter!!.dataList.get(position).uid)
+                                    intent.putExtra("myself", "")
+                                    intent.putExtra("room", "room")
+                                    this@RoomLevelsDialog.context.startActivity(intent)
 
-                        }else{
-                            ToastUtils.showToast(mContext,t.msg)
+                                }
+                            })
+
+                        } else {
+                            ToastUtils.showToast(mContext, t.msg)
                         }
                     }
                 })

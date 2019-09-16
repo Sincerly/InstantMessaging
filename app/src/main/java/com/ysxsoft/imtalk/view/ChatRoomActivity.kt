@@ -97,6 +97,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         //送礼物超过一定公屏消息
     }
 
+
+    override fun onGiftValue(cmd: Int, micPositionInfoList: MutableList<MicPositionsBean>?, houseOwnerValue: String?) {
+        //礼物值
+        if (cmd == 0) {//关闭
+            tv_room_manager.visibility = View.GONE
+            UpdataTips(micPositionInfoList!!, false)
+        } else {
+            tv_room_manager.visibility = View.VISIBLE
+            tv_room_manager.setText(houseOwnerValue)
+            UpdataTips(micPositionInfoList!!, true)
+        }
+    }
+
     override fun onRoomName(room_name: String?) {
         //房间名称
         updataTitle(room_name)
@@ -214,7 +227,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
         // 更新麦位上的说话状态
         for (micSeatView in micSeatViewList!!) {
-            val userId = micSeatView.getMicInfo().uid.toString()
+            val userId = micSeatView.getMicInfo().uid
             if (!TextUtils.equals("0", userId) && speakUserList.contains(userId)) {
                 micSeatView.startRipple()
             }
@@ -306,19 +319,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     private fun ShareData() {
         val map = HashMap<String, String>()
-        map.put("uid",AuthManager.getInstance().currentUserId)
-        map.put("room_id",room_id!!)
+        map.put("uid", AuthManager.getInstance().currentUserId)
+        map.put("room_id", room_id!!)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .share_user(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<ShareUserBean>{
+                .subscribe(object : Observer<ShareUserBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: ShareUserBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             shareBean = t.data
                         }
                     }
@@ -413,19 +426,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun Wechat() {
-                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.WEIXIN)
+                    ShareUrl(shareBean!!.nickname, shareBean!!.desc, shareBean!!.icon, shareBean!!.url, SHARE_MEDIA.WEIXIN)
                 }
 
                 override fun pyq() {
-                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.WEIXIN_CIRCLE)
+                    ShareUrl(shareBean!!.nickname, shareBean!!.desc, shareBean!!.icon, shareBean!!.url, SHARE_MEDIA.WEIXIN_CIRCLE)
                 }
 
                 override fun qqZone() {
-                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.QZONE)
+                    ShareUrl(shareBean!!.nickname, shareBean!!.desc, shareBean!!.icon, shareBean!!.url, SHARE_MEDIA.QZONE)
                 }
 
                 override fun QQ() {
-                    ShareUrl(shareBean!!.nickname,shareBean!!.desc,shareBean!!.icon,shareBean!!.url,SHARE_MEDIA.QQ)
+                    ShareUrl(shareBean!!.nickname, shareBean!!.desc, shareBean!!.icon, shareBean!!.url, SHARE_MEDIA.QQ)
                 }
             })
             friendDialog.show()
@@ -509,6 +522,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             ll_isShow.visibility = View.GONE
             ll_send.visibility = View.VISIBLE
         }
+
         tv_send.setOnClickListener {
             val msg = chatroom_et_chat_input.text.toString().trim()
             if (!TextUtils.isEmpty(msg)) {
@@ -519,13 +533,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         }
 
-
         chatroom_setting.setOnClickListener {
             AddRoomActivity.starAddRoomActivity(mContext, room_id!!, tv_title.text.toString())
         }
 
         chatroom_iv_sound_control.setOnClickListener {
-//            OnLineActivity.starOnLineActivity(mContext, room_id!!)
+            //            OnLineActivity.starOnLineActivity(mContext, room_id!!)
             OnlineListActivity.starOnlineListActivity(mContext, room_id!!)
         }
 
@@ -668,9 +681,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     private fun ShareUrl(nickname: String, desc: String, icon: String, url: String, platform: SHARE_MEDIA) {
         val umWeb = UMWeb(url)
-        umWeb.title=nickname
-        umWeb.setThumb(UMImage(mContext,icon))
-        umWeb.description=desc
+        umWeb.title = nickname
+        umWeb.setThumb(UMImage(mContext, icon))
+        umWeb.description = desc
         ShareAction(this@ChatRoomActivity)
                 .withMedia(umWeb)
                 .setPlatform(platform)
@@ -691,7 +704,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: HomeHLBean?) {
                         if (t!!.code == 0) {
-                            RandomQuiteRoom(SpUtils.getSp(mContext, "uid"), "1",t.data.room_id.toString())
+                            RandomQuiteRoom(SpUtils.getSp(mContext, "uid"), "1", t.data.room_id.toString())
                         }
                     }
 
@@ -793,18 +806,23 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
         roomManager!!.setCurrentRoomEventListener(this)
 
-        if ("1".equals(detailRoomInfo!!.roomInfo.room_pure)) {//纯净模式：0 关闭；1 开启
-            tv_room_level.visibility = View.GONE
-            tv_music.visibility = View.GONE
-            img_gold_egg.visibility = View.GONE
+        if ("0".equals(detailRoomInfo!!.roomInfo.room_gift_tx)) {//礼物值：0 关闭；1 开启
+//            tv_room_level.visibility = View.GONE
+//            tv_music.visibility = View.GONE
+//            img_gold_egg.visibility = View.GONE
             tv_room_manager.visibility = View.GONE
             UpdataTips(detailRoomInfo!!.getMicPositions(), false)
         } else {
-            tv_room_level.visibility = View.VISIBLE
-            tv_music.visibility = View.VISIBLE
-            img_gold_egg.visibility = View.VISIBLE
+//            tv_room_level.visibility = View.VISIBLE
+//            tv_music.visibility = View.VISIBLE
+//            img_gold_egg.visibility = View.VISIBLE
             tv_room_manager.visibility = View.VISIBLE
             UpdataTips(detailRoomInfo!!.getMicPositions(), true)
+        }
+        if ("0".equals(detailRoomInfo!!.roomInfo.is_lock)) {
+            img_w_lock.visibility = View.GONE
+        } else {
+            img_w_lock.visibility = View.VISIBLE
         }
 
         //设置房间背景
@@ -945,7 +963,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             tv_room.setOnClickListener {
                 RoomNoticeDialog(mContext, room_id).show();
             }
-            if (!TextUtils.isEmpty(detailRoomInfo!!.roomInfo.room_content)){
+            if (!TextUtils.isEmpty(detailRoomInfo!!.roomInfo.room_content)) {
                 RoomNoticeDialog(mContext, room_id).show();
             }
         }
@@ -986,7 +1004,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     private fun updatRoomLable(room_lable: String?) {
-        tv_lable.setText("#" + room_lable)
+        tv_lable.setText(room_lable)
     }
 
     private fun updataTitle(room_name: String?) {
@@ -995,15 +1013,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     private fun UpdataTips(micPositions: List<MicPositionsBean>, b: Boolean) {
         if (micPositions == null) return
-        clearMicState()
-        val seatSize = micSeatViewList!!.size
-
         for (micInfo in micPositions) {
             val position = micInfo.sort - 1
-            if (position < seatSize) {
-                val micSeatView = micSeatViewList!!.get(position)
-                micSeatView.setHeartValue(micInfo.gifts, b)
-            }
+            val micSeatView = micSeatViewList!!.get(position)
+            micSeatView.setHeartValue(micInfo.gifts, b)
         }
 
     }
@@ -1302,7 +1315,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun setManager() {
-                        BlackManager(userId, room_id!!, "2")
+                        BlackManager(userId, room_id!!, "2", "", "")
                     }
 
                     override fun setExit() {
@@ -1310,7 +1323,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun blackList() {
-                        BlackManager(userId, room_id!!, "1")
+                        BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
                     }
 
                     override fun clickGiveGift() {
@@ -1338,7 +1351,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 if (currentRole is Listener) {
                     JoinMic(AuthManager.getInstance().currentUserId, micPosition)
                 } else if ((currentRole is Linker) && (preMicPosition != -1)) {
-                    JumpMic(AuthManager.getInstance().currentUserId, preMicPosition,micPosition)
+                    JumpMic(AuthManager.getInstance().currentUserId, preMicPosition, micPosition)
                 }
 
 /*                when (currentRole) {
@@ -1745,7 +1758,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     //设置管理员和添加黑名单
-    private fun BlackManager(userId: String, room_id: String, type: String) {
+    private fun BlackManager(userId: String, room_id: String, type: String, micNickname: String, micIcon: String) {
         NetWork.getService(ImpService::class.java)
                 .addBlack(userId, room_id, type)
                 .subscribeOn(Schedulers.io())
@@ -1758,6 +1771,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
+                            if ("1".equals(type)) {
+                                ExitCurrentRoom(userId, "2", room_id, micNickname, micIcon)
+                            }
                             updateRoomInfo()
                         }
                     }
@@ -1842,7 +1858,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         });
     }
 
-    private fun RandomQuiteRoom(uid: String, kick: String, toString: String){
+    private fun RandomQuiteRoom(uid: String, kick: String, toString: String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = uid
@@ -2037,7 +2053,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     private fun joinChatRoom(roomId: String) {
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, "",object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, "", object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
 
                 val message = RoomMemberChangedMessage()
@@ -2139,6 +2155,23 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
        * 所以当应用切回前台时切换音频输出模式
        */
         changeAudioOutputMode()
+
+        roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+            override fun onSuccess(result: DetailRoomInfo?) {
+                if (result != null) {
+                    val room_gift_tx = result.roomInfo.room_gift_tx
+                    if ("0".equals(room_gift_tx)) {//关闭
+                        UpdataTips(detailRoomInfo!!.getMicPositions(), false)
+                    } else {//开启
+                        UpdataTips(detailRoomInfo!!.getMicPositions(), true)
+                    }
+                }
+            }
+
+            override fun onFail(errorCode: Int) {
+            }
+        })
+
     }
 
     override fun onDestroy() {
@@ -2371,8 +2404,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                                             val startPosition = getPosition(position)
                                             val endPosition = getPosition(i)
-                                            val childOffsetX = endPosition[0] - halfWidth+DisplayUtils.dp2px(mContext,10)
-                                            val childOffsetY = endPosition[1] - halfHeight+DisplayUtils.dp2px(mContext,5)
+                                            val childOffsetX = endPosition[0] - halfWidth + DisplayUtils.dp2px(mContext, 10)
+                                            val childOffsetY = endPosition[1] - halfHeight + DisplayUtils.dp2px(mContext, 5)
 
                                             ViewCompat.animate(childImageView)
                                                     .translationXBy(childOffsetX.toFloat())
@@ -2433,8 +2466,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                                     val startPosition = getPosition(position)
                                     val endPosition = getPosition(i)
-                                    val childOffsetX = endPosition[0] - halfWidth+DisplayUtils.dp2px(mContext,10)
-                                    val childOffsetY = endPosition[1] - halfHeight+DisplayUtils.dp2px(mContext,5)
+                                    val childOffsetX = endPosition[0] - halfWidth + DisplayUtils.dp2px(mContext, 10)
+                                    val childOffsetY = endPosition[1] - halfHeight + DisplayUtils.dp2px(mContext, 5)
 
                                     ViewCompat.animate(childImageView)
                                             .translationXBy(childOffsetX.toFloat())
@@ -2475,18 +2508,18 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val h = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
             valueAnimator.addUpdateListener { animation ->
                 val value = animation.animatedValue as Float
-                if(position==-1){
+                if (position == -1) {
                     //不在麦位上 从顶部到中间 再分到对应的人
                     imageView.x = w
                     imageView.y = h * value
-                }else{
+                } else {
                     //在麦上 从麦位到中间 再分到对应的人
                     val startPosition = getPosition(position)
-                    val offsetX=(w-startPosition[0])*value;
-                    val offsetY=(h-startPosition[1])*value;
+                    val offsetX = (w - startPosition[0]) * value;
+                    val offsetY = (h - startPosition[1]) * value;
 
-                    imageView.x=startPosition[0]+offsetX;
-                    imageView.y=startPosition[1]+offsetY;
+                    imageView.x = startPosition[0] + offsetX;
+                    imageView.y = startPosition[1] + offsetY;
                 }
             }
             valueAnimator.addListener(object : AnimatorListenerAdapter() {
@@ -2508,10 +2541,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                         val startPosition = getPosition(position)
                         val endPosition = getPosition(i)
-                        val childOffsetX = endPosition[0] - halfWidth+DisplayUtils.dp2px(mContext,10)
-                        val childOffsetY = endPosition[1] - halfHeight+DisplayUtils.dp2px(mContext,5)
+                        val childOffsetX = endPosition[0] - halfWidth + DisplayUtils.dp2px(mContext, 10)
+                        val childOffsetY = endPosition[1] - halfHeight + DisplayUtils.dp2px(mContext, 5)
 
-                        Log.e("tag","halfWidth:"+halfWidth+"i:"+i+"position:"+position+"endPosition[0]:"+endPosition[0]+"endPosition[1]:"+endPosition[1]+" startPosition[0]:"+startPosition[0]+"startPosition[1]:"+startPosition[1]+"offsetX:"+childOffsetX+"offsetY:"+childOffsetY);
+                        Log.e("tag", "halfWidth:" + halfWidth + "i:" + i + "position:" + position + "endPosition[0]:" + endPosition[0] + "endPosition[1]:" + endPosition[1] + " startPosition[0]:" + startPosition[0] + "startPosition[1]:" + startPosition[1] + "offsetX:" + childOffsetX + "offsetY:" + childOffsetY);
                         ViewCompat.animate(childImageView)
                                 .translationXBy(childOffsetX.toFloat())
                                 .translationYBy(childOffsetY.toFloat())
@@ -2756,7 +2789,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         return pos
     }
 
-    var shareListener=object :UMShareListener{
+    var shareListener = object : UMShareListener {
         override fun onResult(p0: SHARE_MEDIA?) {
             showToastMessage("分享成功")
         }

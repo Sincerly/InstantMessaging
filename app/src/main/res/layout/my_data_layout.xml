@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
@@ -45,14 +46,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
-                        android:text="点点的摇摇椅"
+                        tools:text="点点的摇摇椅"
                         android:textColor="@color/white" />
 
                     <ImageView
                         android:id="@+id/img_sex"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@mipmap/img_boy" />
+                        tools:src="@mipmap/img_boy" />
                 </LinearLayout>
 
                 <TextView
@@ -115,7 +116,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="666"
+                            tools:text="666"
                             android:textColor="@color/white"
                             android:textSize="15sp" />
 
@@ -141,7 +142,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="888"
+                            tools:text="888"
                             android:textColor="@color/white"
                             android:textSize="15sp" />
 

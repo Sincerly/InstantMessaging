@@ -30,19 +30,19 @@ class MsgChatListAdapter(mContext: Context) : ListBaseAdapter<Conversation>(mCon
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
         val beans = LitePal.where("uid=?", bean.targetId).find<com.ysxsoft.imtalk.bean.UserInfo>()
-
-        ImageLoadUtil.GlideHeadImageLoad(mContext, beans.get(0).icon.toString(), holder.getView<CircleImageView>(R.id.img_head)!!)
-        holder.getView<TextView>(R.id.tv_nikeName)!!.setText(beans.get(0).nikeName)
-        holder.getView<TextView>(R.id.tv_zs_num)!!.setText(beans.get(0).zsl)
-        when(beans.get(0).sex){
-            "1"->{
-                holder.getView<ImageView>(R.id.img_sex)!!.setImageResource(R.mipmap.img_boy)
-            }
-            "2"->{
-                holder.getView<ImageView>(R.id.img_sex)!!.setImageResource(R.mipmap.img_girl)
+        if (beans.size > 0) {
+            ImageLoadUtil.GlideHeadImageLoad(mContext, beans.get(0).icon.toString(), holder.getView<CircleImageView>(R.id.img_head)!!)
+            holder.getView<TextView>(R.id.tv_nikeName)!!.setText(beans.get(0).nikeName)
+            holder.getView<TextView>(R.id.tv_zs_num)!!.setText(beans.get(0).zsl)
+            when (beans.get(0).sex) {
+                "1" -> {
+                    holder.getView<ImageView>(R.id.img_sex)!!.setImageResource(R.mipmap.img_boy)
+                }
+                "2" -> {
+                    holder.getView<ImageView>(R.id.img_sex)!!.setImageResource(R.mipmap.img_girl)
+                }
             }
         }
-
 
         val name = bean.objectName
         when (name) {
@@ -101,7 +101,7 @@ class MsgChatListAdapter(mContext: Context) : ListBaseAdapter<Conversation>(mCon
         holder.itemView.setOnClickListener {
             if (onChatMsgListener != null) {
                 onChatMsgListener!!.onClick(position)
-                bean.unreadMessageCount=0
+                bean.unreadMessageCount = 0
                 QBadgeView(mContext).bindTarget(holder.getView<TextView>(R.id.tv_point)!!).hide(true)
             }
         }

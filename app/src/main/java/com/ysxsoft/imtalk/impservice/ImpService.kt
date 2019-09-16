@@ -392,8 +392,16 @@ interface ImpService {
     @FormUrlEncoded
     @POST("Refund/zs_tx")
     fun zsTxBank(@Field("uid") uid: String,
-                 @Field("type") type: String,
-                 @Field("user_bank_id") user_bank_id: String): Observable<ZSBankBean>
+                 @Field("type") type: String): Observable<ZSBankBean>
+
+
+//   @FormUrlEncoded
+//    @POST("Refund/zs_tx")
+//    fun zsTxBank(@Field("uid") uid: String,
+//                 @Field("type") type: String,
+//                 @Field("user_bank_id") user_bank_id: String): Observable<ZSBankBean>
+
+
 
     @FormUrlEncoded
     @POST("Refund/tx")
@@ -574,9 +582,16 @@ interface ImpService {
     @POST("Roomnew/room_lock")
     fun room_lock(@Body body: RequestBody): Observable<RoomLockBean>
 
- //判断房间是否上锁
+    //房间分享
     @POST("share/share_user")
     fun share_user(@Body body: RequestBody): Observable<ShareUserBean>
+
+    @POST("Index/getBindInfo")
+    fun getBindInfo(@Body body: RequestBody): Observable<BindInfoBean>
+
+
+    @POST("users/get_real_info")
+    fun get_real_info(@Body body: RequestBody): Observable<GetRealInfoBean>
 
 
 }

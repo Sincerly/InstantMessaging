@@ -49,10 +49,10 @@ class RegisterActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            if (!AppUtil.checkPhoneNum(et_phone.text.toString().trim())) {
-                showToastMessage("手机号输入不正确")
-                return@setOnClickListener
-            }
+//            if (!AppUtil.checkPhoneNum(et_phone.text.toString().trim())) {
+//                showToastMessage("手机号输入不正确")
+//                return@setOnClickListener
+//            }
             if (TextUtils.isEmpty(et_code.text.toString().trim())) {
                 showToastMessage("验证码不能为空")
                 return@setOnClickListener

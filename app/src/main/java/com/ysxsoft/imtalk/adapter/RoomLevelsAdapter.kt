@@ -26,6 +26,18 @@ class RoomLevelsAdapter(mContext: Context):ListBaseAdapter<RoomStarBean.DataBean
         holder.getView<TextView>(R.id.tv_id)!!.setText("ID："+bean.tt_id)
         holder.getView<TextView>(R.id.tv_level)!!.setText(bean.now_level)
         holder.getView<TextView>(R.id.tv_juli)!!.setText("距离前一名"+bean.next_user)
+        holder.itemView.setOnClickListener {
+            if (onClickRoomLevelsListener!=null){
+                onClickRoomLevelsListener!!.onClick(position)
+            }
+        }
+    }
 
+    interface OnClickRoomLevelsListener{
+        fun onClick(position: Int)
+    }
+    private var onClickRoomLevelsListener: OnClickRoomLevelsListener?=null
+    fun setOnClickRoomLevelsListener(onClickRoomLevelsListener: OnClickRoomLevelsListener){
+        this.onClickRoomLevelsListener=onClickRoomLevelsListener
     }
 }

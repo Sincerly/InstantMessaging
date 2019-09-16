@@ -74,7 +74,7 @@ class OnlineListActivity : BaseActivity() {
                                     ImageLoadUtil.GlideHeadImageLoad(mContext, item!!.icon, helper?.getView<CircleImageView>(R.id.ivAvatar)!!)
                                     helper.getView<TextView>(R.id.tvNick)!!.text = item.nickname
 
-                                    if (("1").equals(item.sex)) {
+                                    if (item.sex==1) {
                                         helper.getView<ImageView>(R.id.ivSex)!!.setImageResource(R.mipmap.img_boy)
                                     } else {
                                         helper.getView<ImageView>(R.id.ivSex)!!.setImageResource(R.mipmap.img_girl)

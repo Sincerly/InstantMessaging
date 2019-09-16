@@ -76,12 +76,8 @@ public class MicSeatView extends FrameLayout {
      */
     public void setHeartValue(String value, boolean isshow) {
         if (isshow) {
-            if (!TextUtils.isEmpty(micInfo.getUid())) {
-                if (!"0".equals(micInfo.getUid())) {
-                    tv_room_manager.setVisibility(View.VISIBLE);
-                } else {
-                    tv_room_manager.setVisibility(View.GONE);
-                }
+            if (!"0".equals(micInfo.getUid())) {
+                tv_room_manager.setVisibility(View.VISIBLE);
             } else {
                 tv_room_manager.setVisibility(View.GONE);
             }

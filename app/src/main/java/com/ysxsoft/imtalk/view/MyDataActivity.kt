@@ -159,6 +159,14 @@ class MyDataActivity : BaseActivity() {
         img_right.setOnClickListener {
             startActivity(PersonDataActivity::class.java)
         }
+
+        ll_fouce.setOnClickListener {
+            FouceOnActivity.startFouceOnActivity(mContext,uid!!)
+        }
+        ll_fance.setOnClickListener {
+            FansActivity.startFansActivity(mContext,uid!!)
+        }
+
         val bundle = Bundle();
         bundle.putString("uid", uid);
         bundle.putString("myself", myself);
@@ -220,7 +228,11 @@ class MyDataActivity : BaseActivity() {
                 return@setOnClickListener
             }
             if (TextUtils.equals("SearchActivity",myself)){
-                roomLock(bean!!.roomId.toString())
+                if (bean!!.roomId!=null){
+                    roomLock(bean!!.roomId.toString())
+                }else{
+                    showToastMessage("Ta没有房间")
+                }
             }else{
                 quiteRoom(AuthManager.getInstance().currentUserId, "1")
             }
@@ -273,6 +285,7 @@ class MyDataActivity : BaseActivity() {
             }
         });
     }
+
     fun roomLock(roomId: String) {
         val map = HashMap<String, String>()
         map.put("room_id", roomId)
