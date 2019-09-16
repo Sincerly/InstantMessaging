@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
+import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage;
@@ -15,6 +16,7 @@ import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNoticeChangedMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomPublicGiftMessage;
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback;
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
 
@@ -75,6 +77,9 @@ public class IMClient {
             RongIMClient.registerMessageType(RoomNoticeChangedMessage.class);//房间通知
             RongIMClient.registerMessageType(RoomLableChangedMessage.class);//房间标签
             RongIMClient.registerMessageType(RoomNameChangedMessage.class);//房间名称
+
+            RongIMClient.registerMessageType(RoomPublicGiftMessage.class);//礼物公屏幕消息
+            RongIMClient.registerMessageType(GiftChatMessage.class);//礼物小屏消息
         } catch (AnnotationNotFoundException e) {
             SLog.e(TAG, "Failed to register messages!!");
             e.printStackTrace();

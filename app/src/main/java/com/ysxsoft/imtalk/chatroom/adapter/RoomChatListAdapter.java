@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils;
 
@@ -20,9 +22,10 @@ import io.rong.message.TextMessage;
 
 public class RoomChatListAdapter extends BaseAdapter {
 
-    private static final int VIEW_TYPE_COUNT = 2;
+    private static final int VIEW_TYPE_COUNT = 4;
     private static final int VIEW_TYPE_CHAT_MESSAGE = 0;
     private static final int VIEW_TYPE_USER_CHANGED_INFO = 1;
+    private static final int VIEW_TYPE_GIFT = 2;//礼物 小屏消息
 
     private Context context;
     public List<Message> messageList;
@@ -78,8 +81,16 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.nickNameTv = contentView.findViewById(R.id.chatroom_item_chatlist_tv_nickname);
             viewHolder.messageTv = contentView.findViewById(R.id.chatroom_item_chatlit_tv_message);
             contentView.setTag(viewHolder);
+        }else if (viewType == VIEW_TYPE_GIFT) {
+            //礼物消息
+            LayoutInflater inflater = LayoutInflater.from(context);
+            contentView = inflater.inflate(R.layout.chatroom_item_gift, parent, false);
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.giftFromName = contentView.findViewById(R.id.fromName);
+            viewHolder.giftToName = contentView.findViewById(R.id.toName);
+            viewHolder.giftInfo = contentView.findViewById(R.id.giftInfo);
+            contentView.setTag(viewHolder);
         }
-
         return contentView;
     }
 
@@ -103,6 +114,12 @@ public class RoomChatListAdapter extends BaseAdapter {
             } else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_kick);
             }
+        }else if (viewType == VIEW_TYPE_GIFT) {
+            GiftChatMessage giftChatMessage = (GiftChatMessage) message.getContent();
+            viewHolder.giftFromName.setText(giftChatMessage.getName());
+            viewHolder.giftToName.setText(giftChatMessage.getToName());
+            viewHolder.giftInfo.setText(giftChatMessage.getGiftName()+"x"+giftChatMessage.getGiftNum());
+        }else{
         }
     }
 
@@ -113,6 +130,8 @@ public class RoomChatListAdapter extends BaseAdapter {
             return VIEW_TYPE_CHAT_MESSAGE;
         } else if (message.getContent() instanceof RoomMemberChangedMessage) {
             return VIEW_TYPE_USER_CHANGED_INFO;
+        } else if (message.getContent() instanceof GiftChatMessage) {
+            return VIEW_TYPE_GIFT;
         }
         return super.getItemViewType(position);
     }
@@ -130,6 +149,11 @@ public class RoomChatListAdapter extends BaseAdapter {
         ImageView avatarIv;
         TextView nickNameTv;
         TextView messageTv;
+        //礼物start
+        TextView giftFromName;
+        TextView giftToName;
+        TextView giftInfo;
+        //礼物end
     }
 
     interface OnRoomChatListAdapterListener {

@@ -1,5 +1,7 @@
 package com.ysxsoft.imtalk.chatroom.task;
 
+import com.ysxsoft.imtalk.bean.RoomPublicGiftMessageBean;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomPublicGiftMessage;
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean;
 import com.ysxsoft.imtalk.chatroom.task.role.Role;
 
@@ -97,7 +99,7 @@ public interface RoomEventListener {
      * @param giftUrl
      * @param staticUrl
      */
-    void onRoomGift(int p,int toP,String giftUrl,String staticUrl);
+    void onRoomGift(int p, List<Integer> toP,String giftUrl,String staticUrl);
 
     /**
      * 房间通知
@@ -113,6 +115,6 @@ public interface RoomEventListener {
      */
     void onRoomName(String room_name);
 
-
+    void onGiftMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
 
 }

@@ -1,24 +1,31 @@
 package com.ysxsoft.imtalk.chatroom.im.message;
 
 import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
 
 
 /**
- * 表情
+ * 礼物
  */
 @MessageTag(value = "SM:RoomGiftMsg", flag = MessageTag.NONE)
 public class RoomGiftMessage extends MessageContent {
     private final static String TAG = RoomGiftMessage.class.getSimpleName();
     private int position;
-    private int toPosition;
+    private List<Integer> toPosition;
     private String giftUrl;
     private String staticUrl;
 
@@ -31,7 +38,12 @@ public class RoomGiftMessage extends MessageContent {
             jsonStr = new String(data, "UTF-8");
             JSONObject jsonObj = new JSONObject(jsonStr);
             setPosition(jsonObj.optInt("position"));
-            setToPosition(jsonObj.optInt("toPosition"));
+            JSONArray jsonArray=jsonObj.optJSONArray("toPosition");
+            List<Integer> mics=new ArrayList<>();
+            for (int i = 0; i <jsonArray.length(); i++) {
+                mics.add(jsonArray.optInt(i));
+            }
+            setToPosition(mics);
             setGiftUrl(jsonObj.optString("giftUrl"));
             setStaticUrl(jsonObj.optString("staticUrl"));
         } catch (JSONException e) {
@@ -49,11 +61,11 @@ public class RoomGiftMessage extends MessageContent {
         this.position = position;
     }
 
-    public int getToPosition() {
+    public List<Integer> getToPosition() {
         return toPosition;
     }
 
-    public void setToPosition(int toPosition) {
+    public void setToPosition(List<Integer> toPosition) {
         this.toPosition = toPosition;
     }
 
@@ -78,7 +90,10 @@ public class RoomGiftMessage extends MessageContent {
         JSONObject jsonObj = new JSONObject();
         try {
             jsonObj.put("position", getPosition());
-            jsonObj.put("toPosition", getToPosition());
+            String json= JSON.toJSONString(getToPosition());
+            com.alibaba.fastjson.JSONArray jsonArray = com.alibaba.fastjson.JSONArray.parseArray(json);
+            JSONArray array=new JSONArray(jsonArray.toJSONString());
+            jsonObj.put("toPosition", array);
             jsonObj.put("staticUrl", getStaticUrl());
             jsonObj.put("giftUrl", getGiftUrl());
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
@@ -91,6 +106,7 @@ public class RoomGiftMessage extends MessageContent {
         return null;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -99,14 +115,15 @@ public class RoomGiftMessage extends MessageContent {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.position);
-        dest.writeInt(this.toPosition);
+        dest.writeList(this.toPosition);
         dest.writeString(this.giftUrl);
         dest.writeString(this.staticUrl);
     }
 
     protected RoomGiftMessage(Parcel in) {
         this.position = in.readInt();
-        this.toPosition = in.readInt();
+        this.toPosition = new ArrayList<Integer>();
+        in.readList(this.toPosition, Integer.class.getClassLoader());
         this.giftUrl = in.readString();
         this.staticUrl = in.readString();
     }
@@ -119,7 +136,7 @@ public class RoomGiftMessage extends MessageContent {
 
         @Override
         public RoomGiftMessage[] newArray(int size) {
-            return new RoomGiftMessage[0];
+            return new RoomGiftMessage[size];
         }
     };
 }

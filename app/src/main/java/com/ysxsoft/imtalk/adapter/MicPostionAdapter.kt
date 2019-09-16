@@ -1,14 +1,14 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import com.ysxsoft.imtalk.R
-import com.ysxsoft.imtalk.R.id.cb_box
 import com.ysxsoft.imtalk.bean.RoomMicListBean
 import com.ysxsoft.imtalk.com.ListBaseAdapter
 import com.ysxsoft.imtalk.com.SuperViewHolder
@@ -27,37 +27,40 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideHeadImageLoad(mContext, bean.icon, holder.getView<CircleImageView>(R.id.img_head)!!)
         if (position == 0) holder.getView<TextView>(R.id.tv_NO)!!.setText("房主") else holder.getView<TextView>(R.id.tv_NO)!!.setText(bean.sort.toString())
-        if (bean.isChoosed) {
-            holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundResource(R.drawable.btn_cir_bg)
-        }else{
-            holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundDrawable(null);
-        }
+//        if (bean.isChoosed) {
+//            holder.getView<ImageView>(R.id.img_cir_bg)!!.visibility= VISIBLE
+//            holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundResource(R.drawable.btn_cir_bg)
+//        }else{
+//            holder.getView<ImageView>(R.id.img_cir_bg)!!.visibility=GONE
+//        }
 
-        holder.itemView.setOnClickListener {
+//        var cb_box = holder.getView<CheckBox>(R.id.cb_box)
+//
+//        if (bean.isChoosed()) {
+//            cb_box!!.setChecked(true)
+//        } else {
+//            cb_box!!.setChecked(false)
+//        }
+//        cb_box.setOnCheckedChangeListener(object:CompoundButton.OnCheckedChangeListener{
+//            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+//                checkInterface!!.checkGroup(position, isChecked)
+//            }
+//        })
+
+        var header=holder.getView<TextView>(R.id.header);
+        header!!.isSelected=bean.isChoosed;
+        header.setOnClickListener(View.OnClickListener {
             if (onClickListener != null) {
                 onClickListener!!.onClick(position)
             }
-        }
-
-        var cb_box = holder.getView<CheckBox>(R.id.cb_box)
-        if (bean.isChoosed()) {
-            cb_box!!.setChecked(true)
-        } else {
-            cb_box!!.setChecked(false)
-        }
+        })
 //        cb_box.setOnClickListener(View.OnClickListener { v ->
 //            bean.setChoosed((v as CheckBox).isChecked)
 //            if (checkInterface != null) {
 //                checkInterface!!.checkGroup(position, v.isChecked)
 //            }
 //        })
-        cb_box.setOnCheckedChangeListener(object:CompoundButton.OnCheckedChangeListener{
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-                if (checkInterface != null) {
-                    checkInterface!!.checkGroup(position, isChecked)
-                }
-            }
-        })
+
 
     }
 

@@ -41,16 +41,10 @@ import com.umeng.socialize.media.UMImage
 import com.umeng.socialize.media.UMWeb
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
-import com.ysxsoft.imtalk.bean.CommonBean
-import com.ysxsoft.imtalk.bean.HomeHLBean
-import com.ysxsoft.imtalk.bean.ShareUserBean
-import com.ysxsoft.imtalk.bean.UserInfoBean
+import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter
 import com.ysxsoft.imtalk.chatroom.im.IMClient
-import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage
-import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage
-import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage
-import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
+import com.ysxsoft.imtalk.chatroom.im.message.*
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
@@ -99,6 +93,10 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+    override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
+        //送礼物超过一定公屏消息
+    }
+
     override fun onRoomName(room_name: String?) {
         //房间名称
         updataTitle(room_name)
@@ -119,7 +117,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         showPositionEmj(p, url)
     }
 
-    override fun onRoomGift(p: Int, toP: Int, giftUrl: String, staticUrl: String) {
+    override fun onRoomGift(p: Int, toP:List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
         Log.e("tag", "onRoomGift");
         showPositionGift(p, toP, giftUrl, staticUrl)
@@ -593,9 +591,44 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         chatroom_gift.setOnClickListener {
             val giftBagDialog = GiftBagDialog(mContext, room_id!!)
             giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
-                override fun onClck(targetPosition: Int, toPosition: Int, pic: String, gifPic: String) {
-                    Log.d("tag", "onClck:")
+                override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String) {
+                    Log.d("tag", "onClck:"+toPosition.size)
                     showPositionGift(targetPosition, toPosition, gifPic, pic)
+                    //发送小屏消息
+                    for (bean in dataList){
+                        if(bean.isChoosed){
+                            val giftChatMessage = GiftChatMessage()
+                            giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
+                            giftChatMessage.toName = bean.nickname//接收人
+                            giftChatMessage.giftName = gifName//礼物名称
+                            giftChatMessage.giftPic = gifPic//礼物图片
+                            giftChatMessage.giftNum = gifNum//礼物数量
+                            //在本地保存一条数据
+                            val o = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, giftChatMessage)
+
+                            if (chatListAdapter != null) {
+                                chatMessageList.add(o!!)
+                            }
+
+                            RongIMClient.getInstance().sendMessage(o, null, null, object : IRongCallback.ISendMessageCallback {
+                                override fun onAttached(p0: Message?) {
+                                    Log.d("tag", "attached:" + p0!!.content.toString())
+                                }
+
+                                override fun onSuccess(p0: Message?) {
+                                    Log.d("tag", "onSuccess:" + p0!!.content.toString())
+                                }
+
+                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                    Log.d("tag", "onError:" + p0!!.content.toString())
+                                }
+                            });
+                        }
+                    }
+                    chatListAdapter!!.notifyDataSetChanged()
+                    chatroom_list_chat.smoothScrollToPosition(chatListAdapter!!.count)
+
+                    //发送礼物消息
                     val roomGiftMessage = RoomGiftMessage()
                     roomGiftMessage.position = targetPosition
                     roomGiftMessage.toPosition = toPosition
@@ -2288,7 +2321,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 //        })
     }
 
-    fun showPositionGift(position: Int, toPosition: Int, giftImgUrl: String, staticImgUrl: String) {
+    fun showPositionGift(position: Int, toPosition: List<Int>, giftImgUrl: String, staticImgUrl: String) {
         val f = findViewById<FrameLayout>(android.R.id.content)
         if (giftImgUrl.endsWith(".svga")) {
             //val giftImgUrl = "http://chitchat.rhhhyy.com/mengjing.svga"
@@ -2327,7 +2360,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                         //移除之后创建分开View
                                         val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
                                         val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
-                                        for (i in 0..8) {
+                                        for (i in toPosition) {
                                             val childImageView = ImageView(mContext)
                                             Glide.with(mContext).load(staticImgUrl).into(childImageView)
                                             val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
@@ -2389,7 +2422,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 //移除之后创建分开View
                                 val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
                                 val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
-                                for (i in 0..8) {
+                                for (i in toPosition) {
                                     val childImageView = ImageView(mContext)
                                     Glide.with(mContext).load(staticImgUrl).into(childImageView)
                                     val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
@@ -2464,7 +2497,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
                     val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
 
-                    for (i in 0..8) {
+                    for (i in toPosition) {
                         val childImageView = ImageView(mContext)
                         Glide.with(mContext).load(staticImgUrl).into(childImageView)
                         val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
