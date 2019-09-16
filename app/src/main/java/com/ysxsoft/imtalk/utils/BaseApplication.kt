@@ -10,30 +10,29 @@ import android.support.multidex.MultiDex
 import android.util.Log
 import com.umeng.commonsdk.UMConfigure
 import com.umeng.socialize.PlatformConfig
-import com.ysxsoft.imtalk.bean.Song
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.net.HttpClient
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ThreadManager
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication
-import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
 import com.ysxsoft.imtalk.im.provider.PrivateGiftProvider
-import io.rong.imkit.RongIM
-import io.rong.imlib.RongIMClient
-import org.litepal.LitePal
 import com.ysxsoft.imtalk.rong.MyExtensionModule
-import io.rong.imkit.RongExtensionManager
 import io.rong.imkit.DefaultExtensionModule
 import io.rong.imkit.IExtensionModule
+import io.rong.imkit.RongExtensionManager
+import io.rong.imkit.RongIM
+import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Message
 import io.rong.imlib.model.UserInfo
-import io.rong.message.RichContentMessage
-import io.rong.message.VoiceMessage
 import io.rong.message.ImageMessage
+import io.rong.message.RichContentMessage
 import io.rong.message.TextMessage
+import io.rong.message.VoiceMessage
+import org.json.JSONObject
+import org.litepal.LitePal
 import org.litepal.extension.find
-import org.litepal.extension.findAll
 
 
 @SuppressLint("Registered")
@@ -77,17 +76,18 @@ class BaseApplication : MyApplication() {
         PlatformConfig.setWeixin("wx9f167bc9812eb1dc", "efa8793c110273a2af04f92d53acde45");//s:  appId   s1: AppSecret
         PlatformConfig.setQQZone("101762831", "9b5d79670b6aa08e27d23b00861522f3");//qq 的s:APP ID   s1：APP Key
 
-        RongIM.setOnReceiveMessageListener(MyReceiveMessageListener())
-        RongIM.getInstance().setSendMessageListener(MySendMessageListener());
+        RongIMClient.setOnReceiveMessageListener(MyReceiveMessageListener())
+
+        RongIM.getInstance().setSendMessageListener(MySendMessageListener())
         setMyExtensionModule()
 
         RongIM.setUserInfoProvider({ userId ->
             //   //根据 userId 去你的用户系统里查询对应的用户信息返回给融云 SDK。
             val beans = LitePal.where("uid=?", userId).find<com.ysxsoft.imtalk.bean.UserInfo>()
-            if(beans!!.size>0){
+            if (beans!!.size > 0) {
                 val bean = beans.get(0)
                 UserInfo(bean!!.uid, bean.nikeName, Uri.parse(bean.icon))
-            }else{
+            } else {
                 UserInfo(userId, "", Uri.parse(""))
             }
         }, true)
@@ -95,7 +95,7 @@ class BaseApplication : MyApplication() {
         initMessageAndTemplate();
     }
 
-    fun initMessageAndTemplate(){
+    fun initMessageAndTemplate() {
         RongIM.registerMessageType(PrivateGiftMessage::class.java)
         RongIM.registerMessageTemplate(PrivateGiftProvider())
     }
@@ -125,11 +125,48 @@ class BaseApplication : MyApplication() {
          * @param left    剩余未拉取消息数目。
          * @return 收到消息是否处理完成，true 表示自己处理铃声和后台通知，false 走融云默认处理方式。
          */
-        override fun onReceived(p0: io.rong.imlib.model.Message?, p1: Int): Boolean {
-
+        @Override
+        override fun onReceived(p0: Message?, p1: Int): Boolean {
+            Log.e("---->", p0.toString())
+            if (p0 != null) {
+                saveUserInfo(p0)
+            }
             val intent = Intent("RECEIVEMESSAGE")
             sendBroadcast(intent)
             return false
+        }
+    }
+
+    /**
+     * 处理消息扩展
+     */
+    fun saveUserInfo(message: Message) {
+        var userInfo: JSONObject? = null
+        val messageContent = message!!.getContent()
+        if (messageContent is TextMessage) {//文本消息
+            val textMessage = messageContent as TextMessage
+            userInfo = JSONObject(textMessage!!.extra)
+        } else if (messageContent is ImageMessage) {//图片消息
+            val imageMessage = messageContent as ImageMessage
+            userInfo = JSONObject(imageMessage!!.extra)
+        } else if (messageContent is VoiceMessage) {//语音消息
+            val voiceMessage = messageContent as VoiceMessage
+            userInfo = JSONObject(voiceMessage!!.extra)
+        } else if (messageContent is RichContentMessage) {//图文消息
+            val richMessage = messageContent as RichContentMessage
+            userInfo = JSONObject(richMessage!!.extra)
+        } else {
+            Log.d("tag", "onSent-其他消息，自己来判断处理")
+        }
+        //从扩展字段获取用户信息
+        if (userInfo != null) {
+            var tempUser = com.ysxsoft.imtalk.bean.UserInfo()
+            tempUser.uid = userInfo.getString("uid")              //UID
+            tempUser.nikeName = userInfo.getString("nikeName")   //昵称
+            tempUser.icon = userInfo.getString("icon")          //头像
+            tempUser.sex = userInfo.getString("sex")            //性别
+            tempUser.zsl = userInfo.getString("zsl")            //钻数量
+            tempUser.save()
         }
     }
 
@@ -145,6 +182,30 @@ class BaseApplication : MyApplication() {
             //开发者根据自己需求自行处理逻辑
             val intent = Intent("RECEIVEMESSAGE")
             sendBroadcast(intent)
+            val beans = LitePal.where("uid=?", AuthManager.getInstance().currentUserId).find<com.ysxsoft.imtalk.bean.UserInfo>()
+            if (beans!!.size > 0) {
+                val bean = beans.get(0)
+                //将用户信息添加到扩展字段
+                val messageContent = message!!.getContent()
+                val tempUser = JSONObject()
+                tempUser.put("uid", bean.uid)
+                tempUser.put("nikeName", bean.nikeName)
+                tempUser.put("icon", bean.icon)
+                tempUser.put("sex", bean.sex)
+                tempUser.put("zsl", bean.zsl)
+                if (messageContent is TextMessage) {//文本消息
+                    messageContent.extra = tempUser.toString()
+                } else if (messageContent is ImageMessage) {//图片消息
+                    messageContent.extra = tempUser.toString()
+                } else if (messageContent is VoiceMessage) {//语音消息
+                    messageContent.extra = tempUser.toString()
+                } else if (messageContent is RichContentMessage) {//图文消息
+                    messageContent.extra = tempUser.toString()
+                } else {
+                    Log.d("tag", "onSent-其他消息，自己来判断处理")
+                }
+            }
+            Log.e("---->", message.toString())
             return message!!
         }
 
@@ -156,6 +217,7 @@ class BaseApplication : MyApplication() {
          * @return true 表示走自己的处理方式，false 走融云默认处理方式。
          */
         override fun onSent(message: Message?, sentMessageErrorCode: RongIM.SentMessageErrorCode?): Boolean {
+            Log.e("---->11", message.toString())
             if (message!!.getSentStatus() === Message.SentStatus.FAILED) {
                 if (sentMessageErrorCode == RongIM.SentMessageErrorCode.NOT_IN_CHATROOM) {
                     //不在聊天室
