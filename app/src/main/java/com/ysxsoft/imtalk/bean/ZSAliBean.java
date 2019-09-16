@@ -6,10 +6,11 @@ package com.ysxsoft.imtalk.bean;
  */
 public class ZSAliBean {
 
+
     /**
      * code : 0
      * msg : 获取成功！
-     * data : {"uid":"21","type":1,"diamond":"60.00","blv":"1.00","money":60,"account_number":"123456","account_name":"123456"}
+     * data : {"rs":{"uid":"54","type":1,"diamond":"0.00","blv":"1.00","money":0,"account_number":null,"account_name":null}}
      */
 
     private int code;
@@ -42,77 +43,93 @@ public class ZSAliBean {
 
     public static class DataBean {
         /**
-         * uid : 21
-         * type : 1
-         * diamond : 60.00
-         * blv : 1.00
-         * money : 60
-         * account_number : 123456
-         * account_name : 123456
+         * rs : {"uid":"54","type":1,"diamond":"0.00","blv":"1.00","money":0,"account_number":null,"account_name":null}
          */
 
-        private String uid;
-        private int type;
-        private String diamond;
-        private String blv;
-        private String money;
-        private String account_number;
-        private String account_name;
+        private RsBean rs;
 
-        public String getUid() {
-            return uid;
+        public RsBean getRs() {
+            return rs;
         }
 
-        public void setUid(String uid) {
-            this.uid = uid;
+        public void setRs(RsBean rs) {
+            this.rs = rs;
         }
 
-        public int getType() {
-            return type;
-        }
+        public static class RsBean {
+            /**
+             * uid : 54
+             * type : 1
+             * diamond : 0.00
+             * blv : 1.00
+             * money : 0
+             * account_number : null
+             * account_name : null
+             */
 
-        public void setType(int type) {
-            this.type = type;
-        }
+            private String uid;
+            private int type;
+            private String diamond;
+            private String blv;
+            private int money;
+            private String account_number;
+            private String account_name;
 
-        public String getDiamond() {
-            return diamond;
-        }
+            public String getUid() {
+                return uid;
+            }
 
-        public void setDiamond(String diamond) {
-            this.diamond = diamond;
-        }
+            public void setUid(String uid) {
+                this.uid = uid;
+            }
 
-        public String getBlv() {
-            return blv;
-        }
+            public int getType() {
+                return type;
+            }
 
-        public void setBlv(String blv) {
-            this.blv = blv;
-        }
+            public void setType(int type) {
+                this.type = type;
+            }
 
-        public String getMoney() {
-            return money;
-        }
+            public String getDiamond() {
+                return diamond;
+            }
 
-        public void setMoney(String money) {
-            this.money = money;
-        }
+            public void setDiamond(String diamond) {
+                this.diamond = diamond;
+            }
 
-        public String getAccount_number() {
-            return account_number;
-        }
+            public String getBlv() {
+                return blv;
+            }
 
-        public void setAccount_number(String account_number) {
-            this.account_number = account_number;
-        }
+            public void setBlv(String blv) {
+                this.blv = blv;
+            }
 
-        public String getAccount_name() {
-            return account_name;
-        }
+            public int getMoney() {
+                return money;
+            }
 
-        public void setAccount_name(String account_name) {
-            this.account_name = account_name;
+            public void setMoney(int money) {
+                this.money = money;
+            }
+
+            public String getAccount_number() {
+                return account_number;
+            }
+
+            public void setAccount_number(String account_number) {
+                this.account_number = account_number;
+            }
+
+            public String getAccount_name() {
+                return account_name;
+            }
+
+            public void setAccount_name(String account_name) {
+                this.account_name = account_name;
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import android.net.Uri;
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.MicPositionGiftValueMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
@@ -75,6 +76,7 @@ public class IMClient {
             RongIMClient.registerMessageType(RoomNoticeChangedMessage.class);//房间通知
             RongIMClient.registerMessageType(RoomLableChangedMessage.class);//房间标签
             RongIMClient.registerMessageType(RoomNameChangedMessage.class);//房间名称
+            RongIMClient.registerMessageType(MicPositionGiftValueMessage.class);//房间礼物值是否显示
         } catch (AnnotationNotFoundException e) {
             SLog.e(TAG, "Failed to register messages!!");
             e.printStackTrace();

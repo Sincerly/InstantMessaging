@@ -3,12 +3,15 @@ package com.ysxsoft.imtalk.view
 import android.os.Bundle
 import android.text.TextUtils
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.bean.BindInfoBean
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import kotlinx.android.synthetic.main.activity_bind_zfb.*
 import kotlinx.android.synthetic.main.title_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -23,6 +26,31 @@ class BindZfbActivity : BaseActivity() {
         setLightStatusBar(true)
         initStatusBar(topView)
         initView()
+        getBindInfo()
+    }
+    private fun getBindInfo() {
+        val map = HashMap<String, String>()
+        map.put("uid", AuthManager.getInstance().currentUserId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .getBindInfo(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<BindInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: BindInfoBean?) {
+                        if ("0".equals(t!!.code)){
+                            et_zfb.setText(t.data.zfb_accounts)
+                            et_name.setText(t.data.zfb_name)
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     private fun initView() {

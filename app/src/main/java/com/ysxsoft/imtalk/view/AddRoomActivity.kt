@@ -8,8 +8,11 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.id.tv_fj_bq
+import com.ysxsoft.imtalk.R.id.tv_fj_name
 import com.ysxsoft.imtalk.R.string.room_name
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.chatroom.im.message.MicPositionGiftValueMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage
@@ -54,10 +57,10 @@ class AddRoomActivity : BaseActivity() {
     var room_id: String? = null
     var room_name: String? = null
     var room_pwd: String? = null
-    var is_lock: Int? = 0
-    var room_gift_tx: Int? = 0
-    var room_is_fair: Int? = 0
-    var room_pure: Int? = 0
+    var is_lock:Int? = 0
+    var room_gift_tx:Int?  = 0
+    var room_is_fair :Int? = 0
+    var room_pure:Int?  = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         room_id = intent.getStringExtra("room_id")
@@ -166,16 +169,28 @@ class AddRoomActivity : BaseActivity() {
 
         //房间礼物特效
         switch_tx.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
-            if (isChecked) room_gift_tx == 1 else room_gift_tx == 0
+            if (isChecked) {
+                room_gift_tx =1
+            } else {
+                room_gift_tx = 0
+            }
         }
 
         //房间公屏
         switch_gp.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
-            if (isChecked) room_is_fair == 1 else room_is_fair == 0
+            if (isChecked) {
+                room_is_fair = 1
+            } else {
+                room_is_fair = 0
+            }
         }
         //纯净模式
         switch_ms.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
-            if (isChecked) room_pure == 1 else room_pure == 0
+            if (isChecked) {
+                room_pure = 1
+            } else {
+                room_pure = 0
+            }
         }
         tv_title_right.setOnClickListener {
             savaData()
@@ -208,6 +223,7 @@ class AddRoomActivity : BaseActivity() {
                     override fun call(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
+                            //房间背景改变
                             if (!TextUtils.isEmpty(img_url)) {
                                 val intent = Intent("BGCHANG")
                                 intent.putExtra("bgId", img_url)
@@ -229,6 +245,7 @@ class AddRoomActivity : BaseActivity() {
                                     }
                                 });
                             }
+                            //房间标签改变
                             if (!TextUtils.isEmpty(tagName)) {
                                 val intent = Intent("BGCHANG")
                                 intent.putExtra("tagName", tv_fj_bq.text.toString())
@@ -251,6 +268,7 @@ class AddRoomActivity : BaseActivity() {
                                 });
 
                             }
+                            //房间名称改变
                             if (!TextUtils.isEmpty(tv_fj_name.text.toString())) {
                                 val intent = Intent("BGCHANG")
                                 intent.putExtra("roomName", tv_fj_name.text.toString())
@@ -272,9 +290,57 @@ class AddRoomActivity : BaseActivity() {
                                     }
                                 });
 
-
                             }
+                            //是否显示礼物值
+                            RoomManager.getInstance().getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                                override fun onSuccess(result: DetailRoomInfo?) {
+                                    if (result != null) {
+                                        //是否开启礼物值
+                                        if (room_gift_tx == 0) {//关闭
+                                            val giftValueMessage = MicPositionGiftValueMessage()
+                                            giftValueMessage.setCmd(0)
+                                            giftValueMessage.houseOwnerValue = result.roomInfo.gifts
+                                            giftValueMessage.micPositions = result.micPositions
+                                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, giftValueMessage)
+                                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                                override fun onAttached(p0: Message?) {
+                                                    Log.d("tag", p0!!.content.toString())
+                                                }
 
+                                                override fun onSuccess(p0: Message?) {
+                                                    Log.d("tag", p0!!.content.toString())
+                                                }
+
+                                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                                    Log.d("tag", p0!!.content.toString())
+                                                }
+                                            });
+                                        } else {
+                                            val giftValueMessage = MicPositionGiftValueMessage()
+                                            giftValueMessage.setCmd(1)
+                                            giftValueMessage.houseOwnerValue = result.roomInfo.gifts
+                                            giftValueMessage.micPositions = result.micPositions
+                                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, giftValueMessage)
+                                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                                override fun onAttached(p0: Message?) {
+                                                    Log.d("tag", p0!!.content.toString())
+                                                }
+
+                                                override fun onSuccess(p0: Message?) {
+                                                    Log.d("tag", p0!!.content.toString())
+                                                }
+
+                                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                                    Log.d("tag", p0!!.content.toString())
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+
+                                override fun onFail(errorCode: Int) {
+                                }
+                            })
                             finish()
                         }
                     }

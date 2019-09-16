@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -300,6 +301,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
     private fun initClickListernr() {
         //签到
+        ivSign.visibility=View.GONE
         ivSign.setOnClickListener {
             startActivity(QDActivity::class.java)
 //            val dialog = DatePickerDialog(mContext)

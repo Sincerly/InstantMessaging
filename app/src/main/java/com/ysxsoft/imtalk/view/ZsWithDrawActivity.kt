@@ -32,15 +32,15 @@ class ZsWithDrawActivity : BaseActivity() {
         return R.layout.zs_withdraw_layout
     }
 
-    var type = 0
+    var type = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setBackVisibily()
-        tv_title_right.visibility=View.VISIBLE
+        tv_title_right.visibility = View.VISIBLE
         tv_title_right.setText("提现记录")
         setTitle("钻石提现")
         initView()
-        ZsALiPay()
+
     }
 
     private fun initView() {
@@ -54,7 +54,6 @@ class ZsWithDrawActivity : BaseActivity() {
                             type = 1
                             img_type.setImageResource(R.mipmap.img_alipay)
                             tv_pay_type.setText("支付宝账户")
-                            tv_add_bank_card.visibility = View.GONE
                             tv_withdraw_acount.setHint("")
                             ZsALiPay()
                         }
@@ -64,6 +63,7 @@ class ZsWithDrawActivity : BaseActivity() {
                             img_type.setImageResource(R.mipmap.img_bank_card)
                             tv_pay_type.setText("银行卡账号")
                             tv_withdraw_acount.setHint("您还未添加银行卡，")
+                            tv_add_bank_card.setText("添加银行卡")
                             tv_add_bank_card.visibility = View.VISIBLE
                             tv_withdraw_acount.setHintTextColor(R.color.hint_text_color)
                         }
@@ -73,9 +73,13 @@ class ZsWithDrawActivity : BaseActivity() {
             dialog.show()
         }
         tv_add_bank_card.setOnClickListener {
-            val intent = Intent(mContext, BankCardListActivity::class.java)
-            intent.putExtra("is_finish","1")
-            startActivityForResult(intent, 1426)
+            if (type == 1) {
+                startActivity(BindZfbActivity::class.java)
+            } else {
+                val intent = Intent(mContext, BankCardListActivity::class.java)
+                intent.putExtra("is_finish", "1")
+                startActivityForResult(intent, 1426)
+            }
         }
         tv_all.setOnClickListener {
             ed_money.setText(tv_money.text.toString())
@@ -127,7 +131,7 @@ class ZsWithDrawActivity : BaseActivity() {
                     override fun call(t: ZSAliBean?) {
                         if (t!!.code == 0) {
 
-                        }else{
+                        } else {
 
                         }
                     }
@@ -136,14 +140,14 @@ class ZsWithDrawActivity : BaseActivity() {
 
     private fun BankData() {
         NetWork.getService(ImpService::class.java)
-                .TxBank(SpUtils.getSp(mContext,"uid"),ed_money.text.toString().trim(),"2",bank_id!!)
+                .TxBank(SpUtils.getSp(mContext, "uid"), ed_money.text.toString().trim(), "2", bank_id!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<OrderBean>{
+                .subscribe(object : Action1<OrderBean> {
                     override fun call(t: OrderBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             startActivity(PaymentCompletionActivity::class.java)
-                        }else{
+                        } else {
                             showToastMessage(t.msg)
                         }
                     }
@@ -160,7 +164,7 @@ class ZsWithDrawActivity : BaseActivity() {
                     override fun call(t: OrderBean?) {
                         if (t!!.code == 0) {
                             startActivity(PaymentCompletionActivity::class.java)
-                        }else{
+                        } else {
                             showToastMessage(t.msg)
                         }
                     }
@@ -169,17 +173,17 @@ class ZsWithDrawActivity : BaseActivity() {
     }
 
     //银行卡
-    private fun BankALiPay(bank_id: String) {
+    private fun BankALiPay() {
         NetWork.getService(ImpService::class.java)
-                .zsTxBank(SpUtils.getSp(mContext, "uid"), "2", bank_id)
+                .zsTxBank(SpUtils.getSp(mContext, "uid"), "2")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<ZSBankBean> {
                     override fun call(t: ZSBankBean?) {
                         if (t!!.code == 0) {
-                            tv_withdraw_acount.setText(t.data.bank_name)
-                            tv_add_bank_card.visibility = View.GONE
-                            tv_money.setText(t.data.money)
+//                            tv_withdraw_acount.setText(t.data.bank_name)
+//                            tv_add_bank_card.visibility = View.GONE
+                            tv_money.setText(t.data.rs.money.toString())
                         }
                     }
                 })
@@ -195,18 +199,34 @@ class ZsWithDrawActivity : BaseActivity() {
                 .subscribe(object : Action1<ZSAliBean> {
                     override fun call(t: ZSAliBean?) {
                         if (t!!.code == 0) {
-                            tv_money.setText(t.data.money)
-                            tv_withdraw_acount.setText(t.data.account_number)
+                            if (TextUtils.isEmpty(t.data.rs.account_number)) {
+                                tv_withdraw_acount.setHint("您还未添加支付宝，")
+                                tv_add_bank_card.setText("绑定支付宝")
+                                tv_add_bank_card.visibility = View.VISIBLE
+                            } else {
+                                tv_add_bank_card.visibility = View.GONE
+                                tv_money.setText(t.data.rs.money.toString())
+                                tv_withdraw_acount.setText(t.data.rs.account_number)
+                            }
                         }
                     }
                 })
 
     }
-    var bank_id:String?=null
+
+    override fun onResume() {
+        super.onResume()
+        ZsALiPay()
+    }
+
+    var bank_id: String? = null
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1426 && resultCode == 1428) {
-             bank_id = data!!.getStringExtra("bank_id")
-            BankALiPay(bank_id!!)
+            bank_id = data!!.getStringExtra("bank_id")
+            var bank_name = data!!.getStringExtra("bank_name")
+            tv_withdraw_acount.setText(bank_name)
+            tv_add_bank_card.visibility = View.GONE
+            BankALiPay()
         }
     }
 }

@@ -83,6 +83,7 @@ class ImprovingDataActivity : BaseActivity() {
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
                             startActivity(MainActivity::class.java)
+                            finish()
                         }
                     }
 
