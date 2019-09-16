@@ -15,6 +15,7 @@ import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomIsActiveMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomIsLockMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage;
@@ -813,9 +814,17 @@ public class RoomManager {
                                 }
                             });
                         }
+                    }else if (message.getContent() instanceof RoomIsLockMessage){
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomIsLockMessage content = new RoomIsLockMessage(message.getContent().encode());
+                                    roomEventlistener.onIsLock(content.getIsLock(), content.getIsFair(), content.getIsPure());
+                                }
+                            });
+                        }
                     }
-
-
                     return true;
                 }
                 return false;

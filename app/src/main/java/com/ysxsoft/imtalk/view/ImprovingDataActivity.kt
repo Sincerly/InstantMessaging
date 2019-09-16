@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.view
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import com.ysxsoft.imtalk.MainActivity
 import com.ysxsoft.imtalk.R
@@ -65,6 +66,14 @@ class ImprovingDataActivity : BaseActivity() {
         }
         tv_next.setOnClickListener {
  //            startActivity(MainActivity::class.java)
+            if (TextUtils.isEmpty(ed_nikeName.text.toString().trim())){
+                showToastMessage("昵称不能为空")
+                return@setOnClickListener
+            }
+             if (TextUtils.isEmpty(tv_birth.text.toString().trim())){
+                showToastMessage("出生日期不能为空")
+                return@setOnClickListener
+            }
             saveData()
         }
 

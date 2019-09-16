@@ -12,6 +12,7 @@ import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomIsActiveMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomIsLockMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage;
@@ -77,6 +78,7 @@ public class IMClient {
             RongIMClient.registerMessageType(RoomLableChangedMessage.class);//房间标签
             RongIMClient.registerMessageType(RoomNameChangedMessage.class);//房间名称
             RongIMClient.registerMessageType(MicPositionGiftValueMessage.class);//房间礼物值是否显示
+            RongIMClient.registerMessageType(RoomIsLockMessage.class);//房间是否加锁  是否纯净模式  是否开启公屏
         } catch (AnnotationNotFoundException e) {
             SLog.e(TAG, "Failed to register messages!!");
             e.printStackTrace();

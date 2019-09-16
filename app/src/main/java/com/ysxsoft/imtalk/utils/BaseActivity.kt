@@ -284,7 +284,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
             override fun onSuccess(s: String) {
                 SLog.d(TAG, "RongIMClient connect success")
-                showToastMessage(R.string.toast_login_success);
             }
 
             override fun onError(errorCode: RongIMClient.ErrorCode) {

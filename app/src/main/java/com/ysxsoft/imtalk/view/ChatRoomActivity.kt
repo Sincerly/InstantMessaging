@@ -23,6 +23,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import cn.rongcloud.rtc.core.EglBase.lock
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -99,6 +100,11 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+    override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
+        fair=isFair
+        //房间是否加锁  是否纯净模式  是否开启公屏
+        isLockFair(isLock, isFair, isPure)
+    }
 
     override fun onGiftValue(cmd: Int, micPositionInfoList: MutableList<MicPositionsBean>?, houseOwnerValue: String?) {
         //礼物值
@@ -319,6 +325,24 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         ShareData()
     }
 
+    private fun isLockFair(lock: String?, fair: String?, pure: String?) {
+        if ("0".equals(lock)) {
+            img_w_lock.visibility = View.GONE
+        } else {
+            img_w_lock.visibility = View.VISIBLE
+        }
+        if ("0".equals(fair)) {//是否开启公屏
+            chatroom_list_chat.visibility = View.VISIBLE
+        } else {
+            chatroom_list_chat.visibility = View.GONE
+        }
+        if ("0".equals(pure)) {//纯净模式
+            img_gold_egg.visibility = View.VISIBLE
+        } else {
+            img_gold_egg.visibility = View.GONE
+        }
+    }
+
     private fun ShareData() {
         val map = HashMap<String, String>()
         map.put("uid", AuthManager.getInstance().currentUserId)
@@ -526,6 +550,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_send.setOnClickListener {
+            if (!"0".equals(fair)){
+                showToastMessage("当前为公屏模式")
+                return@setOnClickListener
+            }
+
             val msg = chatroom_et_chat_input.text.toString().trim()
             if (!TextUtils.isEmpty(msg)) {
                 roomManager!!.sendChatRoomMessage(msg, SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, mydatabean!!.data.icon);
@@ -2036,8 +2065,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
-                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
                         finish()
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
@@ -2115,6 +2144,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         homeSettingDialog.show()
     }
 
+    var fair:String?=null
+
     override fun onResume() {
         super.onResume()
         /*
@@ -2127,10 +2158,33 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             override fun onSuccess(result: DetailRoomInfo?) {
                 if (result != null) {
                     val room_gift_tx = result.roomInfo.room_gift_tx
+                    fair = result.roomInfo.room_is_fair
+                    val is_lock = result.roomInfo.is_lock
+                    val pure = result.roomInfo.room_pure
+
                     if ("0".equals(room_gift_tx)) {//关闭
+                        tv_room_manager.visibility = View.GONE
                         UpdataTips(detailRoomInfo!!.getMicPositions(), false)
                     } else {//开启
+                        tv_room_manager.visibility = View.VISIBLE
+                        tv_room_manager.setText(result.roomInfo.gifts)
                         UpdataTips(detailRoomInfo!!.getMicPositions(), true)
+                    }
+
+                    if ("0".equals(is_lock)) {
+                        img_w_lock.visibility = View.GONE
+                    } else {
+                        img_w_lock.visibility = View.VISIBLE
+                    }
+                    if ("0".equals(fair)) {//是否开启公屏
+                        chatroom_list_chat.visibility = View.VISIBLE
+                    } else {
+                        chatroom_list_chat.visibility = View.GONE
+                    }
+                    if ("0".equals(pure)) {//纯净模式
+                        img_gold_egg.visibility = View.VISIBLE
+                    } else {
+                        img_gold_egg.visibility = View.GONE
                     }
                 }
             }

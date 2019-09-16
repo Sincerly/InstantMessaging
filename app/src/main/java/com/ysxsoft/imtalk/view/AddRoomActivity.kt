@@ -12,10 +12,7 @@ import com.ysxsoft.imtalk.R.id.tv_fj_bq
 import com.ysxsoft.imtalk.R.id.tv_fj_name
 import com.ysxsoft.imtalk.R.string.room_name
 import com.ysxsoft.imtalk.bean.CommonBean
-import com.ysxsoft.imtalk.chatroom.im.message.MicPositionGiftValueMessage
-import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage
-import com.ysxsoft.imtalk.chatroom.im.message.RoomLableChangedMessage
-import com.ysxsoft.imtalk.chatroom.im.message.RoomNameChangedMessage
+import com.ysxsoft.imtalk.chatroom.im.message.*
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
@@ -77,6 +74,12 @@ class AddRoomActivity : BaseActivity() {
         RoomManager.getInstance().getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                 if (roomDetailInfo != null) {
+                    is_lock=roomDetailInfo.roomInfo.is_lock.toInt()
+                    room_gift_tx=roomDetailInfo.roomInfo.room_gift_tx.toInt()
+                    room_is_fair=roomDetailInfo.roomInfo.room_is_fair.toInt()
+                    room_pure=roomDetailInfo.roomInfo.room_pure.toInt()
+                    room_pwd=roomDetailInfo.roomInfo.lock_pwd
+
                     tv_fj_bq.setText(roomDetailInfo.roomInfo.room_label)
                     if ("0".equals(roomDetailInfo.roomInfo.is_lock)) {//上锁
                         switch_ss.isChecked = false
@@ -341,6 +344,27 @@ class AddRoomActivity : BaseActivity() {
                                 override fun onFail(errorCode: Int) {
                                 }
                             })
+
+                            val lockMessage = RoomIsLockMessage()
+                            lockMessage.isLock=is_lock.toString()
+                            lockMessage.isFair=room_is_fair.toString()
+                            lockMessage.isPure=room_pure.toString()
+                            val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, lockMessage)
+                            RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                override fun onAttached(p0: Message?) {
+                                    Log.d("tag", p0!!.content.toString())
+                                }
+
+                                override fun onSuccess(p0: Message?) {
+                                    Log.d("tag", p0!!.content.toString())
+                                }
+
+                                override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                    Log.d("tag", p0!!.content.toString())
+                                }
+                            });
+
+
                             finish()
                         }
                     }

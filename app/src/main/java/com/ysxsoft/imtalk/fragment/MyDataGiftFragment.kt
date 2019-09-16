@@ -10,10 +10,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.mipmap.myself
-import com.ysxsoft.imtalk.bean.FouceOnBean
-import com.ysxsoft.imtalk.bean.HomeRoomBean
-import com.ysxsoft.imtalk.bean.SFGiftBean
-import com.ysxsoft.imtalk.bean.SGiftBean
+import com.ysxsoft.imtalk.bean.*
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
@@ -40,6 +38,7 @@ class MyDataGiftFragment : BaseFragment() {
 
     var uid: String? = null
     var myself: String? = null
+    var data: Int? = -1
     override fun onResume() {
         super.onResume()
         val bundle = this.arguments//得到从Activity传来的数据
@@ -57,9 +56,13 @@ class MyDataGiftFragment : BaseFragment() {
     }
 
     private fun initView() {
-        tv_fouce.setOnClickListener {
+        ll_add_fouce.setOnClickListener {
             //关注
-
+            if (data==1){
+                FocusOnData(AuthManager.getInstance().currentUserId,uid!!,"1")
+            }else{
+                FocusOnData(AuthManager.getInstance().currentUserId,uid!!,"2")
+            }
         }
         tv_msg.setOnClickListener {
             //私信
@@ -67,6 +70,40 @@ class MyDataGiftFragment : BaseFragment() {
         }
 
     }
+
+    /**
+     * 关注
+     */
+    private fun FocusOnData(sp: String, userId: String, s: String) {
+        val map = HashMap<String, String>()
+        map.put("uid", sp)
+        map.put("fs_id", userId)
+        map.put("flag", s)
+//        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .fans(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        showToastMessage(t!!.msg)
+                        if (t.code == 0) {
+                            activity!!.onBackPressed()
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
+    }
+
+
+
 
     private fun fouceData() {
         NetWork.getService(ImpService::class.java)
@@ -80,7 +117,14 @@ class MyDataGiftFragment : BaseFragment() {
 
                     override fun onNext(t: FouceOnBean?) {
                         if (t!!.code==0){
-//                            tv_fouce.setText("")
+                             data = t.data
+                            if (t.data==1){//未关注
+                                img_fouce.setImageResource(R.mipmap.img_w_add)
+                                tv_fouce.setText("关注")
+                            }else{//已关注  取消
+                                img_fouce.setImageResource(R.mipmap.img_w_dui)
+                                tv_fouce.setText("已关注")
+                            }
                         }
                     }
 

@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
@@ -15,6 +16,7 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import android.text.TextUtils
+import android.view.KeyEvent
 import com.ysxsoft.imtalk.bean.QdSignListBean
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.NetWork
@@ -134,6 +136,20 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private var isBack = false
+   override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (isBack) {
+                finish()
+            } else {
+                showToastMessage("再按一次退出")
+                isBack = true
+                Handler().postDelayed({ isBack = false }, 3000)
+            }
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode != 123) {
 //            showToastMessage("权限没开通，部分功能不能使用")
