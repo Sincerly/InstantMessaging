@@ -131,15 +131,15 @@ public interface RoomEventListener {
      */
     void onGiftMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
 
-    /**
-     * 砸金蛋消息
-     * @param roomPublicGiftMessageBean
-     */
-    void onGoldMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
 
     /**
      *  房间是否加锁  是否纯净模式  是否开启公屏
      */
     void onIsLock(String isLock,String isFair,String isPure);
+
+    /**
+     * 设置管理员
+     */
+    void setManager(String uid,String cmd);
 
 }

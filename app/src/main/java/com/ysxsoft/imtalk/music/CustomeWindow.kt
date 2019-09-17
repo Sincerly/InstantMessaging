@@ -62,7 +62,8 @@ class CustomeWindow(var context: Context,  var icon: String?) {
     var mydatabean: UserInfoBean? = null
     var isShowing:Boolean=false
 
-    init {
+
+    init {//初始化代码块
         requestMyData()
         initView()
     }
@@ -86,6 +87,7 @@ class CustomeWindow(var context: Context,  var icon: String?) {
                 })
 
     }
+
     private fun initView() {
         windowManager = context.getSystemService(WINDOW_SERVICE) as WindowManager
         layoutParams = WindowManager.LayoutParams()

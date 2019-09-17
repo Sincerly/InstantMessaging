@@ -120,6 +120,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:hint="请输入卡号"
+            android:inputType="number"
             android:singleLine="true"
             android:textSize="13dp" />
 

@@ -99,7 +99,7 @@ class MoneyJbFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
             tv_all.isSelected = false
             tv_down.isSelected = false
             tv_up.isSelected = true
-            type = 2
+            type = 1
             onRefresh()
         }
         if (mSwipeRefreshLayout != null) {

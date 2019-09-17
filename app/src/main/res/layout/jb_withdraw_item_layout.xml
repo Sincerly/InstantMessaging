@@ -4,6 +4,7 @@
     android:layout_height="60dp"
     android:id="@+id/ll_bg"
     android:background="@drawable/cccccc_frame_bg"
+    android:layout_marginTop="5dp"
     android:gravity="center"
     android:orientation="vertical">
 

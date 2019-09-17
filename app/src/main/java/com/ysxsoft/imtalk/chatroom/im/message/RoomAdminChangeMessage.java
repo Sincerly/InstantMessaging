@@ -12,12 +12,13 @@ import io.rong.imlib.model.MessageContent;
 
 
 /**
- * 房间背景变动消息
+ * 设置管理员
  */
-@MessageTag(value = "SM:RANtfyMsg", flag = MessageTag.NONE)
+@MessageTag(value = "SM:RAdminMsg", flag = MessageTag.NONE)
 public class RoomAdminChangeMessage extends MessageContent {
     private final static String TAG = RoomAdminChangeMessage.class.getSimpleName();
     private String isAdmin;
+    private String cmd;// 1 添加管理员  2 移除管理员
 
     public RoomAdminChangeMessage(byte[] data) {
         String jsonStr = null;
@@ -25,6 +26,7 @@ public class RoomAdminChangeMessage extends MessageContent {
             jsonStr = new String(data, "UTF-8");
             JSONObject jsonObj = new JSONObject(jsonStr);
             setIsAdmin(jsonObj.optString("isAdmin"));
+            setIsAdmin(jsonObj.optString("cmd"));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -39,11 +41,19 @@ public class RoomAdminChangeMessage extends MessageContent {
         this.isAdmin = isAdmin;
     }
 
+    public String getCmd() {
+        return cmd;
+    }
+
+    public void setCmd(String cmd) {
+        this.cmd = cmd;
+    }
     @Override
     public byte[] encode() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("isAdmin", getIsAdmin());
+            jsonObject.put("cmd", getCmd());
             byte[] bytes = jsonObject.toString().getBytes("UTF-8");
             return bytes;
         } catch (JSONException e) {
@@ -64,10 +74,12 @@ public class RoomAdminChangeMessage extends MessageContent {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.isAdmin);
+        dest.writeString(this.cmd);
     }
 
     protected RoomAdminChangeMessage(Parcel in) {
         this.isAdmin = in.readString();
+        this.cmd = in.readString();
     }
 
     public static final Creator<RoomAdminChangeMessage> CREATOR = new Creator<RoomAdminChangeMessage>() {

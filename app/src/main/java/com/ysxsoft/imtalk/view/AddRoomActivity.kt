@@ -74,7 +74,9 @@ class AddRoomActivity : BaseActivity() {
         RoomManager.getInstance().getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                 if (roomDetailInfo != null) {
-                    is_lock=roomDetailInfo.roomInfo.is_lock.toInt()
+                    if(!TextUtils.isEmpty(roomDetailInfo.roomInfo.is_lock)){
+                        is_lock=roomDetailInfo.roomInfo.is_lock.toInt()
+                    }
                     room_gift_tx=roomDetailInfo.roomInfo.room_gift_tx.toInt()
                     room_is_fair=roomDetailInfo.roomInfo.room_is_fair.toInt()
                     room_pure=roomDetailInfo.roomInfo.room_pure.toInt()

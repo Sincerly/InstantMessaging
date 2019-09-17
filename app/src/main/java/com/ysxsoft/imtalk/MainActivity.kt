@@ -58,14 +58,17 @@ class MainActivity : BaseActivity() {
                         }
                     }
                 })
-        if (!TextUtils.isEmpty(SpUtils.getSp(mContext, "chat_token"))) {
-            loginToIM(SpUtils.getSp(mContext, "chat_token"))
-        }
         setLightStatusBar(true)
         initView()
         requestData()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!TextUtils.isEmpty(SpUtils.getSp(mContext, "chat_token"))) {
+            loginToIM(SpUtils.getSp(mContext, "chat_token"))
+        }
+    }
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
                 .SignList(SpUtils.getSp(mContext, "uid"))

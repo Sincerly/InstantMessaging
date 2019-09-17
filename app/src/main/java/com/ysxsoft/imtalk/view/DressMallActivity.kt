@@ -1,6 +1,8 @@
 package com.ysxsoft.imtalk.view
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -34,15 +36,27 @@ import java.lang.ref.WeakReference
  *on 2019/7/15 0015
  */
 class DressMallActivity : BaseActivity() {
+
+    companion object {
+        fun startDressMallActivity(mContext: Context,uid:String){
+            val intent = Intent(mContext, DressMallActivity::class.java)
+            intent.putExtra("uid",uid)
+            mContext.startActivity(intent)
+        }
+
+    }
+
     override fun getLayout(): Int {
         return R.layout.dress_mall_layout
     }
 
     var currentFragment: BaseFragment? = null
+    var uid: String? = null
 
     private var tagP = "0"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+         uid = intent.getStringExtra("uid")
 //dress_mall_item_layout  theme_frame_bg
         setLightStatusBar(false)
         initStatusBar(topView)
@@ -56,7 +70,7 @@ class DressMallActivity : BaseActivity() {
 
     private fun PersonData() {
         NetWork.getService(ImpService::class.java)
-                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                .GetUserInfo(uid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<UserInfoBean> {

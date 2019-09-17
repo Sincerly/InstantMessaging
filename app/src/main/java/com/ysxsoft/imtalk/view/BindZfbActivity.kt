@@ -57,6 +57,10 @@ class BindZfbActivity : BaseActivity() {
         setBackVisibily()
         setTitle("绑定支付宝账号")
         tv_get_code.setOnClickListener {
+            if (TextUtils.isEmpty(et_zfb.text.toString().trim())) {
+                showToastMessage("支付宝账号不能为空")
+                return@setOnClickListener
+            }
             CountDownTimeHelper(60, tv_get_code)
             SendMsg(et_zfb.text.toString().trim())
         }
@@ -65,10 +69,10 @@ class BindZfbActivity : BaseActivity() {
                 showToastMessage("支付宝账号不能为空")
                 return@setOnClickListener
             }
-            if (!AppUtil.checkPhoneNum(et_zfb.text.toString().trim())) {
-                showToastMessage("支付宝账号不正确")
-                return@setOnClickListener
-            }
+//            if (!AppUtil.checkPhoneNum(et_zfb.text.toString().trim())) {
+//                showToastMessage("支付宝账号不正确")
+//                return@setOnClickListener
+//            }
 
             if (TextUtils.isEmpty(et_name.text.toString().trim())) {
                 showToastMessage("真实姓名不能为空")

@@ -13,6 +13,7 @@ import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionGiftValueMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomAdminChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
@@ -886,6 +887,16 @@ public class RoomManager {
                                         //砸金蛋
                                         //roomEventlistener.onGoldMessage(msg.getNickname(),msg.getSgName(),msg.getGoldNums());
                                     }
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomAdminChangeMessage){
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomAdminChangeMessage content = new RoomAdminChangeMessage(message.getContent().encode());
+                                    roomEventlistener.setManager(content.getIsAdmin(),content.getCmd());
                                 }
                             });
                         }

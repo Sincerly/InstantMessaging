@@ -145,7 +145,8 @@ class MyFragment : BaseFragment() {
         }
         //装扮商城
         tv2.setOnClickListener {
-            startActivity(DressMallActivity::class.java)
+//            startActivity(DressMallActivity::class.java)
+            DressMallActivity.startDressMallActivity(mContext,AuthManager.getInstance().currentUserId)
         }
         //实名认证
         tv3.setOnClickListener {
