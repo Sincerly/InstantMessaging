@@ -138,6 +138,7 @@ public interface RoomEventListener {
      * @param goldNum
      */
     void onGoldMessage(String nickname,String giftName,String goldNum);
+//    void onGoldMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
 
     /**
      *  房间是否加锁  是否纯净模式  是否开启公屏
