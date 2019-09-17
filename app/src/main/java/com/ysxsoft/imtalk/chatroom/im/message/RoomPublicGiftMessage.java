@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.chatroom.im.message;
 
 import android.os.Parcel;
+import android.util.Log;
 
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
 
@@ -21,12 +22,17 @@ import io.rong.imlib.model.UserInfo;
 @MessageTag(value = "Stu:score", flag = MessageTag.NONE)
 public class RoomPublicGiftMessage extends MessageContent {
     private final String TAG = RoomPublicGiftMessage.class.getSimpleName();
+    //送礼物
     private String sendName;
     private String sendIcon;
     private String slName;
     private String slIcon;
     private String giftPic;
     private String giftNums;
+    //砸金蛋
+    private String nickname;//昵称
+    private String sgName;//礼物名称
+    private String goldNums;//金币数量
 
     public RoomPublicGiftMessage(byte[] data) {
         String jsonStr = null;
@@ -43,9 +49,37 @@ public class RoomPublicGiftMessage extends MessageContent {
             setSlIcon(jsonObj.optString("sl_icon"));
             setGiftPic(jsonObj.optString("gift_pic"));
             setGiftNums(jsonObj.optString("gift_nums"));
+            //砸金蛋
+            setNickname(jsonObj.optString("nickname"));
+            setSgName(jsonObj.optString("sg_name"));
+            setGoldNums(jsonObj.optString("gold_nums"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getNickname() {
+        return nickname == null ? "" : nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getSgName() {
+        return sgName == null ? "" : sgName;
+    }
+
+    public void setSgName(String sgName) {
+        this.sgName = sgName;
+    }
+
+    public String getGoldNums() {
+        return goldNums == null ? "" : goldNums;
+    }
+
+    public void setGoldNums(String goldNums) {
+        this.goldNums = goldNums;
     }
 
     public String getSendName() {
@@ -119,7 +153,6 @@ public class RoomPublicGiftMessage extends MessageContent {
     public RoomPublicGiftMessage() {
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -127,13 +160,15 @@ public class RoomPublicGiftMessage extends MessageContent {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.TAG);
         dest.writeString(this.sendName);
         dest.writeString(this.sendIcon);
         dest.writeString(this.slName);
         dest.writeString(this.slIcon);
         dest.writeString(this.giftPic);
         dest.writeString(this.giftNums);
+        dest.writeString(this.nickname);
+        dest.writeString(this.sgName);
+        dest.writeString(this.goldNums);
     }
 
     protected RoomPublicGiftMessage(Parcel in) {
@@ -143,6 +178,9 @@ public class RoomPublicGiftMessage extends MessageContent {
         this.slIcon = in.readString();
         this.giftPic = in.readString();
         this.giftNums = in.readString();
+        this.nickname=in.readString();
+        this.sgName=in.readString();
+        this.goldNums=in.readString();
     }
 
     public static final Creator<RoomPublicGiftMessage> CREATOR = new Creator<RoomPublicGiftMessage>() {

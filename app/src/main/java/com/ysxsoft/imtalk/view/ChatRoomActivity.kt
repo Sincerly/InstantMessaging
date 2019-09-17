@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.view
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.bluetooth.BluetoothHeadset
 import android.content.*
 import android.graphics.Color
@@ -97,6 +98,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
         //送礼物超过一定公屏消息
+        if(giftEggManager!!!=null){
+            giftEggManager!!.addData("111")
+            giftEggManager!!.start()
+        }
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
@@ -139,7 +144,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onRoomGift(p: Int, toP:List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
-        Log.e("tag", "onRoomGift");
         showPositionGift(p, toP, giftUrl, staticUrl)
     }
 
@@ -263,6 +267,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var mydatabean: UserInfoBean? = null
     var shareBean: ShareUserBean.DataBean? = null
     var bgChangBroadCast: BgChangBroadCast? = null
+    var giftEggManager: NotifyManager? = null
 
     /**
      * 监听来电状态进行房间的静音和禁麦操作
@@ -322,6 +327,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val intentFilter = IntentFilter("BGCHANG")
         registerReceiver(bgChangBroadCast, intentFilter)
         ShareData()
+        giftEggManager=NotifyManager(mContext as Activity?)
     }
 
     private fun isLockFair(lock: String?, fair: String?, pure: String?) {
@@ -2242,6 +2248,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     fun showPositionEmj(position: Int, emjGifUrl: String) {
+        onGiftMessage(null)
         var emjGifUrl = emjGifUrl
 //        emjGifUrl = "http://chitchat.rhhhyy.com/uploads/images/20190903/f5d5ee9871ffbd2c422e4f436a72181e.gif"
         val viewMap = java.util.HashMap<Int, View>()
@@ -2858,6 +2865,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         override fun onStart(p0: SHARE_MEDIA?) {
         }
+    }
+
+    /**
+     * 显示砸蛋通知
+     * @param name 砸蛋人
+     * @param num  中奖数量
+     * @param gold 中奖内容  金币/礼物名称
+     */
+    fun showEggNotifyCation(name:String,num:String,gold:String){
+//        val imageView = ImageView(this)
+//        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+//        imageView.layoutParams = layoutParams;
+//        Glide.with(mContext).load(giftImgUrl).into(imageView)
     }
 
 }
