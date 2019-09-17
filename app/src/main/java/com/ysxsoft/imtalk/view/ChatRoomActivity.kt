@@ -94,6 +94,7 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+
     override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
         //送礼物超过一定公屏消息
     }

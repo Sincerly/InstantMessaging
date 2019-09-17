@@ -104,7 +104,6 @@ public interface RoomEventListener {
      * @param staticUrl
      */
     void onRoomGift(int p, List<Integer> toP,String giftUrl,String staticUrl);
-    void onRoomGift(int p, int toP, String giftUrl, String staticUrl);
 
     /**
      * 房间通知

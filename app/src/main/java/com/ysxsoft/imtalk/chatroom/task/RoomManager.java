@@ -827,6 +827,26 @@ public class RoomManager {
                                 }
                             });
                         }
+                    }else if (message.getContent() instanceof MicPositionGiftValueMessage) {
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MicPositionGiftValueMessage content = new MicPositionGiftValueMessage(message.getContent().encode());
+                                    roomEventlistener.onGiftValue(content.getCmd(), content.getMicPositions(), content.getHouseOwnerValue());
+                                }
+                            });
+                        }
+                    }else if (message.getContent() instanceof RoomIsLockMessage){
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RoomIsLockMessage content = new RoomIsLockMessage(message.getContent().encode());
+                                    roomEventlistener.onIsLock(content.getIsLock(), content.getIsFair(), content.getIsPure());
+                                }
+                            });
+                        }
                     }
                     return true;
                 }else if(conversationType == Conversation.ConversationType.PRIVATE){
@@ -864,26 +884,6 @@ public class RoomManager {
                                             }
                                         });
                                     }
-                                }
-                            });
-                        }
-                    } else if (message.getContent() instanceof MicPositionGiftValueMessage) {
-                        if (roomEventlistener != null) {
-                            threadManager.runOnUIThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    MicPositionGiftValueMessage content = new MicPositionGiftValueMessage(message.getContent().encode());
-                                    roomEventlistener.onGiftValue(content.getCmd(), content.getMicPositions(), content.getHouseOwnerValue());
-                                }
-                            });
-                        }
-                    }else if (message.getContent() instanceof RoomIsLockMessage){
-                        if (roomEventlistener != null) {
-                            threadManager.runOnUIThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    RoomIsLockMessage content = new RoomIsLockMessage(message.getContent().encode());
-                                    roomEventlistener.onIsLock(content.getIsLock(), content.getIsFair(), content.getIsPure());
                                 }
                             });
                         }
