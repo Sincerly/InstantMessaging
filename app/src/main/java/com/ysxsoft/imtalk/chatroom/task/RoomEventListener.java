@@ -124,7 +124,19 @@ public interface RoomEventListener {
      * 是否显示礼物值
      */
     void onGiftValue(int cmd, List<MicPositionsBean> micPositionInfoList, String houseOwnerValue);
+
+    /**
+     * 礼物消息
+     * @param roomPublicGiftMessageBean
+     */
     void onGiftMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
+
+    /**
+     * 砸金蛋消息
+     * @param roomPublicGiftMessageBean
+     */
+    void onGoldMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
+
     /**
      *  房间是否加锁  是否纯净模式  是否开启公屏
      */

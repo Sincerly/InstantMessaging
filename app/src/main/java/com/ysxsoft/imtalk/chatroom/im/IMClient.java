@@ -26,6 +26,7 @@ import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.rong.imkit.RongIM;
 import io.rong.imlib.AnnotationNotFoundException;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -94,7 +95,7 @@ public class IMClient {
         /*
          * 管理消息监听，由于同一时间只能有一个消息监听加入 融云 的消息监听，所以做一个消息管理来做消息路由
          */
-        RongIMClient.setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
+        RongIM.setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
             @Override
             public boolean onReceived(Message message, int left) {
                 SLog.d(TAG, "onReceived message. tag:" + message.getObjectName());

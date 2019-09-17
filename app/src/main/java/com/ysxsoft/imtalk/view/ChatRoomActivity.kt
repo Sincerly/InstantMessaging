@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.view
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.bluetooth.BluetoothHeadset
 import android.content.*
 import android.graphics.Color
@@ -100,7 +101,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
-        fair = isFair
+        fair=isFair
         //房间是否加锁  是否纯净模式  是否开启公屏
         isLockFair(isLock, isFair, isPure)
     }
@@ -137,7 +138,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         showPositionEmj(p, url)
     }
 
-    override fun onRoomGift(p: Int, toP: List<Int>, giftUrl: String, staticUrl: String) {
+    override fun onRoomGift(p: Int, toP:List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
         Log.e("tag", "onRoomGift");
         showPositionGift(p, toP, giftUrl, staticUrl)
@@ -263,7 +264,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var mydatabean: UserInfoBean? = null
     var shareBean: ShareUserBean.DataBean? = null
     var bgChangBroadCast: BgChangBroadCast? = null
-    var amdinType = -1
 
     /**
      * 监听来电状态进行房间的静音和禁麦操作
@@ -323,6 +323,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val intentFilter = IntentFilter("BGCHANG")
         registerReceiver(bgChangBroadCast, intentFilter)
         ShareData()
+        giftEggManager=NotifyManager(mContext as Activity?)
         AdminData()
     }
 
@@ -497,8 +498,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             friendDialog.show()
         }
 
-        tv_online.setOnClickListener {
-            OnlineListActivity.starOnlineListActivity(mContext, room_id!!)
+        img_head.setOnClickListener {
+            //            GiveDialog(mContext, detailRoomInfo!!.roomInfo.uid, room_id!!).show()
         }
 
         img_right_img.setOnClickListener {
@@ -577,9 +578,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_send.setOnClickListener {
-            if (!"0".equals(fair)) {
+            if (!"0".equals(fair)){
                 showToastMessage("当前为公屏模式")
-                hideInputKeyboard();
                 return@setOnClickListener
             }
 
@@ -2399,6 +2399,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     fun showPositionEmj(position: Int, emjGifUrl: String) {
+        onGiftMessage(null)
         var emjGifUrl = emjGifUrl
 //        emjGifUrl = "http://chitchat.rhhhyy.com/uploads/images/20190903/f5d5ee9871ffbd2c422e4f436a72181e.gif"
         val viewMap = java.util.HashMap<Int, View>()
@@ -3015,6 +3016,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         override fun onStart(p0: SHARE_MEDIA?) {
         }
+    }
+
+    /**
+     * 显示砸蛋通知
+     * @param name 砸蛋人
+     * @param num  中奖数量
+     * @param gold 中奖内容  金币/礼物名称
+     */
+    fun showEggNotifyCation(name:String,num:String,gold:String){
+//        val imageView = ImageView(this)
+//        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+//        imageView.layoutParams = layoutParams;
+//        Glide.with(mContext).load(giftImgUrl).into(imageView)
     }
 
 }
