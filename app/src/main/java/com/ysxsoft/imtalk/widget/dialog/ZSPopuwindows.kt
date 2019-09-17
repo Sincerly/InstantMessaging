@@ -9,11 +9,13 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.GiftTimesAdapter
 import com.ysxsoft.imtalk.bean.GiftTimesBean
+import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseApplication.Companion.mContext
 import com.ysxsoft.imtalk.utils.NetWork
@@ -39,9 +41,16 @@ class ZSPopuwindows : PopupWindow {
         setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
         val content = LayoutInflater.from(mContext).inflate(resLayout, null, false)
         val recyclerView = content.findViewById<RecyclerView>(R.id.recyclerView)
+        val otherNum = content.findViewById<LinearLayout>(R.id.otherNum)
         contentView = content
-        this.showAtLocation(view,Gravity.RIGHT,0,0)
+        this.showAtLocation(view,Gravity.RIGHT or Gravity.BOTTOM,DisplayUtils.dp2px(mContext,15),DisplayUtils.dp2px(mContext,44))
 
+        otherNum.setOnClickListener {
+            //显示输入框
+            if (onGiftListener!=null){
+                onGiftListener!!.giftClick("-1","")
+            }
+        }
         NetWork.getService(ImpService::class.java)
                 .giftTimes()
                 .subscribeOn(Schedulers.io())
@@ -53,6 +62,7 @@ class ZSPopuwindows : PopupWindow {
                             recyclerView.layoutManager=LinearLayoutManager(mContext)
                             recyclerView.adapter=adapter
                             adapter.addAll(t.data)
+                            otherNum.visibility=View.VISIBLE
                             adapter.setOnGiftTimeListener(object :GiftTimesAdapter.OnGiftTimeListener{
                                 override fun onClick(position: Int) {
                                     val times = adapter!!.dataList.get(position).times

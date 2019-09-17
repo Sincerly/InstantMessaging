@@ -27,6 +27,23 @@ class MicPostionAdapter(mContext: Context) : ListBaseAdapter<RoomMicListBean.Dat
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideHeadImageLoad(mContext, bean.icon, holder.getView<CircleImageView>(R.id.img_head)!!)
         if (position == 0) holder.getView<TextView>(R.id.tv_NO)!!.setText("房主") else holder.getView<TextView>(R.id.tv_NO)!!.setText(bean.sort.toString())
+
+        if (position == 0) {
+            holder.getView<TextView>(R.id.tv_NO)!!.visibility = VISIBLE
+            holder.getView<TextView>(R.id.micSexType)!!.visibility = GONE
+        } else {
+            holder.getView<TextView>(R.id.tv_NO)!!.visibility = GONE
+            holder.getView<TextView>(R.id.micSexType)!!.visibility = VISIBLE
+        }
+
+        //1男2女
+        if(bean.sex==1){
+            holder.getView<TextView>(R.id.micSexType)!!.isSelected=false
+        }else{
+            holder.getView<TextView>(R.id.micSexType)!!.isSelected=true
+        }
+        holder.getView<TextView>(R.id.micSexType)!!.text=bean.sort.toString()
+
 //        if (bean.isChoosed) {
 //            holder.getView<ImageView>(R.id.img_cir_bg)!!.visibility= VISIBLE
 //            holder.getView<ImageView>(R.id.img_cir_bg)!!.setBackgroundResource(R.drawable.btn_cir_bg)

@@ -3,27 +3,18 @@ package com.ysxsoft.imtalk.widget.dialog
 import android.content.Context
 import android.os.Looper
 import android.support.v4.view.ViewCompat
-import android.support.v4.view.ViewPropertyAnimatorListener
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.TimesAdapter
 import com.ysxsoft.imtalk.bean.AwardListDataBean
-import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.EggBean
-import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.NetWork
@@ -31,18 +22,13 @@ import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.utils.ToastUtils
 import com.ysxsoft.imtalk.view.JbWithDrawActivity
 import com.ysxsoft.imtalk.widget.ABSDialog
-import kotlinx.android.synthetic.main.activity_chatroom.*
 import kotlinx.android.synthetic.main.za_dialog_layout.*
-import pl.droidsonroids.gif.AnimationListener
 import pl.droidsonroids.gif.GifDrawable
 import pl.droidsonroids.gif.GifImageView
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
-import java.lang.reflect.InvocationTargetException
-import java.util.logging.Handler
-import kotlin.text.Typography.times
 
 /**
  *Create By 胡
@@ -106,7 +92,6 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                     ZdData()
                 }
                 "4" -> {
-
                     ZdData()
                 }
             }
@@ -125,12 +110,21 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                     override fun call(t: EggBean?) {
                         ToastUtils.showToast(this@EggDialog.context, t!!.msg)
                         if (t.code == 0) {
+                            //刷新金币
+                            getMoney(context)
                             if ("4".equals(type)) {
                                 if (isClick) {
                                     boxViewLayout.removeAllViews()
                                     gifDrawable!!.start(); //开始播放
                                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                     gifDrawable!!.reset()
+                                    Thread(object:Runnable{
+                                        override fun run() {
+                                            if(onEggOpenListener!=null){
+                                                onEggOpenListener!!.onEggOpened(t!!.data!!)
+                                            }
+                                        }
+                                    }).start()
                                     android.os.Handler(Looper.getMainLooper()).postDelayed({
                                         showAnim(t!!.data[0].aw_pic)
                                         ZdData()
@@ -141,6 +135,13 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
+                                Thread(object:Runnable{
+                                    override fun run() {
+                                        if(onEggOpenListener!=null){
+                                            onEggOpenListener!!.onEggOpened(t!!.data!!)
+                                        }
+                                    }
+                                }).start()
                                 //砸1次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     showAnim(t!!.data[0].aw_pic)
@@ -150,6 +151,13 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
+                                Thread(object:Runnable{
+                                    override fun run() {
+                                        if(onEggOpenListener!=null){
+                                            onEggOpenListener!!.onEggOpened(t!!.data!!)
+                                        }
+                                    }
+                                }).start()
                                 //砸10次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     for (bean in t!!.data) {
@@ -161,10 +169,16 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
+                                Thread(object:Runnable{
+                                    override fun run() {
+                                        if(onEggOpenListener!=null){
+                                            onEggOpenListener!!.onEggOpened(t!!.data!!)
+                                        }
+                                    }
+                                }).start()
                                 //砸蛋100次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     //跳转到列表
-
                                 }, 3000)
                             }
                         }
@@ -253,6 +267,26 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
 
     }
 
+    private fun getMoney(mContext: Context) {
+        NetWork.getService(ImpService::class.java)
+                .awardList(SpUtils.getSp(this.context, "uid"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<AwardListDataBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: AwardListDataBean?) {
+                        if (t!!.code == 0) {
+                            tv_jb.setText(t.data.money)
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
     override fun getLayoutResId(): Int {
         return R.layout.za_dialog_layout
     }
@@ -286,4 +320,14 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         boxViewLayout.addView(v)
         ViewCompat.animate(v).alpha(1f).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).setDuration(700).start()
     }
+
+    interface OnEggOpenListener {
+        fun onEggOpened(data:List<EggBean.DataBean>)
+    }
+
+    private var onEggOpenListener: OnEggOpenListener? = null
+    fun setOnEggOpenListener(onEggOpenListener: OnEggOpenListener) {
+        this.onEggOpenListener = onEggOpenListener
+    }
+
 }

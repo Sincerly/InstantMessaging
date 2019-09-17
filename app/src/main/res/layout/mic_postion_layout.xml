@@ -27,6 +27,7 @@
         app:layout_constraintBottom_toBottomOf="@id/img_head"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
     <ImageView
         android:id="@+id/img_cir_bg"
         android:layout_width="wrap_content"
@@ -39,4 +40,17 @@
         android:clickable="true"
         android:background="@drawable/cir_head_selector"
         android:layout_height="31dp"/>
+
+    <TextView
+        android:id="@+id/micSexType"
+        android:layout_width="13dp"
+        android:layout_height="13dp"
+        android:background="@drawable/bg_sex_selector"
+        android:gravity="center"
+        android:text="1"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@id/img_head"
+        app:layout_constraintRight_toRightOf="parent" />
 </android.support.constraint.ConstraintLayout>

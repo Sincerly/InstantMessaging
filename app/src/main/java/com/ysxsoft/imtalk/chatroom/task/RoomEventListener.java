@@ -133,9 +133,11 @@ public interface RoomEventListener {
 
     /**
      * 砸金蛋消息
-     * @param roomPublicGiftMessageBean
+     * @param nickname
+     * @param giftName
+     * @param goldNum
      */
-    void onGoldMessage(RoomPublicGiftMessageBean roomPublicGiftMessageBean);
+    void onGoldMessage(String nickname,String giftName,String goldNum);
 
     /**
      *  房间是否加锁  是否纯净模式  是否开启公屏

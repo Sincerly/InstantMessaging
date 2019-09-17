@@ -1,35 +1,30 @@
 package com.ysxsoft.imtalk.view;
 
 import android.app.Activity;
-import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
-import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.serenegiant.cameracommon.ViewHelper;
+import com.bumptech.glide.Glide;
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.bean.RoomPublicGiftMessageBean;
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils;
 import com.ysxsoft.imtalk.utils.AppUtil;
+import com.ysxsoft.imtalk.widget.CircleImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotifyManager {
+public class GiftNotifyManager {
     private Activity context;
-    private List<Data> data = new ArrayList<>();
+    private List<RoomPublicGiftMessageBean> data = new ArrayList<>();
     private boolean isRunning = false;
 
-    public NotifyManager(Activity context) {
+    public GiftNotifyManager(Activity context) {
         this.context = context;
     }
 
@@ -39,8 +34,8 @@ public class NotifyManager {
     public void start() {
         isRunning = true;
         if (data.size() > 0) {
-            Data d=data.get(0);
-            addView(d.getNickName(),d.getGiftName(),d.getGoldNum());
+            RoomPublicGiftMessageBean d=data.get(0);
+            addView(d);
         }
     }
 
@@ -51,7 +46,7 @@ public class NotifyManager {
         isRunning = false;
     }
 
-    public void setData(List<Data> items) {
+    public void setData(List<RoomPublicGiftMessageBean> items) {
         this.data.clear();
         this.data.addAll(items);
         if (!isRunning) {
@@ -60,7 +55,7 @@ public class NotifyManager {
         }
     }
 
-    public void addData(Data item) {
+    public void addData(RoomPublicGiftMessageBean item) {
         this.data.add(item);
         if (!isRunning) {
             isRunning = true;
@@ -70,24 +65,28 @@ public class NotifyManager {
 
     /**
      * 添加一个通知
-     * @param nickname 昵称
-     * @param giftName 礼物名称
-     * @param goldNum  金币数量
      */
-    public void addView(String nickname,String giftName,String goldNum) {
-        View v = View.inflate(context, R.layout.view_gold_notifycation, null);
-        TextView name = v.findViewById(R.id.name);
+    public void addView(RoomPublicGiftMessageBean d) {
+        View v = View.inflate(context, R.layout.view_gift_notifycation, null);
+        CircleImageView sicon=v.findViewById(R.id.sicon);
+        CircleImageView ticon=v.findViewById(R.id.ticon);
+        CircleImageView gpic=v.findViewById(R.id.gpic);
+        TextView sname = v.findViewById(R.id.sname);
+        TextView tname = v.findViewById(R.id.tname);
         TextView num = v.findViewById(R.id.num);
-        TextView gold = v.findViewById(R.id.gold);
-        name.setText(nickname);
-        num.setText(giftName);
-        gold.setText(goldNum);
+        Glide.with(context).load(d.getSendIcon()).into(sicon);
+        Glide.with(context).load(d.getGiftPic()).into(gpic);
+        Glide.with(context).load(d.getSlIcon()).into(ticon);
+        sname.setText(d.getSendName());
+        tname.setText(d.getSlName());
+        num.setText("x"+d.getGiftNums());
 
         FrameLayout rootView = context.findViewById(android.R.id.content);
         rootView.measure(0, 0);
         int halfWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth() / 2;
         int maxWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth()*3/2;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.topMargin= DisplayUtils.dp2px(context,48);
         v.setLayoutParams(layoutParams);
 
         v.setX(halfWidth);//首先设定在屏幕外边
@@ -119,35 +118,5 @@ public class NotifyManager {
                     public void onAnimationCancel(View view) {
                     }
                 }).start();
-    }
-
-    public static class Data{
-        private String nickName;
-        private String giftName;
-        private String goldNum;
-
-        public String getNickName() {
-            return nickName == null ? "" : nickName;
-        }
-
-        public void setNickName(String nickName) {
-            this.nickName = nickName;
-        }
-
-        public String getGiftName() {
-            return giftName == null ? "" : giftName;
-        }
-
-        public void setGiftName(String giftName) {
-            this.giftName = giftName;
-        }
-
-        public String getGoldNum() {
-            return goldNum == null ? "" : goldNum;
-        }
-
-        public void setGoldNum(String goldNum) {
-            this.goldNum = goldNum;
-        }
     }
 }

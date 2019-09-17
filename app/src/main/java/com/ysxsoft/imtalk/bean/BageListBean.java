@@ -64,6 +64,15 @@ public class BageListBean {
         private String gift_num;
         private String aw_name;
         private String aw_images;
+        private boolean isSelect;
+
+        public boolean isSelect() {
+            return isSelect;
+        }
+
+        public void setSelect(boolean select) {
+            isSelect = select;
+        }
 
         public String getAw_gif() {
             return aw_gif;

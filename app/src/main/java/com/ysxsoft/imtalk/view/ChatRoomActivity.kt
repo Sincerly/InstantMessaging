@@ -24,7 +24,6 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import cn.rongcloud.rtc.core.EglBase.lock
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -32,7 +31,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.opensource.svgaplayer.SVGADrawable
 import com.opensource.svgaplayer.SVGAImageView
 import com.opensource.svgaplayer.SVGAParser
 import com.opensource.svgaplayer.SVGAVideoEntity
@@ -75,8 +73,6 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
-import kotlinx.android.synthetic.main.view_gift.*
-import kotlinx.android.synthetic.main.voice_dialog_layout.view.*
 import okhttp3.Call
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -85,9 +81,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.lang.reflect.InvocationTargetException
-import java.util.*
 import kotlin.collections.HashMap
-import java.net.URL
 import java.util.ArrayList
 
 /**
@@ -95,12 +89,22 @@ import java.util.ArrayList
  * on 2019/7/24 0024
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
+    override fun onGoldMessage(nickname: String?, giftName: String?, goldNum: String?) {
+        if(giftEggManager!!!=null){
+            val d=NotifyManager.Data()
+            d.nickName=nickname;
+            d.giftName=giftName;
+            d.goldNum=goldNum;
+            giftEggManager!!.addData(d)
+            giftEggManager!!.start()
+        }
+    }
 
     override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
         //送礼物超过一定公屏消息
-        if(giftEggManager!!!=null){
-            giftEggManager!!.addData("111")
-            giftEggManager!!.start()
+        if(giftNotifyManager!!!=null){
+            giftNotifyManager!!.addData(roomPublicGiftMessageBean)
+            giftNotifyManager!!.start()
         }
     }
 
@@ -268,6 +272,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var shareBean: ShareUserBean.DataBean? = null
     var bgChangBroadCast: BgChangBroadCast? = null
     var giftEggManager: NotifyManager? = null
+    var giftNotifyManager: GiftNotifyManager? = null
 
     /**
      * 监听来电状态进行房间的静音和禁麦操作
@@ -328,6 +333,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         registerReceiver(bgChangBroadCast, intentFilter)
         ShareData()
         giftEggManager=NotifyManager(mContext as Activity?)
+        giftNotifyManager=GiftNotifyManager(mContext as Activity?)
     }
 
     private fun isLockFair(lock: String?, fair: String?, pure: String?) {
@@ -580,6 +586,38 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         img_gold_egg.setOnClickListener {
             val eggDialog = EggDialog(mContext)
+            eggDialog.setOnEggOpenListener(object : EggDialog.OnEggOpenListener {
+                override fun onEggOpened(data: List<EggBean.DataBean>) {
+                    //创建消息
+                    for(item in data){
+                        val msg=EggChatMessage()
+                        msg.giftName=item.sg_name
+                        msg.giftPrice="0"//TODO: Sincerly 是否需要价格？
+                        msg.name=mydatabean!!.data!!.nickname;
+                        val message = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, msg)
+                        RongIMClient.getInstance().sendMessage(message, null, null, object : IRongCallback.ISendMessageCallback {
+                            override fun onAttached(p0: Message?) {
+                                Log.d("tag", p0!!.content.toString())
+                            }
+
+                            override fun onSuccess(p0: Message?) {
+                                Log.d("tag", p0!!.content.toString())
+                            }
+
+                            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                Log.d("tag", p0!!.content.toString())
+                            }
+                        });
+                        if (chatListAdapter != null) {
+                            chatMessageList.add(message!!)
+                        }
+                    }
+                    runOnUiThread {
+                        chatListAdapter!!.notifyDataSetChanged()
+                        chatroom_list_chat.smoothScrollToPosition(chatListAdapter!!.count)
+                    }
+                }
+            })
             eggDialog.show()
         }
 
@@ -641,7 +679,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val giftBagDialog = GiftBagDialog(mContext, room_id!!)
             giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
                 override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String) {
-                    Log.d("tag", "onClck:"+toPosition.size)
                     showPositionGift(targetPosition, toPosition, gifPic, pic)
                     //发送小屏消息
                     for (bean in dataList){
@@ -2248,7 +2285,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     fun showPositionEmj(position: Int, emjGifUrl: String) {
-        onGiftMessage(null)
         var emjGifUrl = emjGifUrl
 //        emjGifUrl = "http://chitchat.rhhhyy.com/uploads/images/20190903/f5d5ee9871ffbd2c422e4f436a72181e.gif"
         val viewMap = java.util.HashMap<Int, View>()

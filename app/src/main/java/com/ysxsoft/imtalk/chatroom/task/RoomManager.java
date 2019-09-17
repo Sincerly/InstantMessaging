@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.ysxsoft.imtalk.bean.RoomPublicGiftMessageBean;
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.IMClient;
+import com.ysxsoft.imtalk.chatroom.im.message.EggChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
@@ -577,14 +578,22 @@ public class RoomManager {
     private class RoomMessageListener implements RongIMClient.OnReceiveMessageListener {
         @Override
         public boolean onReceived(final Message message, int i) {
-            Log.e("tag","onReceived:"+new Gson().toJson(message.getContent()));
+            Log.e("tag", "onReceived:" + new Gson().toJson(message.getContent()));
             synchronized (roomLock) {
                 Conversation.ConversationType conversationType = message.getConversationType();
                 if (conversationType == Conversation.ConversationType.CHATROOM) {
                     if (currentRoom == null) return false;
                     //判断chatRoomID
                     String targetId = message.getTargetId();
-                    if (!currentRoom.getRoomInfo().getRoom_id().equals(targetId)) return false;
+                    if (currentRoom.getRoomInfo() == null) {
+                        return false;
+                    }
+                    if (currentRoom.getRoomInfo().getRoom_id() == null) {
+                        return false;
+                    }
+                    if (!currentRoom.getRoomInfo().getRoom_id().equals(targetId)) {
+                        return false;
+                    }
                     final RoomEventListener roomEventlistener = currentRoomEventListener;
                     // 当为文本消息
                     if (message.getContent() instanceof TextMessage) {
@@ -808,12 +817,12 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if(message.getContent() instanceof GiftChatMessage){
+                    } else if (message.getContent() instanceof GiftChatMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(currentRoom!=null&&currentRoom.getMessageList()!=null){
+                                    if (currentRoom != null && currentRoom.getMessageList() != null) {
                                         currentRoom.getMessageList().add(message);
                                     }
                                     if (roomEventlistener != null) {
@@ -827,7 +836,7 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof MicPositionGiftValueMessage) {
+                    } else if (message.getContent() instanceof MicPositionGiftValueMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
@@ -837,7 +846,7 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomIsLockMessage){
+                    } else if (message.getContent() instanceof RoomIsLockMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
@@ -847,18 +856,18 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if(message.getContent() instanceof RoomPublicGiftMessage){
-                        Log.e("tag","收到礼物公屏消息");
+                    } else if (message.getContent() instanceof RoomPublicGiftMessage) {
                         //礼物/砸金蛋公屏Message
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    RoomPublicGiftMessage msg=new RoomPublicGiftMessage(message.getContent().encode());
-                                    String nums=msg.getGoldNums();//判断有没有金币数量
-                                    if("".equals(nums)){
+                                    RoomPublicGiftMessage msg = new RoomPublicGiftMessage(message.getContent().encode());
+                                    String nums = msg.getGoldNums();//判断有没有金币数量
+                                    if ("".equals(nums)) {
+                                        Log.e("tag", "收到礼物公屏消息");
                                         //送礼人昵称，头像，收礼人昵称，头像，礼物图片，礼物数量
-                                        RoomPublicGiftMessageBean messageBean=new RoomPublicGiftMessageBean();
+                                        RoomPublicGiftMessageBean messageBean = new RoomPublicGiftMessageBean();
                                         messageBean.setSendName(msg.getSendName());
                                         messageBean.setSendIcon(msg.getSendIcon());
                                         messageBean.setSlName(msg.getSlName());
@@ -867,7 +876,7 @@ public class RoomManager {
                                         messageBean.setGiftNums(msg.getGiftNums());
                                         roomEventlistener.onGiftMessage(messageBean);
                                         if (roomEventlistener != null) {
-                                            GiftChatMessage giftChatMessage=new GiftChatMessage();
+                                            GiftChatMessage giftChatMessage = new GiftChatMessage();
                                             //礼物名称
                                             giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
                                             giftChatMessage.setGiftPic(msg.getGiftPic());
@@ -882,16 +891,38 @@ public class RoomManager {
                                                 }
                                             });
                                         }
-                                    }else{
+                                    } else {
+                                        Log.e("tag", "收到砸金蛋公屏消息");
                                         //砸金蛋
-                                        //roomEventlistener.onGoldMessage(msg.getNickname(),msg.getSgName(),msg.getGoldNums());
+                                        if(roomEventlistener!=null){
+                                            roomEventlistener.onGoldMessage(msg.getNickname(),msg.getSgName(),"("+msg.getGoldNums()+"金币)");
+//                                            threadManager.runOnUIThread(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, eggChatMessage);
+//                                                    roomEventlistener.onMessageEvent(o);//保存消息
+//                                                }
+//                                            });
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    } else if (message.getContent() instanceof EggChatMessage) {
+                        //砸金蛋小屏消息
+                        if (roomEventlistener != null) {
+                            threadManager.runOnUIThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (roomEventlistener != null) {
+                                        roomEventlistener.onMessageEvent(message);
                                     }
                                 }
                             });
                         }
                     }
                     return true;
-                }else if(conversationType == Conversation.ConversationType.PRIVATE){
+                } else if (conversationType == Conversation.ConversationType.PRIVATE) {
                 }
                 return false;
             }

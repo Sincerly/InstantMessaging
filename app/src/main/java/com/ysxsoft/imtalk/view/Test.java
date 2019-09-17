@@ -41,5 +41,7 @@ public class Test {
 //        valueAnimator.setRepeatCount(0);
 //        valueAnimator.setDuration(800);
 //        valueAnimator.start();
+
+        boolean a=true|false;
     }
 }

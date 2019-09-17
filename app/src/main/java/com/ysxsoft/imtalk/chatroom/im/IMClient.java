@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
+import com.ysxsoft.imtalk.chatroom.im.message.EggChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.MicPositionControlMessage;
@@ -85,6 +86,7 @@ public class IMClient {
 
             RongIMClient.registerMessageType(RoomPublicGiftMessage.class);//礼物公屏幕消息
             RongIMClient.registerMessageType(GiftChatMessage.class);//礼物小屏消息
+            RongIMClient.registerMessageType(EggChatMessage.class);//金蛋小屏消息
         } catch (AnnotationNotFoundException e) {
             SLog.e(TAG, "Failed to register messages!!");
             e.printStackTrace();
