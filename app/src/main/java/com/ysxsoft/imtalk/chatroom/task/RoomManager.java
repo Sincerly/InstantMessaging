@@ -887,8 +887,8 @@ public class RoomManager {
                                 }
                             });
                         }
+                        return true;
                     }
-                    return true;
                 }
                 return false;
             }

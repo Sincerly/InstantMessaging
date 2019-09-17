@@ -18,7 +18,7 @@ import io.rong.imlib.model.UserInfo;
 /**
  * 全局礼物消息
  */
-@MessageTag(value = "CR:GiftMsg", flag = MessageTag.NONE)
+@MessageTag(value = "Stu:score", flag = MessageTag.NONE)
 public class RoomPublicGiftMessage extends MessageContent {
     private final String TAG = RoomPublicGiftMessage.class.getSimpleName();
     private String sendName;

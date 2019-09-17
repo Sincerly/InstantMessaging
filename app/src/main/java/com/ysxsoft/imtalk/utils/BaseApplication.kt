@@ -76,7 +76,7 @@ class BaseApplication : MyApplication() {
         PlatformConfig.setWeixin("wx9f167bc9812eb1dc", "efa8793c110273a2af04f92d53acde45");//s:  appId   s1: AppSecret
         PlatformConfig.setQQZone("101762831", "9b5d79670b6aa08e27d23b00861522f3");//qq 的s:APP ID   s1：APP Key
 
-        RongIMClient.setOnReceiveMessageListener(MyReceiveMessageListener())
+        IMClient.getInstance().addMessageReceiveListener(MyReceiveMessageListener())
 
         RongIM.getInstance().setSendMessageListener(MySendMessageListener())
         setMyExtensionModule()
@@ -129,7 +129,10 @@ class BaseApplication : MyApplication() {
         override fun onReceived(p0: Message?, p1: Int): Boolean {
             Log.e("---->", p0.toString())
             if (p0 != null) {
-                saveUserInfo(p0)
+                try {
+                    saveUserInfo(p0)
+                }catch (e:Exception){
+                }
             }
             val intent = Intent("RECEIVEMESSAGE")
             sendBroadcast(intent)
