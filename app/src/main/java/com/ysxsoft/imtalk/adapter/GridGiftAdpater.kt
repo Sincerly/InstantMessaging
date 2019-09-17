@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -26,8 +27,10 @@ class GridGiftAdpater(mContext: Context) : ListBaseAdapter<DressMallBean.DataBea
         holder.getView<TextView>(R.id.tv_gold)!!.setText(bean.gold + "金币")
         if (bean.isSelect) {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.drawable.theme_fragme)
+            holder.getView<TextView>(R.id.tv_gold)!!.setTextColor(Color.parseColor("#FF38C9"))
         } else {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.color.transparent)
+            holder.getView<TextView>(R.id.tv_gold)!!.setTextColor(Color.parseColor("#686868"))
         }
         holder.itemView.setOnClickListener {
             if (onClickListener != null) {

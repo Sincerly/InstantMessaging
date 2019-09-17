@@ -78,10 +78,16 @@ class SendGiftDialog : ABSDialog {
             zsPopuwindows.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
                 override fun giftClick(times: String, id: String) {
                     dismiss()
-                    gift_num = times
-                    gift_id = id
-                    tv_zs.setText("赠送 x " + times)
-                    sendGift()
+                    if("-1".equals(times)){
+                        //选择了其他数量
+
+                    }else{
+                        gift_num = times
+                        gift_id = id
+                        tv_zs.setText("赠送 x " + times)
+                        //直接发送数量
+                        sendGift()
+                    }
                 }
             })
         }
@@ -163,7 +169,7 @@ class SendGiftDialog : ABSDialog {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
-                            tv_gold.setText(t.data.money+"金币")
+                            tv_user_gold.setText(t.data.money+"金币")
                         }
                     }
 

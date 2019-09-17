@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.chatroom.im.message.EggChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
@@ -22,10 +23,11 @@ import io.rong.message.TextMessage;
 
 public class RoomChatListAdapter extends BaseAdapter {
 
-    private static final int VIEW_TYPE_COUNT = 4;
+    private static final int VIEW_TYPE_COUNT = 5;
     private static final int VIEW_TYPE_CHAT_MESSAGE = 0;
     private static final int VIEW_TYPE_USER_CHANGED_INFO = 1;
     private static final int VIEW_TYPE_GIFT = 2;//礼物 小屏消息
+    private static final int VIEW_TYPE_EGG = 3;//砸金蛋  小屏消息
 
     private Context context;
     public List<Message> messageList;
@@ -90,6 +92,17 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.giftToName = contentView.findViewById(R.id.toName);
             viewHolder.giftInfo = contentView.findViewById(R.id.giftInfo);
             contentView.setTag(viewHolder);
+        }else if (viewType == VIEW_TYPE_EGG) {
+            //砸金蛋消息
+            LayoutInflater inflater = LayoutInflater.from(context);
+            contentView = inflater.inflate(R.layout.chatroom_item_egg, parent, false);
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.eggFromName = contentView.findViewById(R.id.fromName);
+            viewHolder.giftName = contentView.findViewById(R.id.eggName);
+            viewHolder.giftPrice = contentView.findViewById(R.id.eggPrice);
+            contentView.setTag(viewHolder);
+        }else{
+
         }
         return contentView;
     }
@@ -119,6 +132,12 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.giftFromName.setText(giftChatMessage.getName());
             viewHolder.giftToName.setText(giftChatMessage.getToName());
             viewHolder.giftInfo.setText(giftChatMessage.getGiftName()+"x"+giftChatMessage.getGiftNum());
+        }else if (viewType == VIEW_TYPE_EGG) {
+            EggChatMessage eggChatMessage = (EggChatMessage) message.getContent();
+            viewHolder.eggFromName.setText(eggChatMessage.getName());//砸金蛋人
+            viewHolder.giftName.setText(eggChatMessage.getGiftName());//砸出的礼物
+//            viewHolder.giftPrice.setText(eggChatMessage.getGiftPrice());//砸出的礼物价值
+            viewHolder.giftPrice.setText("");//砸出的礼物价值
         }else{
         }
     }
@@ -132,6 +151,8 @@ public class RoomChatListAdapter extends BaseAdapter {
             return VIEW_TYPE_USER_CHANGED_INFO;
         } else if (message.getContent() instanceof GiftChatMessage) {
             return VIEW_TYPE_GIFT;
+        }else if (message.getContent() instanceof EggChatMessage) {
+            return VIEW_TYPE_EGG;
         }
         return super.getItemViewType(position);
     }
@@ -154,6 +175,11 @@ public class RoomChatListAdapter extends BaseAdapter {
         TextView giftToName;
         TextView giftInfo;
         //礼物end
+        //砸金蛋start
+        TextView eggFromName;
+        TextView giftName;
+        TextView giftPrice;
+        //砸金蛋end
     }
 
     interface OnRoomChatListAdapterListener {

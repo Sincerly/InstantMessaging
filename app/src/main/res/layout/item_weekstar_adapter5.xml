@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="礼物名"
+        android:textSize="15sp"
+        android:textColor="@color/textColor28"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:lines="1"
+        />
+    <TextView
+        android:id="@+id/tvContent"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="奖励详情"
+        android:textSize="15sp"
+        android:textColor="@color/textColor28"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:lines="1"
+        />
+
+
+</LinearLayout>

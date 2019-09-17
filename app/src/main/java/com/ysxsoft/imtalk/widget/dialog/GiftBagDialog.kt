@@ -66,7 +66,7 @@ class GiftBagDialog : ABSDialog {
         }
 
         tv_zs.setOnClickListener {
-            if ("".equals(mwJson)||"[]".equals(mwJson)) {
+            if (mwJson==null||"".equals(mwJson)||"[]".equals(mwJson)) {
                 ToastUtils.showToast(this@GiftBagDialog.context, "赠送人不能为空")
                 return@setOnClickListener
             }
@@ -76,16 +76,53 @@ class GiftBagDialog : ABSDialog {
                 return@setOnClickListener
             }
 
+            if(gift_num==null){
+                //TODO:Sincerly 送礼物默认1是否固定？
+                gift_num="1"
+                gift_id="1"
+            }
+            dismiss()
+            sendGift()
+        }
+
+        inputNumberLayout.setOnClickListener {
             val zsPopuwindows = ZSPopuwindows(this@GiftBagDialog.context, R.layout.zs_layout, tv_zs)
             zsPopuwindows.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
                 override fun giftClick(times: String, id: String) {
-                    dismiss()
-                    gift_num = times
-                    gift_id = id
-                    tv_zs.setText("赠送 x " + times)
-                    sendGift()
+                    if("-1".equals(times)){
+                        //选择了其他数量
+                    }else {
+                        gift_num = times
+                        gift_id = id
+                        tv_zs.setText("赠送 x " + times)
+                        inputNumber.setText(times)
+                    }
                 }
             })
+        }
+
+        allMic.setOnClickListener {
+            if(allMic.isSelected){
+                allMic.isSelected=false
+                //全部取消
+                for (bean in micPositons!!) {
+                    bean.isChoosed=false
+                }
+            }else{
+                allMic.isSelected=true
+                //全麦
+                val micData= ArrayList<String>()
+                for (bean in micPositons!!) {
+                    if(!bean.uid.toString().equals(AuthManager.getInstance().currentUserId)){
+                        bean.isChoosed=true
+                        micData.add(bean.uid.toString())
+                    }
+                }
+                val gson=Gson();
+                mwJson=gson.toJson(micData);//选择的麦位用户id数组
+
+            }
+            micPostionAdapter!!.notifyDataSetChanged()
         }
     }
 
@@ -206,7 +243,6 @@ class GiftBagDialog : ABSDialog {
                                     gifurl = bageAdpater.dataList.get(position).aw_gif
                                     gifname = bageAdpater.dataList.get(position).aw_name
                                     pic = bageAdpater.dataList.get(position).aw_images
-                                    //TODO: Sincerly ：缺少数量？
                                     bageAdpater.setSelect(position)
                                 }
                             })
@@ -285,7 +321,15 @@ class GiftBagDialog : ABSDialog {
                             manager.orientation = LinearLayoutManager.HORIZONTAL
                             recyclerView.layoutManager = manager
                             recyclerView.adapter = micPostionAdapter
-                            micPostionAdapter!!.addAll(t.data)
+
+                            val micData= ArrayList<RoomMicListBean.DataBean>()
+                            for (item in micPositons!!){
+                                if(item.uid!=0){
+                                    micData!!.add(item)
+                                }
+                            }
+                            micPositons=micData
+                            micPostionAdapter!!.addAll(micPositons!!)
                             micPostionAdapter!!.setOnClickListener(object : MicPostionAdapter.OnClickListener {
                                 override fun onClick(position: Int) {
                                     //循环获取
@@ -299,18 +343,23 @@ class GiftBagDialog : ABSDialog {
                                         ToastUtils.showToast(context,"选择麦位无人!")
                                         return
                                     }
-
                                     //mwuid = micPostionAdapter!!.dataList.get(position).uid.toString()
                                     //toPosition = micPostionAdapter!!.dataList.get(position).sort
                                     val bean = micPostionAdapter!!.dataList.get(position)
                                     bean.isChoosed = !bean.isChoosed;
-
                                     val micData= ArrayList<String>()
+                                    var isAllSelected=true
                                     for (bean in micPositons!!) {
                                         if(bean.isChoosed){
                                             micData.add(bean.uid.toString())
+                                        }else{
+                                            if(!bean.uid.toString().equals(AuthManager.getInstance().currentUserId)){
+                                                //剔除房主
+                                                isAllSelected=false
+                                            }
                                         }
                                     }
+                                    allMic.isSelected=isAllSelected
                                     val gson=Gson();
                                     mwJson=gson.toJson(micData);//选择的麦位用户id数组
                                     micPostionAdapter!!.notifyDataSetChanged()

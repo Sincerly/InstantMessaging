@@ -140,6 +140,10 @@ public class RoomPublicGiftMessage extends MessageContent {
             jsonObj.put("sl_icon",slIcon);
             jsonObj.put("gift_pic", giftPic);
             jsonObj.put("gift_nums", giftNums);
+
+            jsonObj.put("nickname", nickname);
+            jsonObj.put("sg_name", sgName);
+            jsonObj.put("gold_nums", goldNums);
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
             return bytes;
         } catch (UnsupportedEncodingException e) {
