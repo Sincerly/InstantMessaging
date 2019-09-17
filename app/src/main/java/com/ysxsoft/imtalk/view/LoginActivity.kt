@@ -77,6 +77,12 @@ class LoginActivity : BaseActivity() {
                 showToastMessage("密码不能为空")
                 return@setOnClickListener
             }
+
+             if (ed_pwd.text.toString().trim().length<6) {
+                showToastMessage("密码不能少于六位")
+                return@setOnClickListener
+            }
+
             saveData()
         }
     }

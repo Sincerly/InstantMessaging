@@ -46,6 +46,7 @@ private const val ARG_POSITION = "position"
  * 房间子页面 （推荐，女神，男神，娱乐，情感电台。。。）
  */
 class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.OnRefreshListener {
+    var customDialog:CustomDialog?=null
     override fun onRefresh() {
         initUi()
     }
@@ -145,11 +146,13 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 
                     override fun onNext(t: HomeFRoomBean?) {
                         if (t!!.code == 0) {
+                            customDialog!!.dismiss()
                             refreshLayout.isRefreshing = false
                             roomLists = t.data.get(0).roomList
                             init1Adapter()
                         } else {
                             refreshLayout.isRefreshing = false
+                            customDialog!!.dismiss()
                         }
                     }
 
@@ -225,6 +228,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 
                     override fun onNext(t: HomeRoomBean?) {
                         if (t!!.code == 0) {
+                            customDialog!!.dismiss()
                             refreshLayout.isRefreshing = false
                             tuijainDatas = t.data.get(0).roomList
                             tv_gftj.setText(t.data.get(0).cname)
@@ -232,6 +236,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                             onRefresh()
                         } else {
                             refreshLayout.isRefreshing = false
+                            customDialog!!.dismiss()
                         }
                     }
 
@@ -243,6 +248,8 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
     }
 
     override fun initUi() {
+        customDialog = CustomDialog(mContext, "正在加载....")
+        customDialog!!.show()
         requestMyData()
         banner.visibility = if (0 == position) View.VISIBLE else View.GONE
         refreshLayout.setOnRefreshListener(this)
@@ -382,8 +389,6 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     }
                 })
     }
-
-
 
     companion object {
         @JvmStatic

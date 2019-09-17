@@ -10,16 +10,25 @@ import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.MsgChatListAdapter
+import com.ysxsoft.imtalk.bean.SysMessageBean
 import com.ysxsoft.imtalk.bean.UserInfo
+import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
+import com.ysxsoft.imtalk.utils.ImageLoadUtil
+import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.SysCustomerBanner
 import io.rong.imkit.RongIM
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.fm_msg1.*
 import io.rong.imkit.model.ConversationProviderTag
+import kotlinx.android.synthetic.main.sys_customer_layout.view.*
 import org.litepal.LitePal
 import org.litepal.extension.find
+import rx.Observer
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 
 /**
@@ -37,7 +46,7 @@ class Msg1Fragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter("RECEIVEMESSAGE")
-        if(myBroadcast==null){
+        if (myBroadcast == null) {
             myBroadcast = MyBroadcast()
         }
         activity!!.registerReceiver(myBroadcast, intentFilter)
@@ -46,7 +55,7 @@ class Msg1Fragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(mContext)
         mLuRecyclerViewAdapter = LuRecyclerViewAdapter(mAdapter)
         recyclerView.setAdapter(mLuRecyclerViewAdapter)
-        mLuRecyclerViewAdapter!!.addHeaderView(SysCustomerBanner(mContext))
+//        mLuRecyclerViewAdapter!!.addHeaderView(SysCustomerBanner(mContext))
 
         val divider = LuDividerDecoration.Builder(activity, mLuRecyclerViewAdapter)
                 .setHeight(R.dimen.default_divider_height)
@@ -56,14 +65,17 @@ class Msg1Fragment : BaseFragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.addItemDecoration(divider)
 
+        requestHeadData()
         conversionList()
     }
-    var userInfo:UserInfo?=null
+
+    var userInfo: UserInfo? = null
     private fun conversionList() {
         RongIMClient.getInstance().getConversationList(object : RongIMClient.ResultCallback<MutableList<Conversation>>() {
             override fun onSuccess(datas: MutableList<Conversation>?) {
+                Log.e("---->", "" + datas?.size)
                 if (datas != null) {
-                    mAdapter!!.addAll(datas)
+                    mAdapter!!.setDataList(datas)
                     mAdapter!!.notifyDataSetChanged()
                 }
             }
@@ -77,13 +89,13 @@ class Msg1Fragment : BaseFragment() {
 
                 val targetId = mAdapter!!.dataList.get(position).targetId
                 val type = mAdapter!!.dataList.get(position).conversationType
-                val list = LitePal.where("uid=?", targetId).find<com.ysxsoft.imtalk.bean.UserInfo>()
-                if(list.size>0){
-                     userInfo = list.get(0)
+                val list = LitePal.where("uid=?", targetId).find<UserInfo>()
+                if (list.size > 0) {
+                    userInfo = list.get(0)
                 }
                 when (type) {
                     Conversation.ConversationType.PRIVATE -> {
-                        RongIM.getInstance().startPrivateChat(getActivity(),targetId, userInfo!!.nikeName);
+                        RongIM.getInstance().startPrivateChat(getActivity(), targetId, userInfo!!.nikeName)
                     }
                     Conversation.ConversationType.GROUP -> {
                         RongIM.getInstance().startGroupChat(getActivity(), targetId, "标题");
@@ -97,6 +109,37 @@ class Msg1Fragment : BaseFragment() {
                 }
             }
         })
+    }
+
+    private fun requestHeadData() {
+        NetWork.getService(ImpService::class.java)
+                .sysmessage(SpUtils.getSp(mContext, "uid"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<SysMessageBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: SysMessageBean?) {
+                        if (t!!.code == 0) {
+                            for (bean in t.data.userInfo) {
+                                var tempUser = UserInfo()
+                                tempUser.uid = "" + bean.id             //UID
+                                tempUser.nikeName = bean.nickname   //昵称
+                                tempUser.icon = bean.icon          //头像
+                                tempUser.isSys = true
+                                tempUser.save()
+                                RongIMClient.getInstance().setConversationToTop(Conversation.ConversationType.PRIVATE, "" + bean.id, true)
+                            }
+                            if (mAdapter != null) {
+                                mAdapter!!.notifyDataSetChanged()
+                            }
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
     }
 
     inner class MyBroadcast : BroadcastReceiver() {

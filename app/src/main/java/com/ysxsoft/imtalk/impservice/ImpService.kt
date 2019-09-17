@@ -402,7 +402,6 @@ interface ImpService {
 //                 @Field("user_bank_id") user_bank_id: String): Observable<ZSBankBean>
 
 
-
     @FormUrlEncoded
     @POST("Refund/tx")
     fun TxAli(@Field("uid") uid: String,
@@ -592,6 +591,9 @@ interface ImpService {
 
     @POST("users/get_real_info")
     fun get_real_info(@Body body: RequestBody): Observable<GetRealInfoBean>
+
+    @POST("Room/isAdmin")
+    fun isAdmin(@Body body: RequestBody): Observable<IsAdminBean>
 
 
 }

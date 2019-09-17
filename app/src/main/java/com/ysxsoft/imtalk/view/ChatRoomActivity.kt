@@ -100,7 +100,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
-        fair=isFair
+        fair = isFair
         //房间是否加锁  是否纯净模式  是否开启公屏
         isLockFair(isLock, isFair, isPure)
     }
@@ -137,7 +137,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         showPositionEmj(p, url)
     }
 
-    override fun onRoomGift(p: Int, toP:List<Int>, giftUrl: String, staticUrl: String) {
+    override fun onRoomGift(p: Int, toP: List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
         Log.e("tag", "onRoomGift");
         showPositionGift(p, toP, giftUrl, staticUrl)
@@ -263,6 +263,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var mydatabean: UserInfoBean? = null
     var shareBean: ShareUserBean.DataBean? = null
     var bgChangBroadCast: BgChangBroadCast? = null
+    var amdinType = -1
 
     /**
      * 监听来电状态进行房间的静音和禁麦操作
@@ -322,6 +323,33 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val intentFilter = IntentFilter("BGCHANG")
         registerReceiver(bgChangBroadCast, intentFilter)
         ShareData()
+        AdminData()
+    }
+
+    private fun AdminData() {
+        val map = HashMap<String, String>()
+        map.put("room_id", room_id!!)
+        map.put("uid", AuthManager.getInstance().currentUserId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .isAdmin(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<IsAdminBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: IsAdminBean?) {
+                        if (t!!.code == 0) {
+                            amdinType = t.data
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
     }
 
     private fun isLockFair(lock: String?, fair: String?, pure: String?) {
@@ -469,8 +497,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             friendDialog.show()
         }
 
-        img_head.setOnClickListener {
-            //            GiveDialog(mContext, detailRoomInfo!!.roomInfo.uid, room_id!!).show()
+        tv_online.setOnClickListener {
+            OnlineListActivity.starOnlineListActivity(mContext, room_id!!)
         }
 
         img_right_img.setOnClickListener {
@@ -549,8 +577,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_send.setOnClickListener {
-            if (!"0".equals(fair)){
+            if (!"0".equals(fair)) {
                 showToastMessage("当前为公屏模式")
+                hideInputKeyboard();
                 return@setOnClickListener
             }
 
@@ -568,8 +597,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         chatroom_iv_sound_control.setOnClickListener {
-            //            OnLineActivity.starOnLineActivity(mContext, room_id!!)
-            OnlineListActivity.starOnlineListActivity(mContext, room_id!!)
+            startActivity(MsgActivity::class.java)
         }
 
         img_gold_egg.setOnClickListener {
@@ -635,11 +663,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val giftBagDialog = GiftBagDialog(mContext, room_id!!)
             giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
                 override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String) {
-                    Log.d("tag", "onClck:"+toPosition.size)
+                    Log.d("tag", "onClck:" + toPosition.size)
                     showPositionGift(targetPosition, toPosition, gifPic, pic)
                     //发送小屏消息
-                    for (bean in dataList){
-                        if(bean.isChoosed){
+                    for (bean in dataList) {
+                        if (bean.isChoosed) {
                             val giftChatMessage = GiftChatMessage()
                             giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
                             giftChatMessage.toName = bean.nickname//接收人
@@ -703,7 +731,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         setMicSeaViewList()
         // 默认麦克不可用
         enableUseMic(false)
-        defaultMarginBottom = DisplayUtils.dp2px(this, 8)
+        defaultMarginBottom = DisplayUtils.dp2px(this, 10)
 
         //启用软件弹出监听
         enableKeyboardStateListener(true)
@@ -976,7 +1004,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         updateMicSeatState(detailRoomInfo!!.getMicPositions())
 
         // 判断是否可以设置房间
-        if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid)) {
+        if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid) || amdinType == 1) {
             chatroom_setting.setVisibility(View.VISIBLE)
             img_simle.visibility = View.VISIBLE
             tv_music.visibility = View.VISIBLE
@@ -1175,7 +1203,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     //设置房间标题
     private fun updateRoomTitle(room_name: String?, room_num: String?, memcount: String) {
         updataRoomManager()
-        tv_id.setText("ID：" + room_num + "  " + memcount + "人在线")
+        tv_id.setText("ID：" + room_num)
+        tv_online.setText(memcount + "人在线")
         tv_sys_notice.setText("系统公告：" + detailRoomInfo!!.roomInfo.room_notice)
     }
 
@@ -1250,7 +1279,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val is_wheat = targetMicPositionInfo.is_wheat //	是否上麦 0 下麦；1 上麦
         val is_oc_wheat = targetMicPositionInfo.is_oc_wheat //		是否闭麦：0 开麦；1 闭麦
 
-        if (detailRoomInfo!!.roomInfo.uid.equals(SpUtils.getSp(mContext, "uid"))) {//房主
+        if (detailRoomInfo!!.roomInfo.uid.equals(SpUtils.getSp(mContext, "uid"))) {//房主或 管理员
             if ("0".equals(userId)) {//判断点击麦位是否为空
                 val seatMicDialog = UpperSeatMicDialog(mContext)
                 seatMicDialog.findViewById<TextView>(R.id.tv_sm).visibility = View.GONE
@@ -1373,6 +1402,134 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
                 })
                 giveDialog.show()
+            }
+        } else if (amdinType == 1) {//如果我是管理员
+            if ("0".equals(userId)) {//判断点击麦位是否为空
+                val seatMicDialog = UpperSeatMicDialog(mContext)
+                seatMicDialog.findViewById<TextView>(R.id.tv_sm).visibility = View.GONE
+                if ("0".equals(is_lock_wheat)) {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).setText("解麦")
+                } else {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).setText("锁麦")
+                }
+                if ("0".equals(is_oc_wheat)) {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+                } else {
+                    seatMicDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+                }
+
+                seatMicDialog.setOnDialogClickListener(object : UpperSeatMicDialog.OnDialogClickListener {
+                    override fun SMclick(view: TextView) {
+
+                    }
+
+                    override fun BTSMclick(view: TextView) {
+                        val intent = Intent(mContext, OnLineActivity::class.java)
+                        intent.putExtra("roomId", detailRoomInfo!!.roomInfo.room_id)
+                        startActivityForResult(intent, 1033)
+                    }
+
+                    override fun CSMclick(view: TextView) {
+                        if ("0".equals(is_lock_wheat)) {
+                            LockWheat(room_id, micPosition, "2", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        } else {
+                            LockWheat(room_id, micPosition, "1", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        }
+                    }
+
+                    override fun BMclick(view: TextView) {
+                        if ("0".equals(is_oc_wheat)) {
+                            OcWheat(room_id, micPosition, "2", userId)
+                        } else {
+                            OcWheat(room_id, micPosition, "1", userId)
+                        }
+                    }
+                })
+                seatMicDialog.show()
+            }
+            else if (!"0".equals(userId) && "0".equals(is_admin)) {// 点击有人麦位
+                val giveDialog = GiveDialog(mContext, userId, room_id!!)
+                val tv_setting_manager = giveDialog.findViewById<TextView>(R.id.tv_setting_manager)
+                val tv_move_manager = giveDialog.findViewById<TextView>(R.id.tv_move_manager)
+                val zw = giveDialog.findViewById<TextView>(R.id.zw)
+                val tv_btxm = giveDialog.findViewById<TextView>(R.id.tv_btxm)
+                if ("0".equals(is_lock_wheat)) {
+                    giveDialog.findViewById<TextView>(R.id.tv_scm).setText("解麦")
+                } else {
+                    giveDialog.findViewById<TextView>(R.id.tv_scm).setText("锁麦")
+                }
+                if ("0".equals(is_oc_wheat)) {
+                    giveDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+                } else {
+                    giveDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+                }
+
+                if ("1".equals(is_admin)) {
+                    tv_setting_manager.visibility = View.GONE
+                    tv_move_manager.visibility = View.VISIBLE
+                    zw.visibility = View.INVISIBLE
+                } else {
+                    tv_setting_manager.visibility = View.VISIBLE
+                    tv_move_manager.visibility = View.GONE
+                    zw.visibility = View.INVISIBLE
+                }
+                giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                    override fun BmClick() {//闭麦
+                        if ("0".equals(is_oc_wheat)) {
+                            OcWheat(room_id, micPosition, "2", userId)
+                        } else {
+                            OcWheat(room_id, micPosition, "1", userId)
+                        }
+                    }
+
+                    override fun BtxmClick() {//抱TA下麦
+                        ExitMic(userId, micPosition)
+                    }
+
+                    override fun ScmClick() {//锁麦
+                        if ("0".equals(is_lock_wheat)) {
+                            LockWheat(room_id, micPosition, "2", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        } else {
+                            LockWheat(room_id, micPosition, "1", userId)//	是否锁麦：1 锁麦； 2 已解麦
+                        }
+                    }
+
+                    override fun removeManager() {
+                        RemoveManager(userId, room_id!!, "2")
+                    }
+
+                    override fun setManager() {
+                        BlackManager(userId, room_id!!, "2", "", "")
+                    }
+
+                    override fun setExit() {
+                        ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
+                    }
+
+                    override fun blackList() {
+                        BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
+                    }
+
+                    override fun clickGiveGift() {
+                        GiftBagDialog(mContext, room_id!!).show()
+                    }
+
+                    override fun clickPrivateChat() {
+                        RongIM.getInstance().startPrivateChat(mContext, userId, "标题");
+                    }
+
+                    override fun clickGiveZb() {
+                        showToastMessage("装扮")
+                    }
+
+                    override fun clickFoucsOn() {
+                        FocusOnData(SpUtils.getSp(mContext, "uid"), userId, "1")
+                    }
+                })
+                giveDialog.show()
+            }
+            else if(!"0".equals(userId) && "1".equals(is_admin)){
+                showToastMessage("暂无权限操作")
             }
         } else { //非房主  点击控麦位
             if ("0".equals(userId)) {
@@ -2178,7 +2335,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         homeSettingDialog.show()
     }
 
-    var fair:String?=null
+    var fair: String? = null
 
     override fun onResume() {
         super.onResume()

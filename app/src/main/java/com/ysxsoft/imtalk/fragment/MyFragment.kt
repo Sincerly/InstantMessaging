@@ -101,6 +101,11 @@ class MyFragment : BaseFragment() {
                             tv_foucs_on.setText(t.data.gzrs.toString())
                             tv_level.setText(t.data.user_level.toString())
                             tv_mlz.setText(t.data.charm_level.toString())
+                            if (t.data.sex.equals("1")){
+                                img_sex.setImageResource(R.mipmap.img_boy)
+                            }else{
+                                img_sex.setImageResource(R.mipmap.img_girl)
+                            }
                         }
                     }
 

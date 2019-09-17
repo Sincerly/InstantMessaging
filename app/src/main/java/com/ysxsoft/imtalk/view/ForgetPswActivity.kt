@@ -68,6 +68,12 @@ class ForgetPswActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
+              if (et_psw1.text.toString().trim().length<6) {
+                showToastMessage("新密码不能少于六位")
+                return@setOnClickListener
+            }
+
+
             if (TextUtils.isEmpty(et_psw2.text.toString().trim())) {
                 showToastMessage("密码不能为空")
                 return@setOnClickListener

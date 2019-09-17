@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.opengl.Visibility
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
@@ -33,13 +34,22 @@ class MsgChatListAdapter(mContext: Context) : ListBaseAdapter<Conversation>(mCon
         if (beans.size > 0) {
             ImageLoadUtil.GlideHeadImageLoad(mContext, beans.get(0).icon.toString(), holder.getView<CircleImageView>(R.id.img_head)!!)
             holder.getView<TextView>(R.id.tv_nikeName)!!.setText(beans.get(0).nikeName)
-            holder.getView<TextView>(R.id.tv_zs_num)!!.setText(beans.get(0).zsl)
-            when (beans.get(0).sex) {
-                "1" -> {
-                    holder.getView<ImageView>(R.id.img_sex)!!.setImageResource(R.mipmap.img_boy)
-                }
-                "2" -> {
-                    holder.getView<ImageView>(R.id.img_sex)!!.setImageResource(R.mipmap.img_girl)
+            var tv_zsl = holder.getView<TextView>(R.id.tv_zs_num)
+            var iv_sex = holder.getView<ImageView>(R.id.img_sex)
+            if (beans[0].isSys!!) {
+                tv_zsl!!.visibility = View.GONE
+                iv_sex!!.visibility = View.GONE
+            } else {
+                tv_zsl!!.visibility = View.VISIBLE
+                iv_sex!!.visibility = View.VISIBLE
+                tv_zsl.setText(beans.get(0).zsl)
+                when (beans.get(0).sex) {
+                    "1" -> {
+                        iv_sex.setImageResource(R.mipmap.img_boy)
+                    }
+                    "2" -> {
+                        iv_sex.setImageResource(R.mipmap.img_girl)
+                    }
                 }
             }
         }
@@ -75,26 +85,9 @@ class MsgChatListAdapter(mContext: Context) : ListBaseAdapter<Conversation>(mCon
         }
 
         when (bean.conversationType) {
-            Conversation.ConversationType.PRIVATE -> {//私聊
-                holder.getView<ImageView>(R.id.img_sex)!!.visibility = View.VISIBLE
-                holder.getView<TextView>(R.id.tv_zs_num)!!.visibility = View.VISIBLE
-            }
             Conversation.ConversationType.GROUP -> {//群聊
-                holder.getView<ImageView>(R.id.img_sex)!!.visibility = View.VISIBLE
-                holder.getView<TextView>(R.id.tv_zs_num)!!.visibility = View.VISIBLE
-            }
-            Conversation.ConversationType.SYSTEM -> {//系统。
                 holder.getView<ImageView>(R.id.img_sex)!!.visibility = View.GONE
                 holder.getView<TextView>(R.id.tv_zs_num)!!.visibility = View.GONE
-                holder.getView<TextView>(R.id.tv_nikeName)!!.setText("系统消息")
-                holder.getView<CircleImageView>(R.id.img_head)!!.setBackgroundResource(R.mipmap.img_sys)
-            }
-
-            Conversation.ConversationType.CUSTOMER_SERVICE -> {//客服
-                holder.getView<ImageView>(R.id.img_sex)!!.visibility = View.GONE
-                holder.getView<TextView>(R.id.tv_zs_num)!!.visibility = View.GONE
-                holder.getView<TextView>(R.id.tv_nikeName)!!.setText("客服")
-                holder.getView<CircleImageView>(R.id.img_head)!!.setBackgroundResource(R.mipmap.img_kf)
             }
         }
 

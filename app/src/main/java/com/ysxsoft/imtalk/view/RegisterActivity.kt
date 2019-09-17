@@ -38,7 +38,7 @@ class RegisterActivity : BaseActivity() {
                 showToastMessage("手机号输入不正确")
                 return@setOnClickListener
             }
-            CountDownTimeHelper(60,tv_get_code)
+            CountDownTimeHelper(60, tv_get_code)
             SendMsg(et_phone.text.toString().trim())
         }
 
@@ -59,6 +59,10 @@ class RegisterActivity : BaseActivity() {
             }
             if (TextUtils.isEmpty(et_psw1.text.toString().trim())) {
                 showToastMessage("密码不能为空")
+                return@setOnClickListener
+            }
+            if (et_psw1.text.toString().trim().length < 6) {
+                showToastMessage("密码不能少于六位")
                 return@setOnClickListener
             }
 
@@ -83,20 +87,20 @@ class RegisterActivity : BaseActivity() {
 
     private fun saveData() {
         NetWork.getService(ImpService::class.java)
-                .Register(et_phone.text.toString().trim(),et_psw1.text.toString().trim(),et_psw2.text.toString().trim(),et_code.text.toString().trim(),"")
+                .Register(et_phone.text.toString().trim(), et_psw1.text.toString().trim(), et_psw2.text.toString().trim(), et_code.text.toString().trim(), "")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<RegisterBean>{
+                .subscribe(object : Observer<RegisterBean> {
                     override fun onError(e: Throwable?) {
 
                     }
 
                     override fun onNext(t: RegisterBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             loginToIM(t.data.token)
-                            SpUtils.saveSp(mContext,"chat_token",t.data.token)
-                            SpUtils.saveSp(mContext,"uid",t.data.uid)
-                            com.ysxsoft.imtalk.chatroom.utils.SpUtils.saveSp(mContext,"uid",t.data.uid.toString())
+                            SpUtils.saveSp(mContext, "chat_token", t.data.token)
+                            SpUtils.saveSp(mContext, "uid", t.data.uid)
+                            com.ysxsoft.imtalk.chatroom.utils.SpUtils.saveSp(mContext, "uid", t.data.uid.toString())
                             startActivity(ImprovingDataActivity::class.java)
                             finish()
                         }

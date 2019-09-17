@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.view
 
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -44,11 +45,12 @@ class BannerDetailActivity:BaseActivity(){
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object :Observer<BannerDetailBean>{
                     override fun onError(e: Throwable?) {
+                        Log.d(">>>>>>",e!!.message.toString())
                     }
 
                     override fun onNext(t: BannerDetailBean?) {
                         if (t!!.code==0) {
-                            web_content.loadDataWithBaseURL(null, t.data.get(0).content, "text/html", "utf-8", null)
+                            web_content.loadDataWithBaseURL(null, t.data.content, "text/html", "utf-8", null)
                         }
                     }
 

@@ -121,6 +121,7 @@
             android:layout_marginLeft="10dp"
             android:digits="@string/pwd_type"
             android:hint="输入密码"
+            android:maxLength="16"
             android:inputType="textPassword"
             android:singleLine="true" />
 
@@ -156,6 +157,7 @@
             android:layout_marginLeft="10dp"
             android:digits="@string/pwd_type"
             android:hint="确认密码"
+            android:maxLength="16"
             android:inputType="textPassword"
             android:singleLine="true" />
 

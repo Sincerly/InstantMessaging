@@ -1,7 +1,5 @@
 package com.ysxsoft.imtalk.bean;
 
-import java.util.List;
-
 /**
  * Create By 胡
  * on 2019/7/22 0022
@@ -11,12 +9,12 @@ public class BannerDetailBean {
     /**
      * code : 0
      * msg : 获取成功！
-     * data : [{"id":37,"content":"<p>fdsa<\/p>"}]
+     * data : {"id":39,"content":"<p>fdsa<\/p>"}
      */
 
     private int code;
     private String msg;
-    private List<DataBean> data;
+    private DataBean data;
 
     public int getCode() {
         return code;
@@ -34,17 +32,17 @@ public class BannerDetailBean {
         this.msg = msg;
     }
 
-    public List<DataBean> getData() {
+    public DataBean getData() {
         return data;
     }
 
-    public void setData(List<DataBean> data) {
+    public void setData(DataBean data) {
         this.data = data;
     }
 
     public static class DataBean {
         /**
-         * id : 37
+         * id : 39
          * content : <p>fdsa</p>
          */
 

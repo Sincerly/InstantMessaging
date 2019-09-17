@@ -15,4 +15,5 @@ class UserInfo : LitePalSupport() {
     var sex: String? = null
     var zsl: String? = null
     var uid: String? = null
+    var isSys: Boolean? = false //用来区分客服/系统消息还是普通消息
 }
