@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_solid_colorff_10">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewGiftTop"
+        android:layout_width="0dp"
+        android:layout_height="34dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="36dp"
+        />
+    <include
+        android:id="@+id/include_gold"
+        layout="@layout/include_crown_gold"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewGiftTop" />
+
+    <include
+        android:id="@+id/include_silver"
+        layout="@layout/include_crown_silver"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toStartOf="@+id/include_gold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewGiftTop"
+        />
+
+    <include
+        android:id="@+id/include_bronze"
+        layout="@layout/include_crown_bronze"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewGiftTop"
+        app:layout_constraintStart_toEndOf="@+id/include_gold" />
+
+    <com.ysxsoft.imtalk.widget.MyRecyclerView
+        android:id="@+id/recyclerViewStarList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="21dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include_silver" />
+
+
+
+</android.support.constraint.ConstraintLayout>

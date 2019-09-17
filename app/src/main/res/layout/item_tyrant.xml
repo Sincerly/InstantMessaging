@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:id="@+id/rl_jz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingTop="10dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/tvNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/color999999"
+            android:layout_centerVertical="true"
+            />
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_toEndOf="@+id/tvNo"
+            android:layout_marginStart="20dp"
+            />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/ivAvatar"
+            android:singleLine="true"
+            android:text="家族名称"
+            android:textColor="#ff282828"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/tvNumb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="11dp"
+            android:layout_toEndOf="@id/tvName"
+            android:layout_alignBaseline="@+id/tvName"
+            android:text="68"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:background="@drawable/shape_solid_colorcc_oval"
+            android:drawableStart="@mipmap/icon_zuan"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            />
+
+        <TextView
+            android:id="@+id/tvSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tvName"
+            android:text="28.1万"
+            android:textColor="#FE39CA"
+            android:textSize="15sp"
+            android:layout_alignParentEnd="true"
+            />
+
+        <TextView
+            android:id="@+id/tvId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvName"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="4dp"
+            android:layout_toRightOf="@id/ivAvatar"
+            android:text="ID:666"
+            android:textColor="#ff989898"
+            android:textSize="13dp" />
+
+        <TextView
+            android:id="@+id/tvGap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tvId"
+            android:text="距前一名"
+            android:textColor="#666666"
+            android:textSize="12sp"
+            android:layout_alignParentEnd="true"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <RelativeLayout
+        android:layout_width="90dp"
+        android:layout_height="130dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/shape_gradient_vertical">
+        <ImageView
+            android:id="@+id/ivLastWeekGift1"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/circle_gradient_weekstar"
+            android:src="@drawable/circle_gray_shape" />
+
+        <TextView
+            android:id="@+id/tvLastWeekGift1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivLastWeekGift1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="13dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="13dp"
+            android:gravity="center_horizontal"
+            android:lines="2"
+            android:text="hahahahahahah dolor sit"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

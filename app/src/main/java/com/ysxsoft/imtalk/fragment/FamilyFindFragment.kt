@@ -10,8 +10,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
-import com.ysxsoft.imtalk.view.NoticeActivity
-import com.ysxsoft.imtalk.view.QDActivity
+import com.ysxsoft.imtalk.view.*
 import kotlinx.android.synthetic.main.fm_family_find.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -48,15 +47,15 @@ class FamilyFindFragment : BaseFragment() {
     private fun initView() {
         //土豪榜
         tv1.setOnClickListener {
-
+            startActivity(TyrantListActivity::class.java)
         }
         //巨星榜
         tv2.setOnClickListener {
-
+            startActivity(SupperStarActivity::class.java)
         }
         //周星榜
         tv3.setOnClickListener {
-
+            startActivity(WeekStarActivity::class.java)
         }
         //签到
         tv4.setOnClickListener {

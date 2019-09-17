@@ -28,6 +28,14 @@ fun Glide.loadUrlCyclo(iv: ImageView, url: String?, def: Int) {
             .skipMemoryCache(true)//不做内存缓存
     Glide.with(context).load(url).apply(mRequestOptions).into(iv)
 }
+fun Glide.loadUrlCyclo(iv: ImageView, url: Int?, def: Int) {
+    val mRequestOptions = RequestOptions
+            .circleCropTransform()
+            .error(R.mipmap.icon_pic_error)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+            .skipMemoryCache(true)//不做内存缓存
+    Glide.with(context).load(url).apply(mRequestOptions).into(iv)
+}
 //圆角
 fun Glide.loadUrlRoundCorner(iv: ImageView, url: String?, def: Int, cornersSize: Float) {
     //设置图片圆角角度
