@@ -238,4 +238,25 @@
     <color name="bottom_dialog_bg">#FFFAFAFA</color>
 
 
+    <style name="BottomStyle" parent="@android:style/Theme.Dialog">
+        <!-- 背景透明 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <!-- 边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- Dialog以外的区域模糊效果 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 无标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- Dialog进入及退出动画 -->
+        <item name="android:windowAnimationStyle">@style/popWindowYAnimation</item>
+        <item name="android:windowSoftInputMode">stateAlwaysVisible</item><!--显示软件盘-->
+    </style>
+
+
+    <style name="popWindowYAnimation">
+        <item name="android:windowEnterAnimation">@anim/pop_bottom_out</item>
+        <item name="android:windowExitAnimation">@anim/pop_bottom_in</item>
+    </style>
+
 </resources>

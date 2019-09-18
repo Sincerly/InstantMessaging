@@ -26,12 +26,13 @@ public class RoomChatListAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_COUNT = 5;
     private static final int VIEW_TYPE_CHAT_MESSAGE = 0;
     private static final int VIEW_TYPE_USER_CHANGED_INFO = 1;
-    private static final int VIEW_TYPE_GIFT = 2;//礼物 小屏消息
-    private static final int VIEW_TYPE_EGG = 3;//砸金蛋  小屏消息
+    public static final int VIEW_TYPE_GIFT = 2;//礼物 小屏消息
+    public static final int VIEW_TYPE_EGG = 3;//砸金蛋  小屏消息
 
     private Context context;
     public List<Message> messageList;
     private OnRoomChatListAdapterListener onRoomChatListAdapterListener;
+    private OnGiftEggItemClickListener onGiftEggItemClickListener;
 
     public RoomChatListAdapter(Context context) {
         this.context = context;
@@ -83,7 +84,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.nickNameTv = contentView.findViewById(R.id.chatroom_item_chatlist_tv_nickname);
             viewHolder.messageTv = contentView.findViewById(R.id.chatroom_item_chatlit_tv_message);
             contentView.setTag(viewHolder);
-        }else if (viewType == VIEW_TYPE_GIFT) {
+        } else if (viewType == VIEW_TYPE_GIFT) {
             //礼物消息
             LayoutInflater inflater = LayoutInflater.from(context);
             contentView = inflater.inflate(R.layout.chatroom_item_gift, parent, false);
@@ -92,7 +93,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.giftToName = contentView.findViewById(R.id.toName);
             viewHolder.giftInfo = contentView.findViewById(R.id.giftInfo);
             contentView.setTag(viewHolder);
-        }else if (viewType == VIEW_TYPE_EGG) {
+        } else if (viewType == VIEW_TYPE_EGG) {
             //砸金蛋消息
             LayoutInflater inflater = LayoutInflater.from(context);
             contentView = inflater.inflate(R.layout.chatroom_item_egg, parent, false);
@@ -101,7 +102,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.giftName = contentView.findViewById(R.id.eggName);
             viewHolder.giftPrice = contentView.findViewById(R.id.eggPrice);
             contentView.setTag(viewHolder);
-        }else{
+        } else {
 
         }
         return contentView;
@@ -111,13 +112,13 @@ public class RoomChatListAdapter extends BaseAdapter {
         // 文本消息
         if (viewType == VIEW_TYPE_CHAT_MESSAGE) {
             TextMessage textMessage = (TextMessage) message.getContent();
-            viewHolder.nickNameTv.setText(textMessage.getUserInfo().getName()+":");
+            viewHolder.nickNameTv.setText(textMessage.getUserInfo().getName() + ":");
             viewHolder.messageTv.setText(textMessage.getContent());
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
             if (memberMessage.getUserInfo() != null) {
-                viewHolder.nickNameTv.setText(memberMessage.getUserInfo().getName()+":");
+                viewHolder.nickNameTv.setText(memberMessage.getUserInfo().getName() + ":");
             }
             RoomMemberChangedMessage.RoomMemberAction roomMemberAction = memberMessage.getRoomMemberAction();
             if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.JOIN) {
@@ -127,18 +128,21 @@ public class RoomChatListAdapter extends BaseAdapter {
             } else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_kick);
             }
-        }else if (viewType == VIEW_TYPE_GIFT) {
+        } else if (viewType == VIEW_TYPE_GIFT) {
             GiftChatMessage giftChatMessage = (GiftChatMessage) message.getContent();
             viewHolder.giftFromName.setText(giftChatMessage.getName());
             viewHolder.giftToName.setText(giftChatMessage.getToName());
-            viewHolder.giftInfo.setText(giftChatMessage.getGiftName()+"x"+giftChatMessage.getGiftNum());
-        }else if (viewType == VIEW_TYPE_EGG) {
+            viewHolder.giftInfo.setText(giftChatMessage.getGiftName() + "x" + giftChatMessage.getGiftNum());
+            viewHolder.giftFromName.setOnClickListener(new OnUserClickListener(giftChatMessage.getFromUid()));
+            viewHolder.giftToName.setOnClickListener(new OnUserClickListener(giftChatMessage.getToUid()));
+        } else if (viewType == VIEW_TYPE_EGG) {
             EggChatMessage eggChatMessage = (EggChatMessage) message.getContent();
             viewHolder.eggFromName.setText(eggChatMessage.getName());//砸金蛋人
             viewHolder.giftName.setText(eggChatMessage.getGiftName());//砸出的礼物
 //            viewHolder.giftPrice.setText(eggChatMessage.getGiftPrice());//砸出的礼物价值
             viewHolder.giftPrice.setText("");//砸出的礼物价值
-        }else{
+            viewHolder.eggFromName.setOnClickListener(new OnUserClickListener(eggChatMessage.getGiftSendUserId()));
+        } else {
         }
     }
 
@@ -151,7 +155,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             return VIEW_TYPE_USER_CHANGED_INFO;
         } else if (message.getContent() instanceof GiftChatMessage) {
             return VIEW_TYPE_GIFT;
-        }else if (message.getContent() instanceof EggChatMessage) {
+        } else if (message.getContent() instanceof EggChatMessage) {
             return VIEW_TYPE_EGG;
         }
         return super.getItemViewType(position);
@@ -188,6 +192,30 @@ public class RoomChatListAdapter extends BaseAdapter {
 
     public void setOnRoomChatListAdapterListener(OnRoomChatListAdapterListener onRoomChatListAdapterListener) {
         this.onRoomChatListAdapterListener = onRoomChatListAdapterListener;
+    }
+
+    public interface OnGiftEggItemClickListener {
+        void onClickUser(String userId);
+        //void onClickToUser(String userId);
+    }
+
+    public void setOnGiftEggItemClickListener(OnGiftEggItemClickListener onGiftEggItemClickListener) {
+        this.onGiftEggItemClickListener = onGiftEggItemClickListener;
+    }
+
+    class OnUserClickListener implements View.OnClickListener {
+        private String uid;
+
+        public OnUserClickListener(String uid) {
+            this.uid = uid;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(onGiftEggItemClickListener!=null){
+                onGiftEggItemClickListener.onClickUser(uid);
+            }
+        }
     }
 
 }

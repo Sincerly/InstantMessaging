@@ -21,6 +21,7 @@ public class EggChatMessage extends MessageContent {
     private String name;
     private String giftName;
     private String giftPrice;
+    private String giftSendUserId;
 
     public EggChatMessage() {
     }
@@ -33,6 +34,7 @@ public class EggChatMessage extends MessageContent {
             setName(jsonObj.optString("name"));
             setGiftName(jsonObj.optString("giftName"));
             setGiftPrice(jsonObj.optString("giftPrice"));
+            setGiftSendUserId(jsonObj.optString("giftSendUserId"));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -47,6 +49,7 @@ public class EggChatMessage extends MessageContent {
             jsonObj.put("name", getName());
             jsonObj.put("giftName", getGiftName());
             jsonObj.put("giftPrice", getGiftPrice());
+            jsonObj.put("giftSendUserId", getGiftSendUserId());
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
             return bytes;
         } catch (UnsupportedEncodingException e) {
@@ -68,12 +71,14 @@ public class EggChatMessage extends MessageContent {
         dest.writeString(this.name);
         dest.writeString(this.giftName);
         dest.writeString(this.giftPrice);
+        dest.writeString(this.getGiftSendUserId());
     }
 
     protected EggChatMessage(Parcel in) {
         this.name = in.readString();
         this.giftName = in.readString();
         this.giftPrice = in.readString();
+        this.giftSendUserId = in.readString();
     }
 
     public static final Creator<EggChatMessage> CREATOR = new Creator<EggChatMessage>() {
@@ -110,5 +115,13 @@ public class EggChatMessage extends MessageContent {
 
     public void setGiftPrice(String giftPrice) {
         this.giftPrice = giftPrice;
+    }
+
+    public String getGiftSendUserId() {
+        return giftSendUserId == null ? "" : giftSendUserId;
+    }
+
+    public void setGiftSendUserId(String giftSendUserId) {
+        this.giftSendUserId = giftSendUserId;
     }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/inputLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="@drawable/theme_shape"
+    android:orientation="horizontal"
+    android:paddingVertical="@dimen/dp_6">
+
+    <EditText
+        android:id="@+id/inputNum"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:hint="请输入赠送数额"
+        android:imeOptions="actionSend"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/submitNum"
+        android:layout_width="44dp"
+        android:layout_height="36dp"
+        android:layout_marginRight="@dimen/dp_18"
+        android:gravity="center"
+        android:text="确定"
+        android:textColor="@color/white" />
+</LinearLayout>

@@ -28,6 +28,8 @@ public class GiftChatMessage extends MessageContent {
     private String giftName;
     private String giftPic;
     private String giftNum;
+    private String fromUid;
+    private String toUid;
 
     public GiftChatMessage() {
     }
@@ -42,6 +44,8 @@ public class GiftChatMessage extends MessageContent {
             setGiftName(jsonObj.optString("giftName"));
             setGiftPic(jsonObj.optString("giftPic"));
             setGiftNum(jsonObj.optString("giftNum"));
+            setFromUid(jsonObj.optString("fromUid"));
+            setToUid(jsonObj.optString("toUid"));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -58,6 +62,8 @@ public class GiftChatMessage extends MessageContent {
             jsonObj.put("giftName", getGiftName());
             jsonObj.put("giftPic", getGiftPic());
             jsonObj.put("giftNum", getGiftNum());
+            jsonObj.put("fromUid", getFromUid());
+            jsonObj.put("toUid", getToUid());
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
             return bytes;
         } catch (UnsupportedEncodingException e) {
@@ -81,6 +87,8 @@ public class GiftChatMessage extends MessageContent {
         dest.writeString(this.giftName);
         dest.writeString(this.giftPic);
         dest.writeString(this.giftNum);
+        dest.writeString(this.fromUid);
+        dest.writeString(this.toUid);
     }
 
     protected GiftChatMessage(Parcel in) {
@@ -89,6 +97,8 @@ public class GiftChatMessage extends MessageContent {
         this.giftName = in.readString();
         this.giftPic = in.readString();
         this.giftNum = in.readString();
+        this.fromUid = in.readString();
+        this.toUid = in.readString();
     }
 
     public static final Creator<GiftChatMessage> CREATOR = new Creator<GiftChatMessage>() {
@@ -141,5 +151,21 @@ public class GiftChatMessage extends MessageContent {
 
     public void setGiftNum(String giftNum) {
         this.giftNum = giftNum;
+    }
+
+    public String getFromUid() {
+        return fromUid == null ? "" : fromUid;
+    }
+
+    public void setFromUid(String fromUid) {
+        this.fromUid = fromUid;
+    }
+
+    public String getToUid() {
+        return toUid == null ? "" : toUid;
+    }
+
+    public void setToUid(String toUid) {
+        this.toUid = toUid;
     }
 }

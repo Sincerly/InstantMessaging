@@ -5,7 +5,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
 import com.gcssloop.widget.PagerGridLayoutManager
 import com.gcssloop.widget.PagerGridSnapHelper
 import com.google.gson.Gson
@@ -37,7 +39,6 @@ import rx.schedulers.Schedulers
 class GiftBagDialog : ABSDialog {
 
     var type = 3
-    var gift_id: String? = null
     var gift_num: String? = null
     var roomId: String? = null
     var gifname: String? = null
@@ -45,6 +46,8 @@ class GiftBagDialog : ABSDialog {
     var num = 0
     var giftbage = 1
     private var sectionNum = StringBuffer()
+
+
     override fun initView() {
         tv1.isSelected = true
         tv1.setOnClickListener {
@@ -66,7 +69,7 @@ class GiftBagDialog : ABSDialog {
         }
 
         tv_zs.setOnClickListener {
-            if (mwJson==null||"".equals(mwJson)||"[]".equals(mwJson)) {
+            if (mwJson == null || "".equals(mwJson) || "[]".equals(mwJson)) {
                 ToastUtils.showToast(this@GiftBagDialog.context, "赠送人不能为空")
                 return@setOnClickListener
             }
@@ -76,12 +79,10 @@ class GiftBagDialog : ABSDialog {
                 return@setOnClickListener
             }
 
-            if(gift_num==null){
+            if (gift_num == null) {
                 //TODO:Sincerly 送礼物默认1是否固定？
-                gift_num="1"
-                gift_id="1"
+                gift_num = "1"
             }
-            dismiss()
             sendGift()
         }
 
@@ -89,11 +90,11 @@ class GiftBagDialog : ABSDialog {
             val zsPopuwindows = ZSPopuwindows(this@GiftBagDialog.context, R.layout.zs_layout, tv_zs)
             zsPopuwindows.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
                 override fun giftClick(times: String, id: String) {
-                    if("-1".equals(times)){
+                    if ("-1".equals(times)) {
                         //选择了其他数量
-                    }else {
+                        onGiftListener!!.needInputed()
+                    } else {
                         gift_num = times
-                        gift_id = id
                         tv_zs.setText("赠送 x " + times)
                         inputNumber.setText(times)
                     }
@@ -102,34 +103,43 @@ class GiftBagDialog : ABSDialog {
         }
 
         allMic.setOnClickListener {
-            if(allMic.isSelected){
-                allMic.isSelected=false
+            if (allMic.isSelected) {
+                allMic.isSelected = false
                 //全部取消
                 for (bean in micPositons!!) {
-                    bean.isChoosed=false
+                    bean.isChoosed = false
                 }
-            }else{
-                allMic.isSelected=true
+            } else {
+                allMic.isSelected = true
                 //全麦
-                val micData= ArrayList<String>()
+                val micData = ArrayList<String>()
                 for (bean in micPositons!!) {
-                    if(!bean.uid.toString().equals(AuthManager.getInstance().currentUserId)){
-                        bean.isChoosed=true
+                    if (!bean.uid.toString().equals(AuthManager.getInstance().currentUserId)) {
+                        bean.isChoosed = true
                         micData.add(bean.uid.toString())
                     }
                 }
-                val gson=Gson();
-                mwJson=gson.toJson(micData);//选择的麦位用户id数组
+                val gson = Gson();
+                mwJson = gson.toJson(micData);//选择的麦位用户id数组
 
             }
             micPostionAdapter!!.notifyDataSetChanged()
         }
     }
 
+    /**
+     * 设置礼物数量
+     */
+    public fun setGiftNum(num: String) {
+        gift_num = num
+        tv_zs.setText("赠送 x " + num)
+        inputNumber.setText(num)
+    }
+
     val uidList = ArrayList<String>()
     private fun sendGift() {
-        if(mwJson==null){
-            ToastUtils.showToast(context,"请选择赠送的人")
+        if (mwJson == null) {
+            ToastUtils.showToast(context, "请选择赠送的人")
             return
         }
         val map = HashMap<String, String>()
@@ -150,65 +160,67 @@ class GiftBagDialog : ABSDialog {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            uidList.clear()
-                            for (bean in micPositons!!) {
-                                uidList.add(bean.uid.toString())
-                            }
+                            dismiss()
                             if (onGiftListener != null) {
-                                val data= ArrayList<Int>()
-                                var fromPosition=-1;//默认不在麦位上
+                                val data = ArrayList<Int>()
+                                var fromPosition = -1;//默认不在麦位上
                                 for (bean in micPositons!!) {
                                     val sort = bean.sort
-                                    if(!bean.isChoosed){
-                                        if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
-                                            if(sort==0){
-                                                //自己是房主
-                                                fromPosition=8;
-                                            }else{
-                                                fromPosition=sort-1;
-                                            }
-                                        }
-                                    }
-                                    data.clear()
-
-                                    for (bean in micPositons!!) {
-                                        if(bean.isChoosed){
-                                            val sort = bean.sort
+                                    if ("".equals(targetUserId)) {
+                                        //默认全部赠送
+                                        if (!bean.isChoosed) {
                                             if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
-                                            }else{
-                                                if(sort==0){
-                                                    //加入房主
-                                                    data.add(8)
-                                                }else{
-                                                    //加入其它用户
-                                                    data.add(sort-1)
+                                                if (sort == 0) {
+                                                    //自己是房主
+                                                    fromPosition = 8;
+                                                } else {
+                                                    fromPosition = sort - 1;
                                                 }
                                             }
                                         }
+                                    } else {
+                                        //指定人赠送
+                                        if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
+                                            if (sort == 0) {
+                                                //自己是房主
+                                                fromPosition = 8;
+                                            } else {
+                                                fromPosition = sort - 1;
+                                            }
+                                        }
                                     }
-//                                    if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {//自己在麦位
-//                                        val sort = bean.sort
-//                                        if (sort == 0 && toPosition != 0) {//自己是房主    送其他人
-//                                            onGiftListener!!.onClck(8, toPosition - 1, pic!!, gifurl!!)
-//                                        } else if (sort == 0 && toPosition == 0) { //房主送房主
-//                                            onGiftListener!!.onClck(8, 8, pic!!, gifurl!!)
-//                                        } else {
-//                                            if (toPosition == 0) {//送房主
-//                                                onGiftListener!!.onClck(sort - 1, 8, pic!!, gifurl!!)
-//                                            } else {
-//                                                onGiftListener!!.onClck(sort - 1, toPosition - 1, pic!!, gifurl!!)
-//                                            }
-//                                        }
-//                                    }
                                 }
-//                                if (!uidList.contains(AuthManager.getInstance().currentUserId)) {//自己没在麦位上
-//                                    if (toPosition == 0) {//送房主
-//                                        onGiftListener!!.onClck(-1, 8, pic!!, gifurl!!)
-//                                    } else {//送其他人
-//                                        onGiftListener!!.onClck(-1, toPosition - 1, pic!!, gifurl!!)
-//                                    }
-//                                }
-                                onGiftListener!!.onClck(fromPosition,data,pic!!,micPositons!!,gifurl!!,gifname!!,gift_num!!)
+                                data.clear()
+                                for (bean in micPositons!!) {
+                                    val sort = bean.sort
+                                    if ("".equals(targetUserId)) {
+                                        if (bean.isChoosed) {
+                                            if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
+                                            } else {
+                                                if (sort == 0) {
+                                                    //加入房主
+                                                    data.add(8)
+                                                } else {
+                                                    //加入其它用户
+                                                    data.add(sort - 1)
+                                                }
+                                            }
+                                        }
+                                    }else{
+                                        if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
+                                        } else {
+                                            if (sort == 0) {
+                                                //加入房主
+                                                data.add(8)
+                                            } else {
+                                                //加入其它用户
+                                                data.add(sort - 1)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                onGiftListener!!.onClck(fromPosition, data, pic!!, micPositons!!, gifurl!!, gifname!!, gift_num!!,targetUserId,targetUserName)
                             }
                         } else {
                             ToastUtils.showToast(this@GiftBagDialog.context, t.msg)
@@ -272,6 +284,31 @@ class GiftBagDialog : ABSDialog {
                 })
     }
 
+
+    /**
+     * 获取好友资料以及信息
+     */
+    private fun getUserInfo(uid: String) {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(uid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            toUserName.setText(t.data.nickname)
+                            Glide.with(context).load(t.data.icon).into(toIcon)
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
     var giftid: String? = null
     var pic: String? = null
 
@@ -302,7 +339,7 @@ class GiftBagDialog : ABSDialog {
                 })
     }
 
-    var mwJson:String?=null
+    var mwJson: String? = null
     var toPosition = -2
     var micPositons: List<RoomMicListBean.DataBean>? = null
     var micPostionAdapter: MicPostionAdapter? = null
@@ -322,46 +359,46 @@ class GiftBagDialog : ABSDialog {
                             recyclerView.layoutManager = manager
                             recyclerView.adapter = micPostionAdapter
 
-                            val micData= ArrayList<RoomMicListBean.DataBean>()
-                            for (item in micPositons!!){
-                                if(item.uid!=0){
+                            val micData = ArrayList<RoomMicListBean.DataBean>()
+                            for (item in micPositons!!) {
+                                if (item.uid != 0) {
                                     micData!!.add(item)
                                 }
                             }
-                            micPositons=micData
+                            micPositons = micData
                             micPostionAdapter!!.addAll(micPositons!!)
                             micPostionAdapter!!.setOnClickListener(object : MicPostionAdapter.OnClickListener {
                                 override fun onClick(position: Int) {
                                     //循环获取
-                                    val uid=AuthManager.getInstance().currentUserId;
-                                    val data=micPostionAdapter!!.dataList.get(position);
-                                    if(data!!.uid.toString().equals(uid)){
-                                        ToastUtils.showToast(context,"不能送礼物给自己!")
+                                    val uid = AuthManager.getInstance().currentUserId;
+                                    val data = micPostionAdapter!!.dataList.get(position);
+                                    if (data!!.uid.toString().equals(uid)) {
+                                        ToastUtils.showToast(context, "不能送礼物给自己!")
                                         return
                                     }
-                                    if(data!!.uid==0){
-                                        ToastUtils.showToast(context,"选择麦位无人!")
+                                    if (data!!.uid == 0) {
+                                        ToastUtils.showToast(context, "选择麦位无人!")
                                         return
                                     }
                                     //mwuid = micPostionAdapter!!.dataList.get(position).uid.toString()
                                     //toPosition = micPostionAdapter!!.dataList.get(position).sort
                                     val bean = micPostionAdapter!!.dataList.get(position)
                                     bean.isChoosed = !bean.isChoosed;
-                                    val micData= ArrayList<String>()
-                                    var isAllSelected=true
+                                    val micData = ArrayList<String>()
+                                    var isAllSelected = true
                                     for (bean in micPositons!!) {
-                                        if(bean.isChoosed){
+                                        if (bean.isChoosed) {
                                             micData.add(bean.uid.toString())
-                                        }else{
-                                            if(!bean.uid.toString().equals(AuthManager.getInstance().currentUserId)){
+                                        } else {
+                                            if (!bean.uid.toString().equals(AuthManager.getInstance().currentUserId)) {
                                                 //剔除房主
-                                                isAllSelected=false
+                                                isAllSelected = false
                                             }
                                         }
                                     }
-                                    allMic.isSelected=isAllSelected
-                                    val gson=Gson();
-                                    mwJson=gson.toJson(micData);//选择的麦位用户id数组
+                                    allMic.isSelected = isAllSelected
+                                    val gson = Gson();
+                                    mwJson = gson.toJson(micData);//选择的麦位用户id数组
                                     micPostionAdapter!!.notifyDataSetChanged()
                                 }
                             })
@@ -382,7 +419,9 @@ class GiftBagDialog : ABSDialog {
         return R.layout.gift_bag_dialog_layout
     }
 
-    constructor(mContext: Context, room_id: String) : super(mContext) {
+    var layoutManager: PagerGridLayoutManager;
+
+    constructor(mContext: Context, room_id: String, targetUserId: String, targetUserName: String) : super(mContext) {
         roomId = room_id
         val window = window
         window.setGravity(Gravity.BOTTOM)
@@ -392,20 +431,46 @@ class GiftBagDialog : ABSDialog {
         window.attributes = params
 
         // 1.水平分页布局管理器
-        val layoutManager = PagerGridLayoutManager(2, 4, PagerGridLayoutManager.HORIZONTAL)
+        layoutManager = PagerGridLayoutManager(2, 4, PagerGridLayoutManager.HORIZONTAL)
         grid_view.setLayoutManager(layoutManager)
+
+        layoutManager.setPageListener(object : PagerGridLayoutManager.PageListener {
+            override fun onPageSelect(pageIndex: Int) {
+                giftIndicator.setCurrent(pageIndex)
+            }
+
+            override fun onPageSizeChanged(pageSize: Int) {
+                giftIndicator.setMax(pageSize)
+            }
+        })
 
         // 2.设置滚动辅助工具
         val pageSnapHelper = PagerGridSnapHelper()
         pageSnapHelper.attachToRecyclerView(grid_view)
 
-        MwData(room_id, mContext)
-        GiftData()
-        userInfo()
+        if ("".equals(targetUserId)) {
+            MwData(room_id, mContext)
+            micLayout.visibility = View.VISIBLE
+        } else {
+            getUserInfo(targetUserId)//获取别人信息
+            infoLayout.visibility = View.VISIBLE
+            val micData = ArrayList<String>()
+            micData.add(targetUserId)
+            val gson = Gson();
+            mwJson = gson.toJson(micData);
+        }
+        this.targetUserId = targetUserId;
+        this.targetUserName = targetUserName;
+        GiftData()//获取礼物数据
+        userInfo()//获取自己信息
     }
 
+    var targetUserId = "";
+    var targetUserName = "";
+
     interface OnGiftListener {
-        fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String,dataList:List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String)
+        fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String,targetUserId:String,targetUserName:String)
+        fun needInputed();
     }
 
     private var onGiftListener: OnGiftListener? = null

@@ -20,6 +20,7 @@ import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -43,6 +44,8 @@ import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter
+import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter.VIEW_TYPE_EGG
+import com.ysxsoft.imtalk.chatroom.adapter.RoomChatListAdapter.VIEW_TYPE_GIFT
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.*
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
@@ -73,6 +76,7 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
+import kotlinx.android.synthetic.main.view_input_num.*
 import okhttp3.Call
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -654,7 +658,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         val msg=EggChatMessage()
                         msg.giftName=item.sg_name
                         msg.giftPrice="0"//TODO: Sincerly 是否需要价格？
-                        msg.name=mydatabean!!.data!!.nickname;
+                        msg.name=mydatabean!!.data!!.nickname
+                        msg.giftSendUserId=AuthManager.getInstance().currentUserId
                         val message = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, msg)
                         RongIMClient.getInstance().sendMessage(message, null, null, object : IRongCallback.ISendMessageCallback {
                             override fun onAttached(p0: Message?) {
@@ -737,26 +742,61 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         chatroom_gift.setOnClickListener {
-            val giftBagDialog = GiftBagDialog(mContext, room_id!!)
-            giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
-                override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String) {
-                    showPositionGift(targetPosition, toPosition, gifPic, pic)
+            showGiftBagDialog("","")
+        }
+
+        //聊天列表
+        chatListAdapter = RoomChatListAdapter(this)
+        chatroom_list_chat.setAdapter(chatListAdapter)
+        chatListAdapter!!.setOnGiftEggItemClickListener(object : RoomChatListAdapter.OnGiftEggItemClickListener {
+            override fun onClickUser(userId: String?) {
+                showMessageUserInfoDialog(userId.toString(),room_id!!)
+
+            }
+        })
+        //麦位
+        setMicSeaViewList()
+        // 默认麦克不可用
+        enableUseMic(false)
+        defaultMarginBottom = DisplayUtils.dp2px(this, 10)
+
+        //启用软件弹出监听
+        enableKeyboardStateListener(true)
+    }
+
+    private fun showGiftBagDialog(targetUid:String,targetNickName:String) {
+        val giftBagDialog = GiftBagDialog(mContext, room_id!!,targetUid,targetNickName)
+        giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
+            override fun needInputed() {
+                //需要显示输入数量
+                var d = InputDialog(mContext, R.style.BottomStyle)
+                d.setListener(object : InputDialog.OnDialogClickListener {
+                    override fun input(giftNum: String?) {
+                        giftBagDialog.setGiftNum(giftNum.toString())
+                    }
+                })
+                d.showDialog()
+            }
+
+            override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String,targetUserName: String) {
+                showPositionGift(targetPosition, toPosition, gifPic, pic)
+                if("".equals(targetUserId)){
                     //发送小屏消息
-                    for (bean in dataList){
-                        if(bean.isChoosed){
+                    for (bean in dataList) {
+                        if (bean.isChoosed) {
                             val giftChatMessage = GiftChatMessage()
                             giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
                             giftChatMessage.toName = bean.nickname//接收人
                             giftChatMessage.giftName = gifName//礼物名称
                             giftChatMessage.giftPic = gifPic//礼物图片
                             giftChatMessage.giftNum = gifNum//礼物数量
+                            giftChatMessage.fromUid = AuthManager.getInstance().currentUserId.toString()
+                            giftChatMessage.toUid = bean.uid.toString()
                             //在本地保存一条数据
                             val o = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, giftChatMessage)
-
                             if (chatListAdapter != null) {
                                 chatMessageList.add(o!!)
                             }
-
                             RongIMClient.getInstance().sendMessage(o, null, null, object : IRongCallback.ISendMessageCallback {
                                 override fun onAttached(p0: Message?) {
                                     Log.d("tag", "attached:" + p0!!.content.toString())
@@ -795,22 +835,61 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             Log.d("tag", "onError:" + p0!!.content.toString())
                         }
                     });
+                }else{
+                    //赠送的是别人发送小屏消息
+                    val giftChatMessage = GiftChatMessage()
+                    giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
+                    giftChatMessage.toName = targetUserName//接收人
+                    giftChatMessage.giftName = gifName//礼物名称
+                    giftChatMessage.giftPic = gifPic//礼物图片
+                    giftChatMessage.giftNum = gifNum//礼物数量
+                    giftChatMessage.fromUid = AuthManager.getInstance().currentUserId.toString()
+                    giftChatMessage.toUid = targetUid.toString()
+                    //在本地保存一条数据
+                    val o = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, giftChatMessage)
+                    if (chatListAdapter != null) {
+                        chatMessageList.add(o!!)
+                    }
+                    RongIMClient.getInstance().sendMessage(o, null, null, object : IRongCallback.ISendMessageCallback {
+                        override fun onAttached(p0: Message?) {
+                            Log.d("tag", "attached:" + p0!!.content.toString())
+                        }
+
+                        override fun onSuccess(p0: Message?) {
+                            Log.d("tag", "onSuccess:" + p0!!.content.toString())
+                        }
+
+                        override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                            Log.d("tag", "onError:" + p0!!.content.toString())
+                        }
+                    });
+                    chatListAdapter!!.notifyDataSetChanged()
+                    chatroom_list_chat.smoothScrollToPosition(chatListAdapter!!.count)
+
+                    //发送礼物消息
+                    val roomGiftMessage = RoomGiftMessage()
+                    roomGiftMessage.position = targetPosition
+                    roomGiftMessage.toPosition = toPosition
+                    roomGiftMessage.staticUrl = pic
+                    roomGiftMessage.giftUrl = gifPic
+                    val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, roomGiftMessage)
+                    RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                        override fun onAttached(p0: Message?) {
+                            Log.d("tag", "attached:" + p0!!.content.toString())
+                        }
+
+                        override fun onSuccess(p0: Message?) {
+                            Log.d("tag", "onSuccess:" + p0!!.content.toString())
+                        }
+
+                        override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                            Log.d("tag", "onError:" + p0!!.content.toString())
+                        }
+                    });
                 }
-            })
-            giftBagDialog.show()
-        }
-
-        //聊天列表
-        chatListAdapter = RoomChatListAdapter(this)
-        chatroom_list_chat.setAdapter(chatListAdapter)
-        //麦位
-        setMicSeaViewList()
-        // 默认麦克不可用
-        enableUseMic(false)
-        defaultMarginBottom = DisplayUtils.dp2px(this, 10)
-
-        //启用软件弹出监听
-        enableKeyboardStateListener(true)
+            }
+        })
+        giftBagDialog.show()
     }
 
     private fun ShareUrl(nickname: String, desc: String, icon: String, url: String, platform: SHARE_MEDIA) {
@@ -962,93 +1041,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         chatroom_list_chat.setOnItemClickListener(object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (chatListAdapter!!.messageList.get(position) != null && chatListAdapter!!.messageList.size > 0 && !TextUtils.isEmpty(chatListAdapter!!.messageList.get(position).senderUserId)) {
+                    val viewType=chatListAdapter!!.getItemViewType(position);
+                    if(viewType==VIEW_TYPE_GIFT||viewType==VIEW_TYPE_EGG){
+                        //送礼物消息和砸金蛋房间内消息移至 OnGiftEggListener
+                        return
+                    }
+
                     val userid = chatListAdapter!!.messageList.get(position).senderUserId.toString()
                     if (TextUtils.isEmpty(userid)) {
                         return
                     }
-                    val msgListDialog = MsgListDialog(mContext, userid, room_id)
-                    msgListDialog.setOnMsgListDialog(object : MsgListDialog.OnMsgListDialogListener {
-                        override fun bMClick() {//闭麦
-
-                        }
-
-                        override fun xMClick() {//下麦旁听
-
-                        }
-
-                        override fun jMClick() {//解锁
-
-                        }
-
-                        override fun bTMClick() {//报Ta上麦
-                            val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
-                            upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
-                                override fun onClickWheat(position: Int) {
-                                    JoinMic(userid, position)
-                                }
-                            })
-                            upperWheatDialog.show()
-                        }
-                    })
-//                    for (bean in detailRoomInfo!!.roomUserList) {
-//                        if (SpUtils.getSp(mContext, "uid").equals(bean.uid) && ("1".equals(bean.role) || "2".equals(bean.role))) {
-//                            msgListDialog.show()
-//                        }
-//                    }
-                    if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid) || amdinType == 1) {
-                        msgListDialog.show()
-                    }else{
-                        val giveDialog = GiveDialog(mContext, userid, room_id)
-                        giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
-                        giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
-                        giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
-                            override fun BmClick() {
-
-                            }
-
-                            override fun BtxmClick() {
-
-                            }
-
-                            override fun ScmClick() {
-
-                            }
-
-                            override fun clickGiveGift() {
-                                GiftBagDialog(mContext, room_id).show()
-                            }
-
-                            override fun clickPrivateChat() {
-                                RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, "标题");
-                            }
-
-                            override fun clickGiveZb() {
-                                DressMallActivity.startDressMallActivity(mContext,detailRoomInfo!!.roomInfo.uid)
-                            }
-
-                            override fun clickFoucsOn() {
-                                FocusOnData(SpUtils.getSp(mContext, "uid"), detailRoomInfo!!.roomInfo.uid, "1")
-                            }
-
-                            override fun setManager() {
-
-                            }
-
-                            override fun removeManager() {
-
-                            }
-
-                            override fun setExit() {
-
-                            }
-
-                            override fun blackList() {
-
-                            }
-                        })
-                        giveDialog.show()
-                    }
-
+                    showMessageUserInfoDialog(userid, room_id)
                 }
             }
         })
@@ -1075,7 +1078,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveGift() {
-                        GiftBagDialog(mContext, room_id).show()
+                        //送房主礼物
+                        showGiftBagDialog(detailRoomInfo!!.roomInfo.uid,"111")
                     }
 
                     override fun clickPrivateChat() {
@@ -1154,6 +1158,92 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 showToastMessage("初始化语音失败" + errorCode)
             }
         })
+    }
+
+    private fun showMessageUserInfoDialog(userid: String, room_id: String) {
+        val msgListDialog = MsgListDialog(mContext, userid, room_id)
+        msgListDialog.setOnMsgListDialog(object : MsgListDialog.OnMsgListDialogListener {
+            override fun bMClick() {//闭麦
+
+            }
+
+            override fun xMClick() {//下麦旁听
+
+            }
+
+            override fun jMClick() {//解锁
+
+            }
+
+            override fun bTMClick() {//报Ta上麦
+                val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
+                upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
+                    override fun onClickWheat(position: Int) {
+                        JoinMic(userid, position)
+                    }
+                })
+                upperWheatDialog.show()
+            }
+        })
+        //                    for (bean in detailRoomInfo!!.roomUserList) {
+        //                        if (SpUtils.getSp(mContext, "uid").equals(bean.uid) && ("1".equals(bean.role) || "2".equals(bean.role))) {
+        //                            msgListDialog.show()
+        //                        }
+        //                    }
+        if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid) || amdinType == 1) {
+            msgListDialog.show()
+        } else {
+            val giveDialog = GiveDialog(mContext, userid, room_id)
+            giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+            giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+            giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                override fun BmClick() {
+
+                }
+
+                override fun BtxmClick() {
+
+                }
+
+                override fun ScmClick() {
+
+                }
+
+                override fun clickGiveGift() {
+                    showGiftBagDialog(userid,"111")
+                    //GiftBagDialog(mContext, room_id).show()
+                }
+
+                override fun clickPrivateChat() {
+                    RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, "标题");
+                }
+
+                override fun clickGiveZb() {
+                    DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid)
+                }
+
+                override fun clickFoucsOn() {
+                    FocusOnData(SpUtils.getSp(mContext, "uid"), detailRoomInfo!!.roomInfo.uid, "1")
+                }
+
+                override fun setManager() {
+
+                }
+
+                override fun removeManager() {
+
+                }
+
+                override fun setExit() {
+
+                }
+
+                override fun blackList() {
+
+                }
+            })
+            giveDialog.show()
+        }
     }
 
     private fun updataRoomTalk(room_desc: String?) {
@@ -1501,7 +1591,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveGift() {
-                        GiftBagDialog(mContext, room_id!!).show()
+                        showGiftBagDialog(userId,"111")
                     }
 
                     override fun clickPrivateChat() {
@@ -1595,7 +1685,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
 
                         override fun clickGiveGift() {
-                            GiftBagDialog(mContext, room_id!!).show()
+                            showGiftBagDialog(userId,"111")
                         }
 
                         override fun clickPrivateChat() {
@@ -1749,7 +1839,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
 
                             override fun clickGiveGift() {
-                                GiftBagDialog(mContext, room_id!!).show()
+                                showGiftBagDialog(userId,"111")
                             }
 
                             override fun clickPrivateChat() {
@@ -2752,9 +2842,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         if (giftImgUrl.endsWith(".svga")) {
             //val giftImgUrl = "http://chitchat.rhhhyy.com/mengjing.svga"
             //显示View
-            val svgaImageView = SVGAImageView(this)
-            val parser = SVGAParser(this)
-            f.addView(svgaImageView)
+
             //加载svga
             val SDPATH = Environment.getExternalStorageDirectory().absolutePath + "/" + AppUtil.getCurrentPageName(mContext) + "/svags/"
             val file = File(SDPATH)
@@ -2770,81 +2858,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 downloadGift(giftImgUrl, object : OnDownLoadComplteListener {
                     override fun complete(path: String?) {
                         runOnUiThread(Runnable {
-                            //播放动画
-                            val inputStream = FileInputStream(downloadFile)
-                            parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
-                                override fun onComplete(videoItem: SVGAVideoEntity) {
-                                    svgaImageView.setVideoItem(videoItem)
-//                                  val s = videoItem.frames / videoItem.FPS
-                                    svgaImageView.stepToFrame(0, true)
-                                    val s = videoItem.frames / videoItem.FPS
-                                    Log.e("tag", "数据时长:" + s);
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        //8秒后结束
-                                        svgaImageView.stopAnimation()
-                                        f.removeView(svgaImageView)
-                                        //移除之后创建分开View
-                                        val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
-                                        val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
-                                        for (i in toPosition) {
-                                            val childImageView = ImageView(mContext)
-                                            Glide.with(mContext).load(staticImgUrl).into(childImageView)
-                                            val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
-                                            childImageView.layoutParams = layoutParams;
-                                            childImageView.x = halfWidth
-                                            childImageView.y = halfHeight
-                                            f.addView(childImageView)
-
-                                            val startPosition = getPosition(position)
-                                            val endPosition = getPosition(i)
-                                            val childOffsetX = endPosition[0] - halfWidth + DisplayUtils.dp2px(mContext, 10)
-                                            val childOffsetY = endPosition[1] - halfHeight + DisplayUtils.dp2px(mContext, 5)
-
-                                            ViewCompat.animate(childImageView)
-                                                    .translationXBy(childOffsetX.toFloat())
-                                                    .translationYBy(childOffsetY.toFloat())
-                                                    .setDuration(800)
-                                                    .setListener(object : ViewPropertyAnimatorListener {
-                                                        override fun onAnimationStart(view: View) {
-                                                        }
-
-                                                        override fun onAnimationEnd(view: View) {
-                                                            //动画结束后删除大礼物图
-                                                            f.removeView(childImageView)
-                                                        }
-
-                                                        override fun onAnimationCancel(view: View) {
-                                                        }
-                                                    })
-                                        }
-                                    }, 8000)
-                                }
-
-                                override fun onError() {
-                                    Log.e("tag", "异常")
-                                }
-                            }, true)
-                        })
-                    }
-                })
-                return
-            } else {
-                Log.e("tag", "动画存在,直接显示！downloadFile:" + downloadFile)
-                //直接显示
-                try {
-                    val inputStream = FileInputStream(downloadFile)
-                    parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
-                        override fun onComplete(videoItem: SVGAVideoEntity) {
-                            svgaImageView.setVideoItem(videoItem)
-//                                val s = videoItem.frames / videoItem.FPS
-                            svgaImageView.stepToFrame(0, true)
-                            val s = videoItem.frames / videoItem.FPS
-                            Log.e("tag", "数据时长:" + s);
-
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                //8秒后结束
-                                svgaImageView.stopAnimation()
-                                f.removeView(svgaImageView)
+                            //直接显示
+                            try {
                                 //移除之后创建分开View
                                 val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
                                 val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
@@ -2879,12 +2894,95 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                                 }
                                             })
                                 }
-                            }, 8000)
-                        }
 
-                        override fun onError() {
-                        }
-                    }, true)
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    //分发动画结束之后 显示特效
+                                    val svgaImageView = SVGAImageView(mContext)
+                                    val parser = SVGAParser(mContext)
+                                    f.addView(svgaImageView)
+                                    val inputStream = FileInputStream(downloadFile)
+                                    parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
+                                        override fun onComplete(videoItem: SVGAVideoEntity) {
+                                            val s = videoItem.frames / videoItem.FPS
+                                            Log.e("tag", "数据时长:" + s);
+                                            svgaImageView.setVideoItem(videoItem)
+                                            svgaImageView.stepToFrame(0, true)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                //移除特效动画
+                                                f.removeView(svgaImageView)
+                                            }, (s*1000).toLong())
+                                        }
+                                        override fun onError() {
+                                        }
+                                    }, true)
+                                }, (800).toLong())
+                            } catch (e: FileNotFoundException) {
+                                e.printStackTrace()
+                            }
+                        })
+                    }
+                })
+                return
+            } else {
+                Log.e("tag", "动画存在,直接显示！downloadFile:" + downloadFile)
+                //直接显示
+                try {
+                    //移除之后创建分开View
+                    val halfWidth = (AppUtil.getScreenWidth(mContext) / 2 - DisplayUtils.dp2px(mContext, 40)).toFloat()
+                    val halfHeight = (AppUtil.getScreenHeight(mContext) / 2).toFloat()
+                    for (i in toPosition) {
+                        val childImageView = ImageView(mContext)
+                        Glide.with(mContext).load(staticImgUrl).into(childImageView)
+                        val layoutParams = FrameLayout.LayoutParams(DisplayUtils.dp2px(mContext, 80), DisplayUtils.dp2px(mContext, 80))
+                        childImageView.layoutParams = layoutParams;
+                        childImageView.x = halfWidth
+                        childImageView.y = halfHeight
+                        f.addView(childImageView)
+
+                        val startPosition = getPosition(position)
+                        val endPosition = getPosition(i)
+                        val childOffsetX = endPosition[0] - halfWidth + DisplayUtils.dp2px(mContext, 10)
+                        val childOffsetY = endPosition[1] - halfHeight + DisplayUtils.dp2px(mContext, 5)
+
+                        ViewCompat.animate(childImageView)
+                                .translationXBy(childOffsetX.toFloat())
+                                .translationYBy(childOffsetY.toFloat())
+                                .setDuration(800)
+                                .setListener(object : ViewPropertyAnimatorListener {
+                                    override fun onAnimationStart(view: View) {
+                                    }
+
+                                    override fun onAnimationEnd(view: View) {
+                                        //动画结束后删除大礼物图
+                                        f.removeView(childImageView)
+                                    }
+
+                                    override fun onAnimationCancel(view: View) {
+                                    }
+                                })
+                    }
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        //分发动画结束之后 显示特效
+                        val svgaImageView = SVGAImageView(this)
+                        val parser = SVGAParser(this)
+                        f.addView(svgaImageView)
+                        val inputStream = FileInputStream(downloadFile)
+                        parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
+                            override fun onComplete(videoItem: SVGAVideoEntity) {
+                                val s = videoItem.frames / videoItem.FPS
+                                Log.e("tag", "数据时长:" + s);
+                                svgaImageView.setVideoItem(videoItem)
+                                svgaImageView.stepToFrame(0, true)
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    //移除特效动画
+                                    f.removeView(svgaImageView)
+                                }, (s*1000).toLong())
+                            }
+                            override fun onError() {
+                            }
+                        }, true)
+                    }, (800).toLong())
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 }

@@ -876,22 +876,22 @@ public class RoomManager {
                                         messageBean.setGiftPic(msg.getGiftPic());
                                         messageBean.setGiftNums(msg.getGiftNums());
                                         roomEventlistener.onGiftMessage(messageBean);
-                                        if (roomEventlistener != null) {
-                                            GiftChatMessage giftChatMessage = new GiftChatMessage();
-                                            //礼物名称
-                                            giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
-                                            giftChatMessage.setGiftPic(msg.getGiftPic());
-                                            giftChatMessage.setGiftNum(msg.getGiftNums());
-                                            giftChatMessage.setName(msg.getSendName());
-                                            giftChatMessage.setToName(msg.getSlName());
-                                            threadManager.runOnUIThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, giftChatMessage);
-                                                    roomEventlistener.onMessageEvent(o);//保存消息
-                                                }
-                                            });
-                                        }
+//                                        if (roomEventlistener != null) {
+//                                            GiftChatMessage giftChatMessage = new GiftChatMessage();
+//                                            //礼物名称
+//                                            giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
+//                                            giftChatMessage.setGiftPic(msg.getGiftPic());
+//                                            giftChatMessage.setGiftNum(msg.getGiftNums());
+//                                            giftChatMessage.setName(msg.getSendName());
+//                                            giftChatMessage.setToName(msg.getSlName());
+//                                            threadManager.runOnUIThread(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, giftChatMessage);
+//                                                    roomEventlistener.onMessageEvent(o);//保存消息
+//                                                }
+//                                            });
+//                                        }
                                     } else {
                                         Log.e("tag", "收到砸金蛋公屏消息");
                                         //砸金蛋
