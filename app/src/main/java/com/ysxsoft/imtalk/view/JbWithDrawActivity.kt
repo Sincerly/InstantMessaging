@@ -154,6 +154,7 @@ class JbWithDrawActivity : BaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<OrderBean> {
                     override fun call(t: OrderBean?) {
+                        showToastMessage(t!!.msg)
                         if (t!!.code == 0) {
                             when (payType) {
                                 1 -> {

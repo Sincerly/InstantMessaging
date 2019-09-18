@@ -25,6 +25,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import io.rong.imkit.RongIM
 import io.rong.imlib.RongIMClient
 import kotlinx.android.synthetic.main.title_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -266,11 +267,17 @@ abstract class BaseActivity : AppCompatActivity() {
                 .telCode(phone)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<CommonBean> {
-                    override fun call(t: CommonBean?) {
+                .subscribe(object : Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                        Log.d("tag>>>>",e!!.message.toString())
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                     }
 
+                    override fun onCompleted() {
+                    }
                 })
     }
 

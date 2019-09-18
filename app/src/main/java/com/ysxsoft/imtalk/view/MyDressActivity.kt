@@ -10,6 +10,7 @@ import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.id.mSwipeRefreshLayout
 import com.ysxsoft.imtalk.adapter.MyDressAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.SGiftBean
@@ -20,6 +21,7 @@ import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import kotlinx.android.synthetic.main.my_dress_layout.*
+import kotlinx.android.synthetic.main.room_tag_layout.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -108,7 +110,11 @@ class MyDressActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
             override fun userClick(position: Int) {
                 val id = mDataAdapter!!.dataList.get(position).id.toString()
                 val is_use = mDataAdapter!!.dataList.get(position).is_use.toString()
-                saveData(id,is_use)
+                if (is_use.equals("0")){
+                    saveData(id,"1")
+                }else{
+                    saveData(id,"0")
+                }
             }
         })
 
@@ -122,11 +128,11 @@ class MyDressActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
         val map = HashMap<String, String>()
         map.put("uid", SpUtils.getSp(mContext, "uid"))
         map.put("ts_id",id)
-        if (type == 1) {
-            map.put("type", "2")
-        } else {
-            map.put("type", "1")
-        }
+//        if (type == 1) {
+//            map.put("type", "2")
+//        } else {
+            map.put("type", type.toString())
+//        }
         map.put("status", is_use)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)

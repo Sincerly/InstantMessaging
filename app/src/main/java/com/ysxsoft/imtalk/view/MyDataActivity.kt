@@ -99,7 +99,8 @@ class MyDataActivity : BaseActivity() {
 
     private fun requestMySelfData() {
         NetWork.getService(ImpService::class.java)
-                .GetUserInfo(AuthManager.getInstance().currentUserId)
+//                .GetUserInfo(AuthManager.getInstance().currentUserId)
+                .GetUserInfo(uid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<UserInfoBean> {

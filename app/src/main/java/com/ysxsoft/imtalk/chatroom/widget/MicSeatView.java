@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.chatroom.widget;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.ysxsoft.imtalk.chatroom.task.AuthManager;
 import com.ysxsoft.imtalk.chatroom.task.RoomManager;
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
 import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils;
+import com.ysxsoft.imtalk.utils.ImageLoadUtil;
 
 /**
  * Create By 胡
@@ -31,6 +33,7 @@ import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils;
 public class MicSeatView extends FrameLayout {
     private ImageView micSeatIv;
     private ImageView micMuteIv;
+    private ImageView img_head_wear;
     private TextView nameTv, tv_room_manager;
     private MicSeatRippleView micSeatRippleView;
     private MicPositionsBean micInfo;
@@ -55,6 +58,7 @@ public class MicSeatView extends FrameLayout {
         micMuteIv = contentView.findViewById(R.id.chatroom_item_iv_mic_mute);
         tv_room_manager = contentView.findViewById(R.id.tv_room_manager);
         nameTv = contentView.findViewById(R.id.chatroom_item_tv_name);
+        img_head_wear = contentView.findViewById(R.id.img_head_wear);
         micSeatRippleView = contentView.findViewById(R.id.chatroom_item_rp_mic_ripple);
         micSeatIv.setBackground(null);
         micSeatIv.setOnClickListener(new OnClickListener() {
@@ -102,7 +106,7 @@ public class MicSeatView extends FrameLayout {
             lockMicSeat();
             // 麦位有用户
         } else if (!TextUtils.isEmpty(micUserId) && !TextUtils.equals("0", micUserId)) {
-            setMicSeatAvatar(micInfo.getIcon());
+            setMicSeatAvatar(micInfo.getIcon(),micInfo.getUser_ts());
             nameTv.setText(micInfo.getNickname());
             nameTv.setTextColor(getResources().getColor(R.color.white));
 //            if (currentUserId.equals(micUserId)) {
@@ -127,10 +131,11 @@ public class MicSeatView extends FrameLayout {
      *
      * @param resourceId
      */
-    private void setMicSeatAvatar(String resourceId) {
+    private void setMicSeatAvatar(String resourceId,String url) {
         micSeatIv.setBackgroundResource(R.drawable.chatroom_bg_room_linker_avatar);
         Glide.with(MyApplication.mcontext).load(resourceId).apply(RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.mipmap.img_normal_head))
                 .into(micSeatIv);
+        ImageLoadUtil.INSTANCE.GlideGoodsImageLoad(MyApplication.mcontext,url,img_head_wear);
     }
 
     /**
@@ -151,6 +156,7 @@ public class MicSeatView extends FrameLayout {
     private void lockMicSeat() {
         micSeatIv.setImageDrawable(getResources().getDrawable(R.drawable.chatroom_bg_mic_seat_lock));
         micSeatIv.setBackground(null);
+        img_head_wear.setImageBitmap(null);
     }
 
     /**
@@ -160,6 +166,7 @@ public class MicSeatView extends FrameLayout {
     private void setMicSeatEmpty() {
         micSeatIv.setImageDrawable(getResources().getDrawable(R.drawable.img_seat));
         micSeatIv.setBackground(null);
+        img_head_wear.setImageBitmap(null);
     }
 
     /**

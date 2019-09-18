@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ysxsoft.imtalk.R;
@@ -36,7 +37,9 @@ public class PlayMusicService extends Service {
         String url = intent.getStringExtra("music_url");
         try {
             mediaPlayer.reset();
-            mediaPlayer.setDataSource(this, Uri.parse(url));
+            if (!TextUtils.isEmpty(url)){
+                mediaPlayer.setDataSource(this, Uri.parse(url));
+            }
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepareAsync();//异步准备
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -79,6 +82,8 @@ public class PlayMusicService extends Service {
         public void onNext() {
             next();
         }
+
+
     }
 
     @Override
@@ -91,12 +96,6 @@ public class PlayMusicService extends Service {
         this.url = url;
         isRunning = true;
         try {
-//            if (mediaPlayer != null) {
-//                mediaPlayer.stop();
-//                mediaPlayer.release();
-//                mediaPlayer = null;
-//            }
-//            mediaPlayer = new MediaPlayer();
             mediaPlayer.reset();
             mediaPlayer.setDataSource(this, Uri.parse(url));
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -173,6 +172,10 @@ public class PlayMusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (isRunning){
+            mediaPlayer = new MediaPlayer();
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 

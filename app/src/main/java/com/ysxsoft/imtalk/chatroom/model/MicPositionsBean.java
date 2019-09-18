@@ -23,6 +23,7 @@ public class MicPositionsBean implements Parcelable {
     private String add_time;
     private String gifts;
     private String is_oc_wheat;
+    private String user_ts;
 
     public String getIs_oc_wheat() {
         return is_oc_wheat;
@@ -48,6 +49,7 @@ public class MicPositionsBean implements Parcelable {
         add_time = in.readString();
         gifts = in.readString();
         is_oc_wheat = in.readString();
+        user_ts = in.readString();
     }
 
     @Override
@@ -67,6 +69,7 @@ public class MicPositionsBean implements Parcelable {
         dest.writeString(add_time);
         dest.writeString(gifts);
         dest.writeString(is_oc_wheat);
+        dest.writeString(user_ts);
     }
     public MicPositionsBean() {
     }
@@ -199,6 +202,14 @@ public class MicPositionsBean implements Parcelable {
         this.gifts = gifts;
     }
 
+    public String getUser_ts() {
+        return user_ts;
+    }
+
+    public void setUser_ts(String user_ts) {
+        this.user_ts = user_ts;
+    }
+
     public static MicPositionsBean parseJsonToMicPositionInfo(JSONObject jsonObject) {
         MicPositionsBean micPositionInfo = new MicPositionsBean();
         micPositionInfo.setMw_id(jsonObject.optString("mw_id"));
@@ -216,6 +227,7 @@ public class MicPositionsBean implements Parcelable {
         micPositionInfo.setAdd_time(jsonObject.optString("add_time"));
         micPositionInfo.setGifts(jsonObject.optString("gifts"));
         micPositionInfo.setIs_oc_wheat(jsonObject.optString("is_oc_wheat"));
+        micPositionInfo.setUser_ts(jsonObject.optString("user_ts"));
         return micPositionInfo;
     }
 }

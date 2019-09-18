@@ -212,6 +212,7 @@ class LoginActivity : BaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<LoginBean> {
                     override fun onError(e: Throwable?) {
+                        Log.d("tag======",e!!.message.toString())
                     }
 
                     override fun onNext(t: LoginBean?) {

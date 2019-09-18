@@ -123,9 +123,9 @@ public class RoomChatListAdapter extends BaseAdapter {
             RoomMemberChangedMessage.RoomMemberAction roomMemberAction = memberMessage.getRoomMemberAction();
             if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.JOIN) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_enter);
-            } else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
+            } /*else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_quit);
-            } else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
+            }*/ else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_kick);
             }
         } else if (viewType == VIEW_TYPE_GIFT) {

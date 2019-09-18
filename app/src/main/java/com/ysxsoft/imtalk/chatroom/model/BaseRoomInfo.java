@@ -46,6 +46,16 @@ public class BaseRoomInfo {
         private String gifts;
         private String is_wheat;
         private String is_oc_wheat;
+
+        public String getUser_ts() {
+            return user_ts;
+        }
+
+        public void setUser_ts(String user_ts) {
+            this.user_ts = user_ts;
+        }
+
+        private String user_ts;
         private int memCount;
 
         public String getIs_oc_wheat() {

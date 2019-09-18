@@ -88,7 +88,7 @@ class GiveDialog : ABSDialog {
         tv_give_gift.setOnClickListener {
             dismiss()
             if (giveClickListener != null) {
-                giveClickListener!!.clickGiveGift()
+                giveClickListener!!.clickGiveGift(bean!!.uid.toString(),bean!!.nickname)
             }
         }
         tv_private_chat.setOnClickListener {
@@ -110,6 +110,7 @@ class GiveDialog : ABSDialog {
                 giveClickListener!!.clickGiveZb()
             }
         }
+
         tv_foucs_on.setOnClickListener {
             dismiss()
             if (giveClickListener != null) {
@@ -175,7 +176,7 @@ class GiveDialog : ABSDialog {
     }
 
     interface GiveClickListener {
-        fun clickGiveGift()
+        fun clickGiveGift(uid:String,nickname:String)
         fun clickPrivateChat()
         fun clickGiveZb()
         fun clickFoucsOn()

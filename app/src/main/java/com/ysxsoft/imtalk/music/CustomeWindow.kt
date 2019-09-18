@@ -107,7 +107,7 @@ class CustomeWindow(var context: Context,  var icon: String?) {
         layoutParams!!.y = mWindowHeight - 500
     }
 
-    open fun IsShowing():Boolean{
+     fun IsShowing():Boolean{
         return isShowing
     }
 

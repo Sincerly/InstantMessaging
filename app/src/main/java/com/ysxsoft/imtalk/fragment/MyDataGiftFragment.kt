@@ -184,7 +184,7 @@ class MyDataGiftFragment : BaseFragment() {
                                     helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
                                 }
                             }
-                            recyclerView.layoutManager = LinearLayoutManager(mContext)
+                            recyclerView.layoutManager = GridLayoutManager(mContext,3)
                             recyclerView.adapter = myHearadapter
 
                         }

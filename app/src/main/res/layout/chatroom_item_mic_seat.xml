@@ -27,14 +27,20 @@
             android:background="@drawable/heart_shape"
             android:drawableLeft="@mipmap/img_heart"
             android:drawablePadding="5dp"
-            android:paddingLeft="5dp"
             android:gravity="center"
+            android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="0"
             android:textColor="@color/white"
             android:textSize="10sp" />
     </FrameLayout>
 
+    <ImageView
+        android:id="@+id/img_head_wear"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_centerInParent="true"
+        tools:src="@mipmap/img_head_wear" />
 
     <!--chatroom_bg_mic_seat_empty-->
 
