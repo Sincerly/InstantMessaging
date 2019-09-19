@@ -123,6 +123,9 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                             mAdapter2.setDataList(t.data)
                             recyclerView.adapter = mAdapter2
                         }
+                    }else{//无数据
+                        setTopThreeSupperStar(ArrayList())
+                        mAdapter2.setDataList(ArrayList())
                     }
                 }
 
@@ -142,6 +145,9 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                             mAdapter1.setDataList(t.data)
                             recyclerView.adapter = mAdapter1
                         }
+                    }else{//无数据
+                        setTopThreeSupperStar(ArrayList())
+                        mAdapter1.setDataList(ArrayList())
                     }
                 }
 
