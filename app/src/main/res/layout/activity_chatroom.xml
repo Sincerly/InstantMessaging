@@ -84,12 +84,12 @@
                         android:textColor="@color/white"
                         android:textSize="12sp" />
 
-                     <TextView
+                    <TextView
                         android:id="@+id/tv_online"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
                         android:gravity="center_horizontal"
-                         android:layout_marginLeft="10dp"
                         android:text="666人在线"
                         android:textColor="@color/white"
                         android:textSize="12sp" />
@@ -147,9 +147,9 @@
         android:drawableLeft="@mipmap/img_music"
         android:gravity="center"
         android:paddingLeft="10dp"
-        android:visibility="gone"
         android:text="音乐"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tv_room_level"
@@ -191,12 +191,21 @@
             android:padding="4dp"
             tools:src="@drawable/chatroom_user_avatar_02" />
 
+
         <ImageView
             android:id="@+id/img_head_wear"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
-            tools:src="@mipmap/img_head_wear"/>
+            tools:src="@mipmap/img_head_wear" />
+
+        <ImageView
+            android:id="@+id/img_leave"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            android:src="@mipmap/img_leave" />
 
         <TextView
             android:id="@+id/tv_room_manager"

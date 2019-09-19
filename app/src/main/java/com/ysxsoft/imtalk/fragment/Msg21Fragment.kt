@@ -85,7 +85,7 @@ class Msg21Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         mRecyclerView.setHasFixedSize(true)
         mRecyclerView.addItemDecoration(divider)
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
-            RongIM.getInstance().startPrivateChat(mContext, mDataAdapter!!.dataList.get(position).fs_id.toString(), "标题");
+            RongIM.getInstance().startPrivateChat(mContext, mDataAdapter!!.dataList.get(position).fs_id, mDataAdapter!!.dataList.get(position).nickname);
         }
         mRecyclerView.setOnLoadMoreListener {
             if (bean != null) {

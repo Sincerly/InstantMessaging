@@ -56,9 +56,12 @@ class Msg23Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     var flag = 0
     override fun onResume() {
         super.onResume()
-        initView()
+
     }
 
+    override fun initUi() {
+        initView()
+    }
     private fun initView() {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setProgressViewOffset(false, 0, AppUtil.dip2px(mContext, 48))

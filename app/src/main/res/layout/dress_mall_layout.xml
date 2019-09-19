@@ -22,8 +22,7 @@
                 android:id="@+id/fl_img_bg"
                 android:layout_width="95dp"
                 android:layout_height="95dp"
-                android:layout_gravity="center"
-                android:background="@mipmap/img_head_wear">
+                android:layout_gravity="center">
 
                 <com.ysxsoft.imtalk.widget.CircleImageView
                     android:id="@+id/img_head"
@@ -31,6 +30,13 @@
                     android:layout_height="75dp"
                     android:layout_gravity="center"
                     android:src="@mipmap/img_normal_head" />
+
+                <ImageView
+                    android:id="@+id/img_head_wear"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
+                    android:layout_gravity="center"
+                    tools:src="@mipmap/img_head_wear" />
             </FrameLayout>
 
 

@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Handler
 import android.os.Message
 import android.support.v4.widget.SwipeRefreshLayout
@@ -57,6 +58,7 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     val mHandler = PreviewHandler()
     var beas: List<DressMallBean.DataBean>? = null
     var auto_id: String? = null
+    var headwarurl: String? = null
 
     override fun onResume() {
         super.onResume()
@@ -91,10 +93,15 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val bean = mDataAdapter!!.dataList.get(position)
+            headwarurl = bean.pic
             auto_id = bean.id.toString()
-            tv_money.setText(bean.gold + "金币")
-            tv_day.setText("/" + bean.days + "天")
+            tv_money1.setText(bean.gold + "金币")
+            tv_day1.setText("/" + bean.days + "天")
             mDataAdapter!!.setSelect(position)
+
+            val intent = Intent("HEADWEAR")
+            intent.putExtra("headwarurl",headwarurl)
+            activity!!.sendBroadcast(intent)
         }
 
         //设置底部加载颜色

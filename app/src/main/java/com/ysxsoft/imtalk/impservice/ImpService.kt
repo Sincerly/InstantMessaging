@@ -388,22 +388,27 @@ interface ImpService {
     @FormUrlEncoded
     @POST("level/local_tyrant")
     fun roomTyrantList(@Field("type") uid: Int, @Field("room_id") room_id: String): Observable<TyrantListBean>
+
     //巨星榜(房间内)
     @FormUrlEncoded
     @POST("level/giant_star")
     fun roomSupperStarList(@Field("type") uid: Int, @Field("room_id") room_id: String): Observable<SupperStarBean>
+
     //土豪榜
     @FormUrlEncoded
     @POST("level/local_tyrant")
     fun tyrantList(@Field("type") uid: Int): Observable<TyrantListBean>
+
     //巨星榜
     @FormUrlEncoded
     @POST("level/giant_star")
     fun supperStarList(@Field("type") uid: Int): Observable<SupperStarBean>
+
     // 周星榜
 //    @FormUrlEncoded
     @POST("level/week_star")
     fun weekStarList(): Observable<WeekStarBean>
+
     // 周星榜（本周明星）
     @FormUrlEncoded
     @POST("level/week_gift_star")
@@ -622,6 +627,18 @@ interface ImpService {
 
     @POST("Room/remove_user")
     fun remove_user(@Body body: RequestBody): Observable<CommonBean>
+
+    /**
+     * 拉黑好友
+     */
+    @POST("users/userAddBlack")
+    fun userAddBlack(@Body body: RequestBody): Observable<CommonBean>
+
+    /**
+     * 举报
+     */
+    @POST("users/reportUser")
+    fun reportUser(@Body body: RequestBody): Observable<CommonBean>
 
 
 }

@@ -8,8 +8,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import com.ysxsoft.imtalk.R
-import com.ysxsoft.imtalk.R.mipmap.myself
-import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.RoomLockBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
@@ -24,6 +22,7 @@ import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.fragment.*
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
+import com.ysxsoft.imtalk.widget.dialog.ReportDialog
 import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
@@ -73,22 +72,29 @@ class MyDataActivity : BaseActivity() {
         if ("myself".equals(myself)) {
             tv_za_ta.visibility = View.GONE
             tv_t_room.visibility = View.GONE
+            img_right.setImageResource(R.mipmap.img_edittext)
             img_right.visibility = View.VISIBLE
             setTitle("我的资料")
+            img_right.setOnClickListener {
+                startActivity(PersonDataActivity::class.java)
+            }
         } else {
             tv_za_ta.visibility = View.VISIBLE
             tv_t_room.visibility = View.VISIBLE
-            img_right.visibility = View.GONE
+            img_right.setImageResource(R.mipmap.img_w_more)
+            img_right.visibility = View.VISIBLE
             setTitle("TA的资料")
+
+            img_right.setOnClickListener {
+                ReportDialog(mContext,uid!!).show()
+            }
+
         }
-
-        img_right.setImageResource(R.mipmap.img_edittext)
-
+        requestMySelfData()
+        requestData()
         setBackVisibily()
         initStatusBar(topView)
         setLightStatusBar(false)
-        initView()
-
     }
 
     override fun onResume() {
@@ -99,8 +105,7 @@ class MyDataActivity : BaseActivity() {
 
     private fun requestMySelfData() {
         NetWork.getService(ImpService::class.java)
-//                .GetUserInfo(AuthManager.getInstance().currentUserId)
-                .GetUserInfo(uid!!)
+                .GetUserInfo(AuthManager.getInstance().currentUserId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<UserInfoBean> {
@@ -132,6 +137,7 @@ class MyDataActivity : BaseActivity() {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             bean = t.data
+                            initView()
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_head)
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID:" + t.data.tt_id)
@@ -157,19 +163,18 @@ class MyDataActivity : BaseActivity() {
     }
 
     private fun initView() {
-        img_right.setOnClickListener {
-            startActivity(PersonDataActivity::class.java)
-        }
+
 
         ll_fouce.setOnClickListener {
-            FouceOnActivity.startFouceOnActivity(mContext,uid!!)
+            FouceOnActivity.startFouceOnActivity(mContext, uid!!)
         }
         ll_fance.setOnClickListener {
-            FansActivity.startFansActivity(mContext,uid!!)
+            FansActivity.startFansActivity(mContext, uid!!)
         }
 
         val bundle = Bundle();
         bundle.putString("uid", uid);
+        bundle.putString("nikeName",bean!!.nickname);
         bundle.putString("myself", myself);
         mydatafragment.setArguments(bundle);//数据传递到fragment中
         replaceFragment()
@@ -179,6 +184,7 @@ class MyDataActivity : BaseActivity() {
             }
             val bundle = Bundle();
             bundle.putString("uid", uid);
+            bundle.putString("nikeName", bean!!.nickname);
             bundle.putString("myself", myself);
             mydatafragment.setArguments(bundle);//数据传递到fragment中
             tagP = "0"
@@ -191,6 +197,7 @@ class MyDataActivity : BaseActivity() {
             }
             val bundle = Bundle();
             bundle.putString("uid", uid);
+            bundle.putString("nikeName", bean!!.nickname);
             bundle.putString("myself", myself);
             mydatagiftfragment.setArguments(bundle);//数据传递到fragment中
 
@@ -204,21 +211,23 @@ class MyDataActivity : BaseActivity() {
             }
             val bundle = Bundle();
             bundle.putString("uid", uid);
+            bundle.putString("nikeName", bean!!.nickname);
             bundle.putString("myself", myself);
             mydatacarfragment.setArguments(bundle);//数据传递到fragment中
             tagP = "2"
             replaceFragment()
         }
+
         tv_za_ta.setOnClickListener {
             //Ta 所在的房间
             if (TextUtils.equals("room", room)) {
                 showToastMessage("已经和对方在同一个房间")
                 return@setOnClickListener
             }
-            if (TextUtils.equals("SearchActivity",myself)){
+            if (TextUtils.equals("SearchActivity", myself)) {
                 roomLock(bean!!.now_roomId.toString())
-            }else{
-                joinChatRoom(bean!!.now_roomId,"")
+            } else {
+                joinChatRoom(bean!!.now_roomId, "")
             }
         }
 
@@ -228,20 +237,30 @@ class MyDataActivity : BaseActivity() {
                 finish()
                 return@setOnClickListener
             }
-            if (TextUtils.equals("SearchActivity",myself)){
-                if (bean!!.roomId!=null){
+            if (TextUtils.equals("SearchActivity", myself)) {
+                if (bean!!.roomId != null) {
                     roomLock(bean!!.roomId.toString())
-                }else{
+                } else {
                     showToastMessage("Ta没有房间")
                 }
-            }else{
-                quiteRoom(AuthManager.getInstance().currentUserId, "1")
+            } else {
+                if (!TextUtils.isEmpty(mybean!!.now_roomId)&&!TextUtils.isEmpty(bean!!.roomId)){
+                    roomLock(bean!!.roomId.toString())
+                }else{
+                    if (TextUtils.isEmpty(bean!!.roomId)){
+                        showToastMessage("Ta没有房间")
+                        return@setOnClickListener
+                    }
+                    if (!TextUtils.isEmpty(mybean!!.now_roomId)){
+                        quiteRoom(AuthManager.getInstance().currentUserId, "1")
+                    }
+                }
             }
         }
     }
 
     /**
-     * 退出房间
+     * 我 退出房间
      */
     private fun quiteRoom(uid: String, kick: String) {
         val message = RoomMemberChangedMessage()
@@ -301,23 +320,23 @@ class MyDataActivity : BaseActivity() {
 
                     override fun onNext(t: RoomLockBean?) {
                         if (t!!.code == 0) {
-                            RoomManager.getInstance().getRoomDetailInfo1(roomId,object :ResultCallback<DetailRoomInfo>{
+                            RoomManager.getInstance().getRoomDetailInfo1(roomId, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(result: DetailRoomInfo?) {
-                                    if (result!=null){
-                                        if (AuthManager.getInstance().currentUserId.equals(result.roomInfo.uid)){
-                                            joinChatRoom(bean!!.roomId,"")
-                                        }else{
+                                    if (result != null) {
+                                        if (AuthManager.getInstance().currentUserId.equals(result.roomInfo.uid)) {
+                                            joinChatRoom(bean!!.roomId, "")
+                                        } else {
                                             var roomLock = t.data
-                                            if (roomLock==1){
+                                            if (roomLock == 1) {
                                                 val roomLockDialog = RoomLockDialog(mContext)
-                                                roomLockDialog.setEdClickListener(object : RoomLockDialog.EdClickListener{
+                                                roomLockDialog.setEdClickListener(object : RoomLockDialog.EdClickListener {
                                                     override fun setData(string: String) {
-                                                        joinChatRoom(bean!!.roomId,string)
+                                                        joinChatRoom(bean!!.roomId, string)
                                                     }
                                                 })
                                                 roomLockDialog.show()
-                                            }else{
-                                                joinChatRoom(bean!!.roomId,"")
+                                            } else {
+                                                joinChatRoom(bean!!.roomId, "")
                                             }
                                         }
                                     }
@@ -328,13 +347,17 @@ class MyDataActivity : BaseActivity() {
                             })
                         }
                     }
+
                     override fun onCompleted() {
                     }
                 })
     }
 
-    fun joinChatRoom(roomId: String,lock_pwd:String) {
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId,lock_pwd, object : ResultCallback<DetailRoomInfo> {
+    /**
+     * 加入他的房间
+     */
+    fun joinChatRoom(roomId: String, lock_pwd: String) {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, lock_pwd, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
@@ -349,7 +372,7 @@ class MyDataActivity : BaseActivity() {
 
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
-                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mybean!!.nickname, mybean!!.icon)
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, bean!!.nickname, bean!!.icon)
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {

@@ -16,14 +16,30 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.bean.UserInfoBean;
+import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo;
+import com.ysxsoft.imtalk.chatroom.task.AuthManager;
+import com.ysxsoft.imtalk.chatroom.task.ResultCallback;
+import com.ysxsoft.imtalk.chatroom.task.RoomManager;
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
+import com.ysxsoft.imtalk.chatroom.utils.SpUtils;
+import com.ysxsoft.imtalk.impservice.ImpService;
 import com.ysxsoft.imtalk.utils.ImageLoadUtil;
+import com.ysxsoft.imtalk.utils.NetWork;
+import com.ysxsoft.imtalk.view.ChatRoomActivity;
 import com.ysxsoft.imtalk.widget.CircleImageView;
+
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class FloatingDisplayService extends Service {
     public static boolean isStarted = false;
@@ -36,10 +52,12 @@ public class FloatingDisplayService extends Service {
     private CircleImageView imageView;
     @org.jetbrains.annotations.Nullable
     private String icon;
+    private UserInfoBean mydatabean;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        requestMyData();
         isStarted = true;
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         layoutParams = new WindowManager.LayoutParams();
@@ -59,6 +77,32 @@ public class FloatingDisplayService extends Service {
         layoutParams.y = mWindowHeight - 500;
     }
 
+    private void requestMyData() {
+        NetWork.INSTANCE.getService(ImpService.class)
+                .GetUserInfo(AuthManager.getInstance().getCurrentUserId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<UserInfoBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(UserInfoBean userInfoBean) {
+                        if (userInfoBean.getCode() == 0) {
+                            mydatabean = userInfoBean;
+                        }
+                    }
+                });
+
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -72,7 +116,7 @@ public class FloatingDisplayService extends Service {
     }
 
     public class MyBinder extends Binder {
-        public FloatingDisplayService getService(){
+        public FloatingDisplayService getService() {
             return FloatingDisplayService.this;
         }
     }
@@ -86,14 +130,44 @@ public class FloatingDisplayService extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void showFloatingWindow() {
-        if (Settings.canDrawOverlays(this)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Settings.canDrawOverlays(this)) {
+                LayoutInflater layoutInflater = LayoutInflater.from(this);
+                displayView = layoutInflater.inflate(R.layout.floatwindow_layout, null);
+                displayView.setOnTouchListener(new FloatingOnTouchListener());
+                imageView = displayView.findViewById(R.id.img_head);
+                FrameLayout viewById = displayView.findViewById(R.id.fl);
+                windowManager.addView(displayView, layoutParams);
+                viewById.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(MyApplication.mcontext, FloatingDisplayService.class);
+                        stopService(intent);
+                    }
+                });
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        joinChatRoom(mydatabean.getData().getNow_roomId());
+                    }
+                });
+                Glide.with(MyApplication.mcontext).load(icon).into(imageView);
+                RotateAnimation rotate  = new RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                LinearInterpolator lin = new LinearInterpolator();
+                rotate.setInterpolator(lin);
+                rotate.setDuration(5000);//设置动画持续周期
+                rotate.setRepeatCount(-1);//设置重复次数
+                rotate.setFillAfter(true);//动画执行完后是否停留在执行完的状态
+                rotate.setStartOffset(10);//执行前的等待时间
+                imageView.setAnimation(rotate);
+            }
+        }else {
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             displayView = layoutInflater.inflate(R.layout.floatwindow_layout, null);
             displayView.setOnTouchListener(new FloatingOnTouchListener());
             imageView = displayView.findViewById(R.id.img_head);
-            Glide.with(MyApplication.mcontext).load(icon).into(imageView);
-            windowManager.addView(displayView, layoutParams);
             FrameLayout viewById = displayView.findViewById(R.id.fl);
+            windowManager.addView(displayView, layoutParams);
             viewById.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -101,6 +175,50 @@ public class FloatingDisplayService extends Service {
                     stopService(intent);
                 }
             });
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    joinChatRoom(mydatabean.getData().getNow_roomId());
+                }
+            });
+            Glide.with(MyApplication.mcontext).load(icon).into(imageView);
+            RotateAnimation rotate  = new RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            LinearInterpolator lin = new LinearInterpolator();
+            rotate.setInterpolator(lin);
+            rotate.setDuration(5000);//设置动画持续周期
+            rotate.setRepeatCount(-1);//设置重复次数
+            rotate.setFillAfter(true);//动画执行完后是否停留在执行完的状态
+            rotate.setStartOffset(10);//执行前的等待时间
+            imageView.setAnimation(rotate);
+        }
+
+    }
+
+    private void joinChatRoom(String now_roomId) {
+        RoomManager.getInstance().joinRoom(AuthManager.getInstance().getCurrentUserId(), now_roomId, "", new ResultCallback<DetailRoomInfo>() {
+            @Override
+            public void onSuccess(DetailRoomInfo detailRoomInfo) {
+                Intent intent =new  Intent(FloatingDisplayService.this, ChatRoomActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("room_id",now_roomId);
+                intent.putExtra("nikeName",mydatabean.getData().getNickname());
+                intent.putExtra("icon",mydatabean.getData().getIcon());
+                startActivity(intent);
+                dismissWindow();
+            }
+
+            @Override
+            public void onFail(int errorCode) {
+
+            }
+        });
+    }
+
+    public void dismissWindow() {
+        if (windowManager != null && displayView != null) {
+            windowManager.removeViewImmediate(displayView);
+            windowManager.removeView(displayView);
+            displayView = null;
         }
     }
 

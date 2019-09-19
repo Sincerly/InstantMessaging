@@ -91,6 +91,8 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val bean = mDataAdapter!!.dataList.get(position)
             auto_id = bean.id.toString()
+            tv_money1.setText(bean.gold + "金币")
+            tv_day1.setText("/" + bean.days + "天")
             mDataAdapter!!.setSelect(position)
         }
         //设置底部加载颜色

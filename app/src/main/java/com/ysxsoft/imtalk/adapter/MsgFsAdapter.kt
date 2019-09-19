@@ -12,6 +12,7 @@ import com.ysxsoft.imtalk.com.ListBaseAdapter
 import com.ysxsoft.imtalk.com.SuperViewHolder
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.widget.CircleImageView
+import io.rong.imkit.RongIM
 
 class MsgFsAdapter(mContext: Context) : ListBaseAdapter<FansListBean.DataBean>(mContext) {
     override val layoutId: Int
@@ -49,7 +50,9 @@ class MsgFsAdapter(mContext: Context) : ListBaseAdapter<FansListBean.DataBean>(m
                 onMsgFsListener!!.onClick(position)
             }
         }
-
+        holder.itemView.setOnClickListener {
+            RongIM.getInstance().startPrivateChat(mContext, bean.fs_id, bean.nickname);
+        }
     }
 
     interface OnMsgFsListener {

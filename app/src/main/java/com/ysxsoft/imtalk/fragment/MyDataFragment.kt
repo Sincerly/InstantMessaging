@@ -64,7 +64,7 @@ class MyDataFragment : BaseFragment() {
 
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
-                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                .GetUserInfo(uid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<UserInfoBean> {

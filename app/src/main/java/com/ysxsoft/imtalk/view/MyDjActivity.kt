@@ -34,7 +34,7 @@ class MyDjActivity : BaseActivity() {
         return R.layout.user_levels_layout
     }
 
-    var flag: String? = "1"
+    var flag: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         flag = intent.getStringExtra("flag")
@@ -63,12 +63,14 @@ class MyDjActivity : BaseActivity() {
             tv_user_level_tip.setText("当前用户等级：")
         }
         tv1.setOnClickListener {
+            flag="1"
             tv1.isSelected = true
             tv2.isSelected = false
             rqeustData()
             tv_user_level_tip.setText("当前用户等级：")
         }
         tv2.setOnClickListener {
+            flag="2"
             tv1.isSelected = false
             tv2.isSelected = true
             rqeustData()
@@ -93,6 +95,7 @@ class MyDjActivity : BaseActivity() {
                             tv_user_level.setText(t.data.now_level)
                             tv_cjb.setText("差"+t.data.next_level_gold+"金币升级")
                             ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.icon,img_head)
+//                            web_content.reload()
                             web_content.loadDataWithBaseURL(null,t.data.sign_rule, "text/html", "utf-8", null)
                         }
                     }

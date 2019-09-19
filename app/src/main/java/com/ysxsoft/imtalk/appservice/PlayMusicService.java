@@ -28,74 +28,34 @@ public class PlayMusicService extends Service {
     private List<RoomMusicListBean.DataBean> musics = new ArrayList<>();
     private int position = 0;
     private boolean isRunning = false;
-    private String url;
 
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        String url = intent.getStringExtra("music_url");
-        try {
-            mediaPlayer.reset();
-            if (!TextUtils.isEmpty(url)){
-                mediaPlayer.setDataSource(this, Uri.parse(url));
-            }
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.prepareAsync();//异步准备
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    Log.e("tag", "onPrepared");
-                    mediaPlayer.start();//开始播放
-                }
-            });
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    //播放完成
-                    Log.e("tag", "资源已释放!");
-                    next();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return new MyBind();
     }
 
-    public class MyBind extends Binder implements IMusicService{
+    public class MyBind extends Binder{
         public PlayMusicService getService() {
             return PlayMusicService.this;
         }
-
-        @Override
-        public void onPlay() {
-            start();
-        }
-
-        @Override
-        public void onPause() {
-            pause();
-        }
-
-        @Override
-        public void onNext() {
-            next();
-        }
-
-
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mediaPlayer = new MediaPlayer();
     }
 
     public void musicPlay(String url) {
-        this.url = url;
         isRunning = true;
         try {
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.reset();
             mediaPlayer.setDataSource(this, Uri.parse(url));
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -172,10 +132,6 @@ public class PlayMusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (isRunning){
-            mediaPlayer = new MediaPlayer();
-        }
-
         return super.onStartCommand(intent, flags, startId);
     }
 
