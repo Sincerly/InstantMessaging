@@ -24,6 +24,13 @@ public interface RoomEventListener {
     /**
      * 房间人数发生变化
      *
+     * @param memberCount
+     */
+    void onRoomMemberChangeWithCar(int memberCount,String carPic);
+
+    /**
+     * 房间人数发生变化
+     *
      * @param uid
      */
     void onRoomMemberKickChange(String uid);

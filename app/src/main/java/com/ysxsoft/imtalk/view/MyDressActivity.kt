@@ -16,10 +16,7 @@ import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.SGiftBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.AppUtil
-import com.ysxsoft.imtalk.utils.BaseActivity
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.utils.*
 import kotlinx.android.synthetic.main.my_dress_layout.*
 import kotlinx.android.synthetic.main.room_tag_layout.*
 import rx.Observer
@@ -111,9 +108,9 @@ class MyDressActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                 val id = mDataAdapter!!.dataList.get(position).id.toString()
                 val is_use = mDataAdapter!!.dataList.get(position).is_use.toString()
                 if (is_use.equals("0")){
-                    saveData(id,"1")
+                    saveData(id,"1",mDataAdapter!!.dataList.get(position).name,mDataAdapter!!.dataList.get(position).pic)
                 }else{
-                    saveData(id,"0")
+                    saveData(id,"0","","")
                 }
             }
         })
@@ -124,7 +121,7 @@ class MyDressActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
         mRecyclerView.setFooterViewHint("拼命加载中", "没有更多数据了", "网络不给力啊，点击再试一次吧")
     }
 
-    private fun saveData(id: String, is_use: String) {
+    private fun saveData(id: String, is_use: String,name:String,pic:String) {
         val map = HashMap<String, String>()
         map.put("uid", SpUtils.getSp(mContext, "uid"))
         map.put("ts_id",id)
@@ -143,6 +140,8 @@ class MyDressActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                     override fun call(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
+                            SharedPreferencesUtils.saveCarName(mContext,name)
+                            SharedPreferencesUtils.saveCarPic(mContext, pic)
                             onRefresh()
                         }
                     }

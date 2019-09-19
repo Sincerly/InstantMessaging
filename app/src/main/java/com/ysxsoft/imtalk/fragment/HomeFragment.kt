@@ -40,6 +40,7 @@ import com.ysxsoft.imtalk.widget.CircleImageView
 import com.ysxsoft.imtalk.widget.UniversalItemDecoration
 import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
 import kotlinx.android.synthetic.main.fm_home.*
+import org.litepal.util.SharedUtil
 import org.w3c.dom.Text
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -93,6 +94,9 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             mydatabean = t
+                            //保存座驾名称 座驾图片
+                            SharedPreferencesUtils.saveCarName(mContext,mydatabean!!.data.user_zj_name);
+                            SharedPreferencesUtils.saveCarPic(mContext,mydatabean!!.data.user_zj_pic)
                         }
                     }
 

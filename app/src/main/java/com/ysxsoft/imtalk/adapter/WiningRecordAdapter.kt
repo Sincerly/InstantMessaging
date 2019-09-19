@@ -2,6 +2,7 @@ package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.AwardRecodeBean
 import com.ysxsoft.imtalk.bean.ContentBean
@@ -20,8 +21,9 @@ class WiningRecordAdapter(mContext: Context) :ListBaseAdapter<AwardRecodeBean.Da
 
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
-        ImageLoadUtil.GlideHeadImageLoad(mContext,bean.aw_images,holder.getView<CircleImageView>(R.id.img_head)!!)
-        holder.getView<TextView>(R.id.tv_nikeName)!!.setText(bean.aw_name)
+        val c=holder.getView<CircleImageView>(R.id.img_head2)!!
+        Glide.with(mContext).load(bean.aw_images).into(c)
+        holder.getView<TextView>(R.id.tv_nikeName)!!.setText(bean.aw_name+"x"+bean.nums)
         holder.getView<TextView>(R.id.tv_time)!!.setText(bean.add_time)
         holder.getView<TextView>(R.id.tv_money)!!.setText(bean.aw_gold+"金币")
     }

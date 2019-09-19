@@ -7,9 +7,9 @@
     android:padding="10dp">
 
     <com.ysxsoft.imtalk.widget.CircleImageView
-        android:id="@+id/img_head"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/img_head2"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:src="@mipmap/img_normal_head" />
 
     <TextView
@@ -20,7 +20,7 @@
         android:singleLine="true"
         android:text="Lorem ipsum dolor sit  "
         android:textColor="@color/white"
-        app:layout_constraintLeft_toRightOf="@id/img_head" />
+        app:layout_constraintLeft_toRightOf="@id/img_head2" />
 
     <TextView
         android:id="@+id/tv_time"
@@ -30,7 +30,7 @@
         android:text="中奖时间：2019-06-18 16:13:26"
         android:textColor="@color/white"
         android:textSize="10sp"
-        app:layout_constraintLeft_toRightOf="@id/img_head"
+        app:layout_constraintLeft_toRightOf="@id/img_head2"
         app:layout_constraintTop_toBottomOf="@id/tv_nikeName" />
 
     <TextView
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/img_head"
+        app:layout_constraintTop_toBottomOf="@id/img_head2"
         android:background="@color/white"/>
 
 

@@ -9,13 +9,17 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.ysxsoft.imtalk.R;
+import com.ysxsoft.imtalk.bean.RoomMicListBean;
 import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage;
 import com.ysxsoft.imtalk.widget.dialog.GiftBagDialog;
+import com.ysxsoft.imtalk.widget.dialog.InputDialog;
 import com.ysxsoft.imtalk.widget.dialog.SendGiftDialog;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import io.rong.imkit.RongExtension;
 import io.rong.imkit.RongIM;
@@ -46,16 +50,29 @@ public class GiftPlugin implements IPluginModule,IPluginRequestPermissionResultC
     @Override
     public void onClick(Fragment fragment, RongExtension rongExtension) {
         SendGiftDialog sendGiftDialog=new SendGiftDialog(fragment.getActivity(),rongExtension.getTargetId());
-        sendGiftDialog.setOnSendGiftListener(new SendGiftDialog.OnSendGiftListener() {
+        sendGiftDialog.setonGiftListener(new SendGiftDialog.OnGiftListener() {
             @Override
-            public void onSendSuccess(@NotNull String from, @Nullable String to, @NotNull String giftId, @NotNull String giftNum) {
-                ToastUtils.showToast("from"+from+" to:"+to+" giftId:"+giftId+" giftNum:"+giftNum);
-                PrivateGiftMessage message=new PrivateGiftMessage();
-                message.setGiftNum(giftNum);
-                message.setGiftName("测试");
-                message.setGiftUrl("http://www.baidu.com/a.png");
+            public void needInputed() {
+                //需要显示输入数量
+                InputDialog d = new InputDialog(fragment.getActivity(), R.style.BottomStyle);
+                d.setListener(new InputDialog.OnDialogClickListener(){
+                    @Override
+                    public void input(String giftNum) {
+                        sendGiftDialog.setGiftNum(giftNum.toString());
+                    }
+                });
+                d.showDialog();
+            }
 
-                RongIMClient.getInstance().sendMessage(Conversation.ConversationType.PRIVATE,rongExtension.getTargetId(),message, null, null, new IRongCallback.ISendMessageCallback() {
+            @Override
+            public void onClck(int targetPosition, @NotNull List<Integer> toPosition, @NotNull String pic, @NotNull List<? extends RoomMicListBean.DataBean> dataList, @NotNull String gifPic, @NotNull String gifName, @NotNull String gifNum, @NotNull String targetUserId, @NotNull String toUserName) {
+                PrivateGiftMessage message=new PrivateGiftMessage();
+                message.setGiftNum(gifNum);
+                message.setGiftName(gifName);
+                message.setGiftUrl(pic);
+                message.setToName(toUserName);
+                Message m=Message.obtain(rongExtension.getTargetId(), Conversation.ConversationType.PRIVATE,message);
+                RongIM.getInstance().sendMessage(m, null, null, new IRongCallback.ISendMessageCallback() {
                     @Override
                     public void onAttached(Message message) {
                         Log.e("tag","onAttached");

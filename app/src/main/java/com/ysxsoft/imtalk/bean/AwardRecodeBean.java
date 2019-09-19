@@ -66,6 +66,7 @@ public class AwardRecodeBean {
         private String aw_images;
         private String aw_gold;
         private String add_time;
+        private String nums;
 
         public int getId() {
             return id;
@@ -73,6 +74,14 @@ public class AwardRecodeBean {
 
         public void setId(int id) {
             this.id = id;
+        }
+
+        public String getNums() {
+            return nums == null ? "" : nums;
+        }
+
+        public void setNums(String nums) {
+            this.nums = nums;
         }
 
         public String getAw_name() {

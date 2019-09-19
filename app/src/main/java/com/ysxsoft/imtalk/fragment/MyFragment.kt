@@ -11,12 +11,10 @@ import com.ysxsoft.imtalk.bean.UserInfoBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.BaseFragment
-import com.ysxsoft.imtalk.utils.ImageLoadUtil
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.*
 import com.ysxsoft.imtalk.widget.dialog.DatePickerDialog
+import io.rong.callkit.util.SPUtils
 import kotlinx.android.synthetic.main.fm_my.*
 import kotlinx.android.synthetic.main.include_my_top.*
 import kotlinx.android.synthetic.main.title_layout2.*
@@ -106,6 +104,9 @@ class MyFragment : BaseFragment() {
                             }else{
                                 img_sex.setImageResource(R.mipmap.img_girl)
                             }
+
+                            SharedPreferencesUtils.saveCarName(mContext,dataBean!!.user_zj_name);//保存座驾名称
+                            SharedPreferencesUtils.saveCarPic(mContext,dataBean!!.user_zj_pic)//保存座驾图片
                         }
                     }
 

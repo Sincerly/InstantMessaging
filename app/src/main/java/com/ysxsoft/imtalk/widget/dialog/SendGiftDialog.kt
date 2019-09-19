@@ -1,13 +1,17 @@
 package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
-import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
 import com.gcssloop.widget.PagerGridLayoutManager
 import com.gcssloop.widget.PagerGridSnapHelper
+import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.GridBageAdpater
 import com.ysxsoft.imtalk.adapter.GridGiftAdpater
@@ -22,8 +26,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.JbWithDrawActivity
 import com.ysxsoft.imtalk.widget.ABSDialog
-import io.rong.callkit.util.SPUtils
-import kotlinx.android.synthetic.main.dialog_send_gift.*
+import kotlinx.android.synthetic.main.gift_bag_dialog_layout.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -35,14 +38,16 @@ import rx.schedulers.Schedulers
  */
 class SendGiftDialog : ABSDialog {
 
+    var zsPopuwindows:ZSPopuwindows?=null
     var type = 3
-    var gift_id: String? = null
     var gift_num: String? = null
-    var targetId: String? = null
+    var gifname: String? = null
     var gifurl: String? = null
-    var num = 0
     var giftbage = 1
-    private var sectionNum = StringBuffer()
+    var mwJson:String?=""
+    var targetUserId = "";
+    var targetUserName = "";
+
     override fun initView() {
         tv1.isSelected = true
         tv1.setOnClickListener {
@@ -64,32 +69,46 @@ class SendGiftDialog : ABSDialog {
         }
 
         tv_zs.setOnClickListener {
-            if (TextUtils.isEmpty(targetId) || "0".equals(targetId)) {
-                ToastUtils.showToast(this@SendGiftDialog.context, "赠送人不能为空")
-                return@setOnClickListener
-            }
-
             if (TextUtils.isEmpty(giftid) && TextUtils.isEmpty(bageId)) {
                 ToastUtils.showToast(this@SendGiftDialog.context, "所选礼物或座驾不能为空")
                 return@setOnClickListener
             }
+            if (gift_num == null) {
+                gift_num = "1"
+            }
+            if("".equals(toUserName.text.toString())){
+                ToastUtils.showToast(this@SendGiftDialog.context, "正在获取对方信息，请稍后重试！")
+                return@setOnClickListener
+            }
+            sendGift()
+        }
 
-            val zsPopuwindows = ZSPopuwindows(this@SendGiftDialog.context, R.layout.zs_layout, tv_zs)
-            zsPopuwindows.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
+        inputNumberLayout.setOnClickListener {
+            zsPopuwindows = ZSPopuwindows(this@SendGiftDialog.context, R.layout.zs_layout, tv_zs)
+            zsPopuwindows!!.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
                 override fun giftClick(times: String, id: String) {
-                    dismiss()
-                    if("-1".equals(times)){
+                    if ("-1".equals(times)) {
                         //选择了其他数量
-
-                    }else{
+                        onGiftListener!!.needInputed()
+                    } else {
                         gift_num = times
-                        gift_id = id
                         tv_zs.setText("赠送 x " + times)
-                        //直接发送数量
-                        sendGift()
+                        inputNumber.setText(times)
                     }
                 }
             })
+        }
+    }
+
+    /**
+     * 设置礼物数量
+     */
+    public fun setGiftNum(num: String) {
+        gift_num = num
+        tv_zs.setText("赠送 x " + num)
+        inputNumber.setText(num)
+        if(zsPopuwindows!!!=null&&zsPopuwindows!!.isShowing){
+            zsPopuwindows!!.dismiss()
         }
     }
 
@@ -99,7 +118,7 @@ class SendGiftDialog : ABSDialog {
         map.put("gift_id", giftid.toString())
         map.put("gift_num", gift_num.toString())
         map.put("room_id", "")
-        map.put("income_gift_uid", targetId!!)
+        map.put("income_gift_uid", mwJson!!)
         map.put("uid", SpUtils.getSp(this@SendGiftDialog.context, "uid"))
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
@@ -112,19 +131,21 @@ class SendGiftDialog : ABSDialog {
 
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
-                            if (listener != null) {
-                                listener!!.onSendSuccess(SpUtils.getSp(this@SendGiftDialog.context, "uid"),targetId,giftid.toString(),gift_num.toString())
+                            dismiss()
+                            if (onGiftListener != null) {
+                                val data = ArrayList<Int>()
+                                var fromPosition = -1;//默认不在麦位上
+
+                                onGiftListener!!.onClck(fromPosition, data, pic!!, emptyList(), gifurl!!, gifname!!, gift_num!!,targetUserId,toUserName.text.toString())
                             }
-                        }else{
-                            ToastUtils.showToast(this@SendGiftDialog.context,t.msg)
+                        } else {
+                            ToastUtils.showToast(this@SendGiftDialog.context, t.msg)
                         }
                     }
 
                     override fun onCompleted() {
                     }
                 })
-
-
     }
 
     var bageId: String? = null
@@ -148,6 +169,7 @@ class SendGiftDialog : ABSDialog {
                                 override fun onBage(position: Int) {
                                     giftid = bageAdpater.dataList.get(position).id.toString()
                                     gifurl = bageAdpater.dataList.get(position).aw_gif
+                                    gifname = bageAdpater.dataList.get(position).aw_name
                                     pic = bageAdpater.dataList.get(position).aw_images
                                     bageAdpater.setSelect(position)
                                 }
@@ -178,6 +200,31 @@ class SendGiftDialog : ABSDialog {
                 })
     }
 
+
+    /**
+     * 获取好友资料以及信息
+     */
+    private fun getUserInfo(uid: String) {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(uid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            toUserName.setText(t.data.nickname)
+                            Glide.with(context).load(t.data.icon).into(toIcon)
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
     var giftid: String? = null
     var pic: String? = null
 
@@ -199,6 +246,7 @@ class SendGiftDialog : ABSDialog {
                                     giftid = giftAdpater.dataList.get(position).id.toString()
                                     pic = giftAdpater.dataList.get(position).pic
                                     gifurl = giftAdpater.dataList.get(position).gif_pic
+                                    gifname = giftAdpater.dataList.get(position).name
                                     giftAdpater.setSelect(position)
                                 }
                             })
@@ -208,37 +256,54 @@ class SendGiftDialog : ABSDialog {
     }
 
     override fun getLayoutResId(): Int {
-        return R.layout.dialog_send_gift
+        return R.layout.gift_bag_dialog_layout
     }
 
-    constructor(mContext: Context, targetId: String) : super(mContext) {
-        this.targetId = targetId
+    var layoutManager: PagerGridLayoutManager;
+
+    constructor(mContext: Context, targetUserId: String) : super(mContext) {
         val window = window
         window.setGravity(Gravity.BOTTOM)
         val params = window.attributes
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         params.width = ViewGroup.LayoutParams.MATCH_PARENT
         window.attributes = params
-
         // 1.水平分页布局管理器
-        val layoutManager = PagerGridLayoutManager(2, 4, PagerGridLayoutManager.HORIZONTAL)
+        layoutManager = PagerGridLayoutManager(2, 4, PagerGridLayoutManager.HORIZONTAL)
         grid_view.setLayoutManager(layoutManager)
+        layoutManager.setPageListener(object : PagerGridLayoutManager.PageListener {
+            override fun onPageSelect(pageIndex: Int) {
+                giftIndicator.setCurrent(pageIndex)
+            }
 
+            override fun onPageSizeChanged(pageSize: Int) {
+                giftIndicator.setMax(pageSize)
+            }
+        })
         // 2.设置滚动辅助工具
         val pageSnapHelper = PagerGridSnapHelper()
         pageSnapHelper.attachToRecyclerView(grid_view)
+        infoLayout.visibility = View.VISIBLE
+        val micData = ArrayList<String>()
+        micData.add(targetUserId)
+        val gson = Gson();
+        mwJson = gson.toJson(micData);
+        this.targetUserId = targetUserId;
+        this.targetUserName = targetUserName;
 
-        GiftData()
-        userInfo()
+        getUserInfo(targetUserId)//获取别人信息
+        GiftData()//获取礼物数据
+        userInfo()//获取自己信息
     }
 
-    interface OnSendGiftListener {
-        fun onSendSuccess(from: String,to: String?,giftId: String,giftNum: String)
+    interface OnGiftListener {
+        fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String,targetUserId:String,toUserName:String)
+        fun needInputed();
     }
 
-    private var listener: OnSendGiftListener? = null
+    private var onGiftListener: OnGiftListener? = null
 
-    fun setOnSendGiftListener(onSendGiftListener: OnSendGiftListener) {
-        this.listener = onSendGiftListener
+    fun setonGiftListener(onGiftListener: OnGiftListener) {
+        this.onGiftListener = onGiftListener
     }
 }

@@ -27,6 +27,9 @@ public class RoomMemberChangedMessage extends MessageContent {
     private String targetUserId;
     private int targetPosition = -1; //-1 无效，>=0 有效的麦位
 
+    private String carName="";//座驾名称
+    private String carPic="";//座驾链接
+
     public RoomMemberChangedMessage(byte[] data) {
         String jsonStr = null;
         try {
@@ -39,6 +42,8 @@ public class RoomMemberChangedMessage extends MessageContent {
             setCmd(jsonObj.optInt("cmd"));
             setTargetUserId(jsonObj.optString("targetUserId"));
             setTargetPosition(jsonObj.optInt("targetPosition"));
+            setCarName(jsonObj.optString("carName"));
+            setCarPic(jsonObj.optString("carPic"));
             if (jsonObj.has("user")) {
                 this.setUserInfo(this.parseJsonToUserInfo(jsonObj.getJSONObject("user")));
             }
@@ -72,6 +77,22 @@ public class RoomMemberChangedMessage extends MessageContent {
         this.targetPosition = targetPosition;
     }
 
+    public String getCarName() {
+        return carName == null ? "" : carName;
+    }
+
+    public void setCarName(String carName) {
+        this.carName = carName;
+    }
+
+    public String getCarPic() {
+        return carPic == null ? "" : carPic;
+    }
+
+    public void setCarPic(String carPic) {
+        this.carPic = carPic;
+    }
+
     @Override
     public byte[] encode() {
         JSONObject jsonObj = new JSONObject();
@@ -79,6 +100,8 @@ public class RoomMemberChangedMessage extends MessageContent {
             jsonObj.put("cmd", cmd);
             jsonObj.put("targetUserId", getTargetUserId());
             jsonObj.put("targetPosition", getTargetPosition());
+            jsonObj.put("carName", getCarName());
+            jsonObj.put("carPic", getCarPic());
             if (this.getJSONUserInfo() != null) {
                 jsonObj.putOpt("user", this.getJSONUserInfo());
             }
@@ -102,6 +125,8 @@ public class RoomMemberChangedMessage extends MessageContent {
         dest.writeInt(this.cmd);
         dest.writeString(this.targetUserId);
         dest.writeInt(this.targetPosition);
+        dest.writeString(this.carName);
+        dest.writeString(this.carPic);
         ParcelUtils.writeToParcel(dest, this.getUserInfo());
     }
 
@@ -112,6 +137,8 @@ public class RoomMemberChangedMessage extends MessageContent {
         this.cmd = in.readInt();
         this.targetUserId = in.readString();
         this.targetPosition = in.readInt();
+        this.carName = in.readString();
+        this.carPic = in.readString();
         this.setUserInfo((UserInfo)ParcelUtils.readFromParcel(in, UserInfo.class));
     }
 

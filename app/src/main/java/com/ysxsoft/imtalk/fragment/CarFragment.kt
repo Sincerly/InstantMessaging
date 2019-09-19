@@ -15,10 +15,7 @@ import com.ysxsoft.imtalk.adapter.DressMallAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DressMallBean
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.AppUtil
-import com.ysxsoft.imtalk.utils.BaseFragment
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.MyDressActivity
 import kotlinx.android.synthetic.main.head_wear_fragment_layout.*
 import rx.Observer
@@ -94,6 +91,7 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
             tv_money1.setText(bean.gold + "金币")
             tv_day1.setText("/" + bean.days + "天")
             mDataAdapter!!.setSelect(position)
+            CarUtils.playCarPlayOne(activity,bean.gif_pic)
         }
         //设置底部加载颜色
         mRecyclerView.setFooterViewColor(R.color.btn_color, R.color.black, android.R.color.transparent)
