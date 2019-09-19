@@ -612,5 +612,8 @@ interface ImpService {
     @POST("Room/isAdmin")
     fun isAdmin(@Body body: RequestBody): Observable<IsAdminBean>
 
+    @POST("Room/remove_user")
+    fun remove_user(@Body body: RequestBody): Observable<CommonBean>
+
 
 }

@@ -12,6 +12,7 @@ import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
@@ -150,13 +151,9 @@ class SettingActivity : BaseActivity() {
                                 if (t.code == 0) {
                                     IMClient.getInstance().quitChatRoom(roomId, null)
                                     RtcClient.getInstance().quitRtcRoom(roomId, null)
-                                    val intent = Intent(mContext, PlayMusicService::class.java)
-                                    stopService(intent)
-
-                                    var instance = ActivityPageManager.getInstance();
-                                    instance!!.finishAllActivity();
-                                    SpUtils.deleteSp(mContext)
-                                    mContext.startActivity(Intent(mContext, LoginActivity::class.java))
+                                    removeUser(roomId!!,AuthManager.getInstance().currentUserId)
+//                                    val intent = Intent(mContext, PlayMusicService::class.java)
+//                                    stopService(intent)
 
                                 }
                             }
@@ -171,5 +168,30 @@ class SettingActivity : BaseActivity() {
             }
         });
     }
+    fun removeUser(roomId:String,uid:String){
+        val map = HashMap<String, String>()
+        map.put("room_id",roomId)
+        map.put("uid",uid)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .remove_user(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
 
+                    override fun onNext(t: CommonBean?) {
+                        if (t!!.code==0){
+                            var instance = ActivityPageManager.getInstance();
+                            instance!!.finishAllActivity();
+                            SpUtils.deleteSp(mContext)
+                            mContext.startActivity(Intent(mContext, LoginActivity::class.java))
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
 }

@@ -38,6 +38,7 @@ import rx.schedulers.Schedulers
  */
 class GiftBagDialog : ABSDialog {
 
+    var zsPopuwindows:ZSPopuwindows?=null
     var type = 3
     var gift_num: String? = null
     var roomId: String? = null
@@ -87,8 +88,8 @@ class GiftBagDialog : ABSDialog {
         }
 
         inputNumberLayout.setOnClickListener {
-            val zsPopuwindows = ZSPopuwindows(this@GiftBagDialog.context, R.layout.zs_layout, tv_zs)
-            zsPopuwindows.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
+            zsPopuwindows = ZSPopuwindows(this@GiftBagDialog.context, R.layout.zs_layout, tv_zs)
+            zsPopuwindows!!.setOnGiftListener(object : ZSPopuwindows.OnGiftListener {
                 override fun giftClick(times: String, id: String) {
                     if ("-1".equals(times)) {
                         //选择了其他数量
@@ -134,6 +135,9 @@ class GiftBagDialog : ABSDialog {
         gift_num = num
         tv_zs.setText("赠送 x " + num)
         inputNumber.setText(num)
+        if(zsPopuwindows!!!=null&&zsPopuwindows!!.isShowing){
+            zsPopuwindows!!.dismiss()
+        }
     }
 
     val uidList = ArrayList<String>()
