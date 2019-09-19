@@ -5,6 +5,7 @@
     >
 
     <RelativeLayout
+        android:id="@+id/linoutItem"
         android:layout_width="90dp"
         android:layout_height="130dp"
         android:layout_marginStart="7dp"

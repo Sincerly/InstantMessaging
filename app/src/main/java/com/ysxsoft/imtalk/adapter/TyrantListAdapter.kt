@@ -18,8 +18,12 @@ class TyrantListAdapter(mContext:Context) :ListBaseAdapter<TyrantListBean.DataBe
     override val layoutId: Int
         get() = R.layout.item_tyrant
 
+    override fun getItemCount(): Int {
+        return super.getItemCount()-3
+    }
+
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
-        val bean = mDataList.get(position)
+        val bean = mDataList.get(position+3)
         //排名
         holder.getView<TextView>(R.id.tvNo)!!.text = (position+4).toString()
         //头像圆形

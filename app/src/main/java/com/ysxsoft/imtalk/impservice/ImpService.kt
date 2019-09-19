@@ -384,6 +384,14 @@ interface ImpService {
     @POST("Order/recharge")
     fun recharge(@Body body: RequestBody): Observable<OrderBean>
 
+    //土豪榜（房间内)
+    @FormUrlEncoded
+    @POST("level/local_tyrant")
+    fun roomTyrantList(@Field("type") uid: Int, @Field("room_id") room_id: String): Observable<TyrantListBean>
+    //巨星榜(房间内)
+    @FormUrlEncoded
+    @POST("level/giant_star")
+    fun roomSupperStarList(@Field("type") uid: Int, @Field("room_id") room_id: String): Observable<SupperStarBean>
     //土豪榜
     @FormUrlEncoded
     @POST("level/local_tyrant")
