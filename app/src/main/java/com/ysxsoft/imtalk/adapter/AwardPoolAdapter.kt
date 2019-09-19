@@ -22,7 +22,7 @@ class AwardPoolAdapter(mContext: Context) : ListBaseAdapter<AwardListDataBean.Da
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
         holder.getView<TextView>(R.id.tv_time)!!.visibility=View.GONE
-        ImageLoadUtil.GlideHeadImageLoad(mContext,bean.sg_pic,holder.getView<CircleImageView>(R.id.img_head)!!)
+        ImageLoadUtil.GlideHeadImageLoad(mContext,bean.sg_pic,holder.getView<CircleImageView>(R.id.img_head2)!!)
         holder.getView<TextView>(R.id.tv_nikeName)!!.setText(bean.sg_name)
         holder.getView<TextView>(R.id.tv_money)!!.setText(bean.sg_gold+"金币")
 

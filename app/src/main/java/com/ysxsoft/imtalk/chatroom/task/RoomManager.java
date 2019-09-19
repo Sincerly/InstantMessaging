@@ -627,7 +627,7 @@ public class RoomManager {
                                         @Override
                                         public void run() {
                                             roomEventlistener.onMessageEvent(message);
-                                            roomEventlistener.onRoomMemberChange(memCount);
+                                            roomEventlistener.onRoomMemberChangeWithCar(memCount,memberChangedMessage.getCarPic());
                                         }
                                     });
                                 }

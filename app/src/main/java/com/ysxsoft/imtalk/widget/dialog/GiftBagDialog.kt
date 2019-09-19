@@ -279,7 +279,7 @@ class GiftBagDialog : ABSDialog {
 
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
-                            tv_user_gold.setText(t.data.money)
+                            tv_user_gold.setText(t.data.money+"金币")
                         }
                     }
 
@@ -456,6 +456,7 @@ class GiftBagDialog : ABSDialog {
             MwData(room_id, mContext)
             micLayout.visibility = View.VISIBLE
         } else {
+            MwData(room_id, mContext)
             getUserInfo(targetUserId)//获取别人信息
             infoLayout.visibility = View.VISIBLE
             val micData = ArrayList<String>()

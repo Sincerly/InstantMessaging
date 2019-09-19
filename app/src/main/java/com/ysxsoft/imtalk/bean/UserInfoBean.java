@@ -74,6 +74,24 @@ public class UserInfoBean {
         private int user_level;
         private int charm_level;
         private List<PictureBean> picture;
+        private String user_zj_name;//座驾名称
+        private String user_zj_pic;//座驾图片
+
+        public String getUser_zj_name() {
+            return user_zj_name == null ? "" : user_zj_name;
+        }
+
+        public void setUser_zj_name(String user_zj_name) {
+            this.user_zj_name = user_zj_name;
+        }
+
+        public String getUser_zj_pic() {
+            return user_zj_pic == null ? "" : user_zj_pic;
+        }
+
+        public void setUser_zj_pic(String user_zj_pic) {
+            this.user_zj_pic = user_zj_pic;
+        }
 
         public String getMoney() {
             return money;

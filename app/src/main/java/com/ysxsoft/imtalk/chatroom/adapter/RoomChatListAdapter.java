@@ -122,8 +122,12 @@ public class RoomChatListAdapter extends BaseAdapter {
             }
             RoomMemberChangedMessage.RoomMemberAction roomMemberAction = memberMessage.getRoomMemberAction();
             if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.JOIN) {
-                viewHolder.messageTv.setText(R.string.chatroom_user_enter);
-            } /*else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
+                String carName="";
+                if(memberMessage.getCarName()!=null&&!"".equals(memberMessage.getCarName())){
+                    carName="乘着"+memberMessage.getCarName();
+                }
+                viewHolder.messageTv.setText((carName)+context.getString(R.string.chatroom_user_enter));
+            }/*else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_quit);
             }*/ else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_kick);

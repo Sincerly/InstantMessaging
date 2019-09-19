@@ -54,22 +54,18 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         }
         tv_winning_record.setOnClickListener {
             isClick = false
-            dismiss()
             WiningRecordDialog(mContext).show()
         }
         tv_award_pool.setOnClickListener {
             isClick = false
-            dismiss()
             AwardPoolDialog(mContext).show()
         }
         tv_activity_rules.setOnClickListener {
             isClick = false
-            dismiss()
             ActivityRulesDialog(mContext).show()
         }
         tv_withdraw.setOnClickListener {
             isClick = false
-            dismiss()
             JbWithDrawActivity.starJbWithDrawActivity(mContext)
         }
 
@@ -179,6 +175,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 //砸蛋100次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     //跳转到列表
+                                    WiningRecordDialog(mContext).show()
                                 }, 3000)
                             }
                         }

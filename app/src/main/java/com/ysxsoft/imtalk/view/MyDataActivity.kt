@@ -338,6 +338,10 @@ class MyDataActivity : BaseActivity() {
             override fun onSuccess(result: DetailRoomInfo?) {
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
+                val carName=SharedPreferencesUtils.getCarName(mContext)
+                val carPic=SharedPreferencesUtils.getCarPic(mContext)
+                message.carName=carName//座驾名称
+                message.carPic=carPic//座驾图片
                 message.targetUserId = SpUtils.getSp(mContext, "uid")
                 message.targetPosition = -1
                 message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mybean!!.nickname, Uri.parse(mybean!!.icon))

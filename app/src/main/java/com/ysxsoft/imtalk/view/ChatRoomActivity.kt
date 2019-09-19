@@ -95,7 +95,6 @@ import java.util.ArrayList
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
-
     override fun setManager(uid: String?,cmd:String?) {
         Log.d("》》》》","设置管理员成功====="+uid)
         AdminData()
@@ -179,6 +178,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onRoomMemberChange(memberCount: Int) {
         updateRoomInfo()
         updateRoomTitle(detailRoomInfo!!.roomInfo.room_name, detailRoomInfo!!.roomInfo.room_num, memberCount.toString())
+    }
+
+    /**
+     * 携带座驾进入
+     */
+    override fun onRoomMemberChangeWithCar(memberCount: Int,carPic:String) {
+        updateRoomInfo()
+        updateRoomTitle(detailRoomInfo!!.roomInfo.room_name, detailRoomInfo!!.roomInfo.room_num, memberCount.toString())
+        if(carPic!=null&&!"".equals(carPic)){
+            CarUtils.playCar(this,carPic);
+        }
     }
 
     override fun onMicUpdate(micPositionInfoList: MutableList<MicPositionsBean>?) {
@@ -366,8 +376,16 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val messageList = detailRoomInfo!!.getMessageList()
 
         //加入一条自己进入房间的消息
-        val message = IMClient.getInstance().createLocalEnterRoomMessage(AuthManager.getInstance().currentUserId, room_id, nikeName!!, icon!!)
+        val carName=SharedPreferencesUtils.getCarName(mContext)
+        val carPic=SharedPreferencesUtils.getCarPic(mContext)
+
+        val message = IMClient.getInstance().createLocalEnterRoomMessage(AuthManager.getInstance().currentUserId, room_id, nikeName!!, icon!!,carName,carPic)
         chatMessageList.add(message)
+
+        //播放自己的座驾
+        if(carPic!=null&&!"".equals(carPic)){
+            CarUtils.playCar(this,carPic)
+        }
 
         //设置聊天信息
         chatMessageList.addAll(messageList)
@@ -853,7 +871,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
                     });
                 }else{
-                    //赠送的是别人发送小屏消息
+                    //赠送给别人 发送小屏消息
                     val giftChatMessage = GiftChatMessage()
                     giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
                     giftChatMessage.toName = targetUserName//接收人
@@ -2551,6 +2569,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
                 message.targetUserId = SpUtils.getSp(mContext, "uid")
+                val carName=SharedPreferencesUtils.getCarName(mContext)
+                val carPic=SharedPreferencesUtils.getCarPic(mContext)
+                message.carName=carName//座驾名称
+                message.carPic=carPic//座驾图片
                 message.targetPosition = -1
                 message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
                 val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
@@ -2711,6 +2733,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         super.onDestroy()
         unregisterReceiver(headsetPlugReceiver)
         unregisterReceiver(bgChangBroadCast)
+
         if (audioManager != null) {
             audioManager!!.setMode(AudioManager.MODE_NORMAL)
         }

@@ -195,9 +195,11 @@ public class IMClient {
      * @param roomId 房间id
      * @return
      */
-    public Message createLocalEnterRoomMessage(String userId, String roomId,String name,String icon) {
+    public Message createLocalEnterRoomMessage(String userId, String roomId,String name,String icon,String carName,String carPic) {
         RoomMemberChangedMessage memberChangedMessage = new RoomMemberChangedMessage();
         memberChangedMessage.setTargetUserId(userId);
+        memberChangedMessage.setCarName(carName==null?"":carName);//座驾名称
+        memberChangedMessage.setCarPic(carPic==null?"":carPic);//座驾图片
         memberChangedMessage.setCmd(1);
         memberChangedMessage.setUserInfo(new UserInfo(userId, name,Uri.parse(icon)));
         return Message.obtain(roomId, Conversation.ConversationType.CHATROOM, memberChangedMessage);

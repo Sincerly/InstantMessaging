@@ -155,7 +155,7 @@ class MainActivity : BaseActivity() {
     }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode != 123) {
-//            showToastMessage("权限没开通，部分功能不能使用")
+            //showToastMessage("权限没开通，部分功能不能使用")
         }
     }
 }

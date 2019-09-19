@@ -9,6 +9,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -75,6 +76,12 @@ public class NotifyManager {
      * @param goldNum  金币数量
      */
     public void addView(String nickname,String giftName,String goldNum) {
+        if(isPaused=true){
+            Log.e("tag","暂停中...");
+            return;
+        }else{
+            Log.e("tag","播放中...");
+        }
         View v = View.inflate(context, R.layout.view_gold_notifycation, null);
         TextView name = v.findViewById(R.id.name);
         TextView num = v.findViewById(R.id.num);
@@ -149,5 +156,15 @@ public class NotifyManager {
         public void setGoldNum(String goldNum) {
             this.goldNum = goldNum;
         }
+    }
+
+    public boolean isPaused=false;
+
+    public void pause(){
+        isPaused=true;
+    }
+
+    public void resume(){
+        isPaused=false;
     }
 }

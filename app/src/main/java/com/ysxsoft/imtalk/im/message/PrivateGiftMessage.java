@@ -10,12 +10,13 @@ import java.io.UnsupportedEncodingException;
 import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
 
-@MessageTag(value = "SM:PrivateGiftMsg", flag = MessageTag.NONE)
+@MessageTag(value = "SM:PrivateGiftMsg", flag = MessageTag.ISCOUNTED|MessageTag.ISPERSISTED)
 public class PrivateGiftMessage extends MessageContent {
     private final static String TAG = PrivateGiftMessage.class.getSimpleName();
     private String giftUrl;
     private String giftName;
     private String giftNum;
+    private String toName;
 
     public PrivateGiftMessage() {
     }
@@ -28,6 +29,7 @@ public class PrivateGiftMessage extends MessageContent {
             setGiftName(jsonObj.optString("giftName"));
             setGiftUrl(jsonObj.optString("giftUrl"));
             setGiftNum(jsonObj.optString("giftNum"));
+            setToName(jsonObj.optString("toName"));
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -53,6 +55,14 @@ public class PrivateGiftMessage extends MessageContent {
 
     public String getGiftNum() {
         return giftNum == null ? "" : giftNum;
+    }
+
+    public String getToName() {
+        return toName == null ? "" : toName;
+    }
+
+    public void setToName(String toName) {
+        this.toName = toName;
     }
 
     public void setGiftNum(String giftNum) {
@@ -86,12 +96,14 @@ public class PrivateGiftMessage extends MessageContent {
         dest.writeString(this.giftName);
         dest.writeString(this.giftNum);
         dest.writeString(this.giftUrl);
+        dest.writeString(this.toName);
     }
 
     protected PrivateGiftMessage(Parcel in) {
         this.giftName = in.readString();
         this.giftNum = in.readString();
         this.giftUrl = in.readString();
+        this.toName = in.readString();
     }
 
     public static final Creator<PrivateGiftMessage> CREATOR = new Creator<PrivateGiftMessage>() {
