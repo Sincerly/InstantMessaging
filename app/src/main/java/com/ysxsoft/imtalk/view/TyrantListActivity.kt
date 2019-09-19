@@ -2,6 +2,7 @@ package com.ysxsoft.imtalk.view
 
 import android.support.design.widget.TabLayout
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.TyrantListAdapter
 import com.ysxsoft.imtalk.bean.SupperStarBean
@@ -9,6 +10,7 @@ import com.ysxsoft.imtalk.bean.TyrantListBean
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.utils.displayResCyclo
 import com.ysxsoft.imtalk.utils.displayUrlCyclo
 import kotlinx.android.synthetic.main.activity_tyrant_list.*
 import kotlinx.android.synthetic.main.include_crown_bronze.*
@@ -27,7 +29,7 @@ import rx.schedulers.Schedulers
 class TyrantListActivity : BaseActivity() {
 
 
-    var mAdapter : TyrantListAdapter ?= null
+    private lateinit var mAdapter : TyrantListAdapter
 
 
     override fun getLayout(): Int {
@@ -90,14 +92,43 @@ class TyrantListActivity : BaseActivity() {
                     if (t!!.code==0){
                         setTopThree(t.data)
                         mAdapter?.setDataList(t.data)
+                    }else{
+                        setTopThree(ArrayList())
+                        mAdapter?.clear()
                     }
                 }
     }
 
     /**
+     * 清除前三
+     */
+    private fun clearTopThree(){
+        ivCrownGold.displayResCyclo( R.mipmap.icon_zanwu)
+        tvNo1Name.text = ""
+        tvNo1ID.text = ""
+        tvNo1Zuan.text = ""
+        tvNo1Zuan.visibility = View.GONE
+        tvNo1Content.visibility = View.GONE
+
+        ivCrownSilver.displayResCyclo(R.mipmap.icon_zanwu)
+        tvNo2Name.text = ""
+        tvNo2ID.text = ""
+        tvNo2Zuan.text = ""
+        tvNo2Zuan.visibility = View.GONE
+        tvNo2Content.visibility = View.GONE
+
+        ivCrownBronze.displayResCyclo(R.mipmap.icon_zanwu)
+        tvNo3Name.text = ""
+        tvNo3ID.text = ""
+        tvNo3Zuan.text = ""
+        tvNo3Zuan.visibility = View.GONE
+        tvNo2Content.visibility = View.GONE
+    }
+    /**
      * 设置前三名
      */
     private fun setTopThree(data: List<TyrantListBean.DataBean>) {
+        clearTopThree()
         for (i in 0..2) {
             when (i) {
                 0 ->
