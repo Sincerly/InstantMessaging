@@ -1,16 +1,20 @@
 package com.ysxsoft.imtalk.view
 
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.view.View
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.*
 import com.ysxsoft.imtalk.bean.StarBean
 import com.ysxsoft.imtalk.bean.SupperStarBean
 import com.ysxsoft.imtalk.bean.WeekStarBean
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.utils.displayResCyclo
 import com.ysxsoft.imtalk.utils.displayUrlCyclo
 import kotlinx.android.synthetic.main.activity_week_star.*
 import kotlinx.android.synthetic.main.include_crown_bronze.*
@@ -20,6 +24,7 @@ import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.include_weekstar_3.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.util.ArrayList
 
 /**
  * 周星榜
@@ -82,6 +87,17 @@ class WeekStarActivity : BaseActivity() {
                 postWeekStarData(item.id)
             }
         })
+        //上周明星/本周明星可以点击进入个人信息页面
+        mAdapter2.setOnclickListener(object : WeekAdapter2.OnItemClickListener{
+            override fun onItemClick(itemView: View, position: Int, item: WeekStarBean.DataBean.LastStarBean) {
+                MyDataActivity.startMyDataActivity(mContext, item.uid.toString(), if (item.uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
+            }
+        })
+        mAdapter4.setOnclickListener(object : WeekAdapter4.OnItemClickListener{
+            override fun onItemClick(itemView: View, position: Int, item: StarBean.DataBean) {
+                MyDataActivity.startMyDataActivity(mContext, item.uid.toString(), if (item.uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
+            }
+        })
     }
 
     /**
@@ -117,9 +133,12 @@ class WeekStarActivity : BaseActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { t ->
-                    if (t!!.code == 0) {
+                    if (t.code == 0) {
                         setTopThree(t.data)
                         mAdapter4.setDataList(t.data)
+                    }else{
+                        setTopThree(ArrayList())
+                        mAdapter4.setDataList(ArrayList())
                     }
                 }
     }
@@ -128,14 +147,27 @@ class WeekStarActivity : BaseActivity() {
      * 设置前三名
      */
     private fun setTopThree(data: List<StarBean.DataBean>) {
-        when (data.size) {
-            0 -> tvNo1Name.text = "暂无"
-            1 -> {
-                tvNo2Name.text = "暂无"
-                tvNo3Name.text = "暂无"
-            }
-            2 -> tvNo3Name.text = "暂无"
-        }
+        ivCrownGold.displayResCyclo( R.mipmap.icon_zanwu)
+        tvNo1Name.text = ""
+        tvNo1ID.text = ""
+        tvNo1Zuan.text = ""
+        tvNo1Zuan.visibility = View.GONE
+        tvNo1Content.visibility = View.GONE
+
+        ivCrownSilver.displayResCyclo(R.mipmap.icon_zanwu)
+        tvNo2Name.text = ""
+        tvNo2ID.text = ""
+        tvNo2Zuan.text = ""
+        tvNo2Zuan.visibility = View.GONE
+        tvNo2Content.visibility = View.GONE
+
+        ivCrownBronze.displayResCyclo(R.mipmap.icon_zanwu)
+        tvNo3Name.text = ""
+        tvNo3ID.text = ""
+        tvNo3Zuan.text = ""
+        tvNo3Zuan.visibility = View.GONE
+        tvNo2Content.visibility = View.GONE
+
         for (i in 0..2) {
             when (i) {
                 0 ->
@@ -144,6 +176,12 @@ class WeekStarActivity : BaseActivity() {
                         tvNo1Name.text = data[i].nickname
                         tvNo1ID.text = "ID:" + data[i].tt_id
                         tvNo1Zuan.text = data[i].now_level.toString()
+                        tvNo1Zuan.visibility = View.VISIBLE
+                        tvNo1Content.text = "NO.1"
+                        tvNo1Content.visibility = View.VISIBLE
+                        ivCrownGold.setOnClickListener {
+                            MyDataActivity.startMyDataActivity(mContext, data[i].uid.toString(), if (data[i].uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
+                        }
                     }
                 1 ->
                     if (data.size >= 2) {
@@ -151,7 +189,12 @@ class WeekStarActivity : BaseActivity() {
                         tvNo2Name.text = data[i].nickname
                         tvNo2ID.text = "ID:" + data[i].tt_id
                         tvNo2Zuan.text = data[i].now_level.toString()
+                        tvNo2Zuan.visibility = View.VISIBLE
                         tvNo2Content.text = "距前一名" + data[i].next_user
+                        tvNo2Content.visibility = View.VISIBLE
+                        ivCrownSilver.setOnClickListener {
+                            MyDataActivity.startMyDataActivity(mContext, data[i].uid.toString(), if (data[i].uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
+                        }
                     }
                 2 ->
                     if (data.size >= 3) {
@@ -159,7 +202,12 @@ class WeekStarActivity : BaseActivity() {
                         tvNo3Name.text = data[i].nickname
                         tvNo3ID.text = "ID:" + data[i].tt_id
                         tvNo3Zuan.text = data[i].now_level.toString()
+                        tvNo3Zuan.visibility = View.VISIBLE
                         tvNo3Content.text = "距前一名" + data[i].next_user
+                        tvNo3Content.visibility = View.GONE
+                        ivCrownBronze.setOnClickListener {
+                            MyDataActivity.startMyDataActivity(mContext, data[i].uid.toString(), if (data[i].uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
+                        }
                     }
             }
         }

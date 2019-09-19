@@ -1,12 +1,15 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.ContentBean
 import com.ysxsoft.imtalk.bean.StarBean
 import com.ysxsoft.imtalk.bean.UserBankListBean
+import com.ysxsoft.imtalk.bean.WeekStarBean
 import com.ysxsoft.imtalk.com.ListBaseAdapter
 import com.ysxsoft.imtalk.com.SuperViewHolder
 import com.ysxsoft.imtalk.utils.displayResCyclo
@@ -19,6 +22,8 @@ import com.ysxsoft.imtalk.view.BankCardEditActivity
  */
 class WeekAdapter4(mContext:Context) :ListBaseAdapter<StarBean.DataBean>(mContext) {
 
+    private lateinit var listener : OnItemClickListener
+
     override val layoutId: Int
         get() = R.layout.item_tyrant
 
@@ -26,8 +31,12 @@ class WeekAdapter4(mContext:Context) :ListBaseAdapter<StarBean.DataBean>(mContex
         return super.getItemCount()-3
     }
 
+    fun setOnclickListener(listener : OnItemClickListener){
+        this.listener = listener
+    }
+
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
-        val bean = mDataList.get(position+3)
+        val bean = mDataList[position+3]
         //排名
         holder.getView<TextView>(R.id.tvNo)!!.text = (position+4).toString()
         //头像圆形
@@ -42,5 +51,14 @@ class WeekAdapter4(mContext:Context) :ListBaseAdapter<StarBean.DataBean>(mContex
         holder.getView<TextView>(R.id.tvSize)!!.text = bean.next_user
         // 距离上一名差距
         holder.getView<TextView>(R.id.tvGap)!!.text = "距离上一名"
+        holder.getView<LinearLayout>(R.id.linoutItem)?.setOnClickListener {
+            listener.onItemClick(it, position, bean)
+        }
     }
+
+
+    interface OnItemClickListener{
+        fun onItemClick(itemView : View, position: Int, item : StarBean.DataBean)
+    }
+
 }

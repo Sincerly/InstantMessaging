@@ -586,7 +586,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_room_level.setOnClickListener {
-            RoomLevelsDialog(mContext, room_id).show()
+//            RoomLevelsDialog(mContext, room_id).show()
+            RoomLevelDialog(mContext, room_id!!)
+                    .show()
         }
 
         tv_music.setOnClickListener {

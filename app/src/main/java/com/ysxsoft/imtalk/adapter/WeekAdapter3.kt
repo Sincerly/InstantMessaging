@@ -21,7 +21,7 @@ import com.ysxsoft.imtalk.view.BankCardEditActivity
  */
 class WeekAdapter3(mContext: Context) : ListBaseAdapter<WeekStarBean.DataBean.WeekBean>(mContext) {
 
-    private var selected: Int? = 0
+    private var selected: Int = 0
     private lateinit var listener : ItemClickListener
 
     fun setListener(listener : ItemClickListener){
@@ -49,6 +49,7 @@ class WeekAdapter3(mContext: Context) : ListBaseAdapter<WeekStarBean.DataBean.We
         linoutItem?.setOnClickListener {
             selected = position
             notifyDataSetChanged()
+            listener.itemClick(mDataList[selected])
         }
     }
 
