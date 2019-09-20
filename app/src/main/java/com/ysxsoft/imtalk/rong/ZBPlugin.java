@@ -34,7 +34,7 @@ public class ZBPlugin implements IPluginModule,IPluginRequestPermissionResultCal
     public void onClick(Fragment fragment, RongExtension rongExtension) {
        String targetId = rongExtension.getTargetId();
        Intent intent=new Intent(fragment.getActivity(),DressMallActivity.class);
-       intent.putExtra("targetId",targetId);
+       intent.putExtra("uid",targetId);
        fragment.getActivity().startActivity(intent);
     }
 

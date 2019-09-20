@@ -38,12 +38,14 @@ class MyDataGiftFragment : BaseFragment() {
 
     var uid: String? = null
     var myself: String? = null
+    var nikeName: String? = null
     var data: Int? = -1
     override fun onResume() {
         super.onResume()
         val bundle = this.arguments//得到从Activity传来的数据
         uid = bundle!!.getString("uid")
         myself = bundle!!.getString("myself")
+        nikeName = bundle!!.getString("nikeName")
         if ("myself".equals(myself)) {
             ll_fs.visibility = View.GONE
         } else {
@@ -66,7 +68,7 @@ class MyDataGiftFragment : BaseFragment() {
         }
         tv_msg.setOnClickListener {
             //私信
-            RongIM.getInstance().startGroupChat(getActivity(), uid, "");
+            RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
 
     }
@@ -147,7 +149,7 @@ class MyDataGiftFragment : BaseFragment() {
 
                     override fun onNext(t: SFGiftBean?) {
                         if (t!!.code == 0) {
-                            tv_gift.setText("收到的礼物（" + t.data.sum + ")")
+                            tv_gift.setText("收到的礼物(" + t.data.sum + ")")
                             myGiftadapter = object : BaseQuickAdapter<SFGiftBean.DataBean.ListInfoBean, BaseViewHolder>(R.layout.my_gift_item_layout, t.data.listInfo) {
                                 override fun convert(helper: BaseViewHolder?, item: SFGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))

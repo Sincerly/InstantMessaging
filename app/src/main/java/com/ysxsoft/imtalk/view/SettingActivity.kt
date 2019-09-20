@@ -118,6 +118,8 @@ class SettingActivity : BaseActivity() {
                     SpUtils.deleteSp(mContext)
                     mContext.startActivity(Intent(mContext, LoginActivity::class.java))
                 }
+
+                sendBroadcast(Intent("WINDOW"))
                 outDialog.dismiss()
             }
             outDialog.show()

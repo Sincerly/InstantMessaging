@@ -28,14 +28,14 @@ class SongVoiceDialog : ABSDialog{
         }
 
         img_stop.setOnClickListener {
-            dismiss()
+//            dismiss()
             if (songVoiceListener!=null){
                 songVoiceListener!!.StopSong()
             }
         }
 
         img_up_song.setOnClickListener {
-            dismiss()
+//            dismiss()
             if (songVoiceListener!=null){
                 songVoiceListener!!.NextSong()
             }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import com.luck.picture.lib.PictureSelector
 import com.luck.picture.lib.config.PictureConfig
 import com.luck.picture.lib.config.PictureMimeType
@@ -18,6 +19,8 @@ import com.ysxsoft.imtalk.adapter.ReportAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.ReportListBean
 import com.ysxsoft.imtalk.bean.UploadFileBean
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.com.FullyGridLayoutManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
@@ -26,6 +29,7 @@ import kotlinx.android.synthetic.main.report_layout.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -59,12 +63,14 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
     var sectionDelete = StringBuffer()
     var sectionPic= StringBuffer()
     var room_id: String? = null
+    var be_uid: String? = null
     var Ids = ArrayList<String>()
     var photoAdapter: GridImageAdapter? = null
      var selectList = ArrayList<LocalMedia>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         room_id = intent.getStringExtra("room_id")
+        be_uid = intent.getStringExtra("be_uid")
         setTitle("举报")
         setBackVisibily()
         initView()
@@ -120,8 +126,42 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
             }
             var info_id = sectionDelete.deleteCharAt(sectionDelete.length - 1).toString();
             var pic_id = sectionPic.deleteCharAt(sectionPic.length - 1).toString();
-            saveData(info_id,pic_id)
+            if (!TextUtils.isEmpty(be_uid)){
+                reportFriend(be_uid,info_id,pic_id)
+            }else{
+                saveData(info_id,pic_id)
+            }
         }
+    }
+
+    private fun reportFriend(be_uid: String?, info_id: String, pic_id: String) {
+        val map = HashMap<String, String>()
+        map.put("be_uid",be_uid!!)
+        map.put("uid",AuthManager.getInstance().currentUserId)
+        map.put("info_id",info_id)
+        map.put("pic_id",pic_id)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .reportUser(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        showToastMessage(t!!.msg)
+                        if (t.code == 0) {
+                            finish()
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
+
     }
 
     private fun saveData(info_id: String, pic_id: String) {

@@ -1,12 +1,15 @@
 package com.ysxsoft.imtalk
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v7.widget.LinearLayoutManager
 import com.luck.picture.lib.permissions.RxPermissions
 import com.ysxsoft.imtalk.fragment.*
 import com.ysxsoft.imtalk.utils.BaseActivity
@@ -16,10 +19,25 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import android.text.TextUtils
+import android.util.Log
 import android.view.KeyEvent
+import com.ysxsoft.imtalk.adapter.PhotosAdpater
+import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.QdSignListBean
+import com.ysxsoft.imtalk.bean.UserInfoBean
+import com.ysxsoft.imtalk.chatroom.im.IMClient
+import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.utils.ActivityPageManager
 import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.view.LoginActivity
+import io.rong.imlib.IRongCallback
+import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.Message
 import org.litepal.LitePal
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -61,6 +79,29 @@ class MainActivity : BaseActivity() {
         setLightStatusBar(true)
         initView()
         requestData()
+        requestMyData()
+    }
+
+    var dataBean: UserInfoBean.DataBean? = null
+    private fun requestMyData() {
+        NetWork.getService(ImpService::class.java)
+                .GetUserInfo(AuthManager.getInstance().currentUserId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<UserInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: UserInfoBean?) {
+                        if (t!!.code == 0) {
+                            dataBean = t.data
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
     }
 
     override fun onResume() {
@@ -69,18 +110,19 @@ class MainActivity : BaseActivity() {
             loginToIM(SpUtils.getSp(mContext, "chat_token"))
         }
     }
+
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
                 .SignList(SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<QdSignListBean>{
+                .subscribe(object : Observer<QdSignListBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: QdSignListBean?) {
-                        if (t!!.code==0){
-                            if (t.data.is_signs==1){
+                        if (t!!.code == 0) {
+                            if (t.data.is_signs == 1) {
                                 QDDialog(mContext).show()
                             }
                         }
@@ -140,9 +182,13 @@ class MainActivity : BaseActivity() {
     }
 
     private var isBack = false
-   override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (isBack) {
+                sendBroadcast(Intent("WINDOW"))
+                if (!TextUtils.isEmpty(dataBean!!.now_roomId)){
+                    quiteRoom(AuthManager.getInstance().currentUserId,"1")
+                }
                 finish()
             } else {
                 showToastMessage("再按一次退出")
@@ -153,9 +199,79 @@ class MainActivity : BaseActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode != 123) {
             //showToastMessage("权限没开通，部分功能不能使用")
         }
+    }
+
+    private fun quiteRoom(uid: String, kick: String) {
+        val message = RoomMemberChangedMessage()
+        message.setCmd(2)//离开房间
+        message.targetUserId = uid
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), dataBean!!.nickname, Uri.parse(dataBean!!.icon))
+        val obtain = Message.obtain(dataBean!!.now_roomId, Conversation.ConversationType.CHATROOM, message)
+
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+                Log.d("tag", p0!!.content.toString())
+            }
+
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(uid, kick, dataBean!!.now_roomId!!)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                            }
+
+                            override fun onNext(t: CommonBean?) {
+                                showToastMessage(t!!.msg)
+                                if (t.code == 0) {
+                                    IMClient.getInstance().quitChatRoom(dataBean!!.now_roomId, null)
+                                    RtcClient.getInstance().quitRtcRoom(dataBean!!.now_roomId, null)
+                                    removeUser(dataBean!!.now_roomId!!,AuthManager.getInstance().currentUserId)
+//                                    val intent = Intent(mContext, PlayMusicService::class.java)
+//                                    stopService(intent)
+
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
+            }
+
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                Log.d("tag", p0!!.content.toString())//23409
+            }
+        });
+    }
+
+    fun removeUser(roomId:String,uid:String){
+        val map = HashMap<String, String>()
+        map.put("room_id",roomId)
+        map.put("uid",uid)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .remove_user(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        if (t!!.code==0){
+
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
     }
 }

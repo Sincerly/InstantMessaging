@@ -1045,7 +1045,6 @@ public class RoomManager {
          */
         @Override
         public void onUserLeft(RongRTCRemoteUser rongRTCRemoteUser) {
-            ToastUtils.showToast("用户离开房间");
         }
 
         /**

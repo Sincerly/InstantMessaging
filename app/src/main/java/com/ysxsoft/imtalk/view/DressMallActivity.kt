@@ -1,8 +1,10 @@
 package com.ysxsoft.imtalk.view
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -38,12 +40,11 @@ import java.lang.ref.WeakReference
 class DressMallActivity : BaseActivity() {
 
     companion object {
-        fun startDressMallActivity(mContext: Context,uid:String){
+        fun startDressMallActivity(mContext: Context, uid: String) {
             val intent = Intent(mContext, DressMallActivity::class.java)
-            intent.putExtra("uid",uid)
+            intent.putExtra("uid", uid)
             mContext.startActivity(intent)
         }
-
     }
 
     override fun getLayout(): Int {
@@ -52,11 +53,12 @@ class DressMallActivity : BaseActivity() {
 
     var currentFragment: BaseFragment? = null
     var uid: String? = null
+    var myBroadCast: MyBroadCast? = null
 
     private var tagP = "0"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-         uid = intent.getStringExtra("uid")
+        uid = intent.getStringExtra("uid")
 //dress_mall_item_layout  theme_frame_bg
         setLightStatusBar(false)
         initStatusBar(topView)
@@ -66,6 +68,19 @@ class DressMallActivity : BaseActivity() {
         setBackVisibily()
         initView()
         PersonData()
+        myBroadCast = MyBroadCast()
+        val filter = IntentFilter("HEADWEAR")
+        registerReceiver(myBroadCast, filter)
+
+    }
+
+    inner class MyBroadCast : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if ("HEADWEAR".equals(intent!!.action) && !TextUtils.isEmpty("headwarurl")) {
+                val headwarurl = intent.getStringExtra("headwarurl")
+                ImageLoadUtil.GlideHeadImageLoad(mContext,headwarurl,img_head_wear)
+            }
+        }
     }
 
     private fun PersonData() {
@@ -108,6 +123,7 @@ class DressMallActivity : BaseActivity() {
             startActivity(MyDressActivity::class.java)
         }
     }
+
     private fun replaceFragment() {
         tv_headwear.isSelected = tagP.equals("0")
         tv_car.isSelected = tagP.equals("1")

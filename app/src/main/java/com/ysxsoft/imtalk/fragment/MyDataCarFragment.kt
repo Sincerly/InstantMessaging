@@ -35,12 +35,14 @@ class MyDataCarFragment : BaseFragment() {
 
     var uid: String? = null
     var myself: String? = null
+    var nikeName: String? = null
     private lateinit var myHearadapter: BaseQuickAdapter<SGiftBean.DataBean.ListInfoBean, BaseViewHolder>
     override fun onResume() {
         super.onResume()
         val bundle = this.arguments//得到从Activity传来的数据
         uid = bundle!!.getString("uid")
         myself = bundle!!.getString("myself")
+        nikeName = bundle!!.getString("nikeName")
         if ("myself".equals(myself)) {
             ll_fs.visibility = View.GONE
             tv_car.visibility = View.GONE
@@ -57,13 +59,14 @@ class MyDataCarFragment : BaseFragment() {
             fouceData()
         }
         tv_msg.setOnClickListener {//私信
-            RongIM.getInstance().startGroupChat(getActivity(), uid, "标题");
+            RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
         tv_car.setOnClickListener {//送座驾
 
         }
 
     }
+
     private fun fouceData() {
         NetWork.getService(ImpService::class.java)
                 .fans_status(SpUtils.getSp(mContext,"uid"),uid!!)
@@ -93,7 +96,7 @@ class MyDataCarFragment : BaseFragment() {
                 .subscribe(object : Action1<SGiftBean> {
                     override fun call(t: SGiftBean?) {
                         if (t!!.code == 0) {
-                            tv_carNum.setText("座驾（" + t.data.sum + ")")
+                            tv_carNum.setText("座驾(" + t.data.sum + ")")
                             myHearadapter = object : BaseQuickAdapter<SGiftBean.DataBean.ListInfoBean, BaseViewHolder>(R.layout.dress_mall_item_layout, t.data.listInfo) {
                                 override fun convert(helper: BaseViewHolder?, item: SGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
@@ -102,7 +105,7 @@ class MyDataCarFragment : BaseFragment() {
                                     helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
                                 }
                             }
-                            recyclerView.layoutManager = GridLayoutManager(mContext,2)
+                            recyclerView.layoutManager = GridLayoutManager(mContext,3)
                             recyclerView.adapter = myHearadapter
 
                         }

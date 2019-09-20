@@ -4,18 +4,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.BlackListBean
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.chatroom.im.message.RoomAdminChangeMessage
+import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
+import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.CircleImageView
+import io.rong.imlib.IRongCallback
+import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.manager_layout.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -100,6 +108,25 @@ class ManagerActivity:BaseActivity(){
                         if (t.code==0){
                             requestData()
                             adapter1.notifyDataSetChanged()
+                            if (type==2){
+                                val adminChangeMessage = RoomAdminChangeMessage()
+                                adminChangeMessage.cmd = "2"
+                                adminChangeMessage.isAdmin = uid
+                                val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, adminChangeMessage)
+
+                                RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+                                    override fun onAttached(p0: Message?) {
+                                        Log.d("tag", p0!!.content.toString())
+                                    }
+
+                                    override fun onSuccess(p0: Message?) {
+                                    }
+
+                                    override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                                        Log.d("tag", p0!!.content.toString())//23409
+                                    }
+                                });
+                            }
                         }
                     }
                 })

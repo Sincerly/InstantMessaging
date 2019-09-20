@@ -112,12 +112,14 @@ public class RoomChatListAdapter extends BaseAdapter {
         // 文本消息
         if (viewType == VIEW_TYPE_CHAT_MESSAGE) {
             TextMessage textMessage = (TextMessage) message.getContent();
-            viewHolder.nickNameTv.setText(textMessage.getUserInfo().getName() + ":");
+            if (textMessage.getUserInfo()!=null){
+                viewHolder.nickNameTv.setText(textMessage.getUserInfo().getName() + ":");
+            }
             viewHolder.messageTv.setText(textMessage.getContent());
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
-            if (memberMessage.getUserInfo() != null) {
+            if (memberMessage.getUserInfo() != null||memberMessage.getRoomMemberAction()!= RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
                 viewHolder.nickNameTv.setText(memberMessage.getUserInfo().getName() + ":");
             }
             RoomMemberChangedMessage.RoomMemberAction roomMemberAction = memberMessage.getRoomMemberAction();

@@ -20,6 +20,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.bean.EventBusBean
 import com.ysxsoft.imtalk.bean.RoomMusicListBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.impservice.ImpService
@@ -30,6 +31,7 @@ import com.ysxsoft.imtalk.utils.displayRes
 import kotlinx.android.synthetic.main.fragment_my_song_book.*
 import kotlinx.android.synthetic.main.include_my_song_book_empty.*
 import kotlinx.android.synthetic.main.include_onlyrecyclerview.*
+import org.greenrobot.eventbus.EventBus
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -46,7 +48,7 @@ class MySongBookFragment : BaseFragment() {
         return R.layout.fragment_my_song_book
     }
 
-    var lists: MutableList<RoomMusicListBean.DataBean>? = null
+    var lists: ArrayList<RoomMusicListBean.DataBean>? = null
     var roomId: String? = null
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -68,7 +70,7 @@ class MySongBookFragment : BaseFragment() {
                 .subscribe(object : Action1<RoomMusicListBean> {
                     override fun call(t: RoomMusicListBean?) {
                         if (t!!.code == 0) {
-                            lists = t.data
+                            lists = t.data as ArrayList<RoomMusicListBean.DataBean>?
                             if (lists == null || lists!!.size <= 0) {
                                 includeEmpty.visibility = View.VISIBLE
                                 layoutList.visibility = View.GONE
@@ -84,7 +86,6 @@ class MySongBookFragment : BaseFragment() {
 
     }
 
-    var position = 0
     private fun initAdapter() {
         adapter = object : BaseQuickAdapter<RoomMusicListBean.DataBean, BaseViewHolder>(R.layout.item_music, lists) {
             override fun convert(helper: BaseViewHolder?, item: RoomMusicListBean.DataBean?) {
@@ -97,40 +98,13 @@ class MySongBookFragment : BaseFragment() {
                 helper.getView<TextView>(R.id.tvSongName)!!.setText(item!!.music_name)
                 helper.getView<TextView>(R.id.tvName)!!.setText(item.a_name)
                 helper.itemView.setOnClickListener {
-                    position = helper.adapterPosition
-                    startService(item.music_url)
-
+                    EventBus.getDefault().post(EventBusBean(lists,helper.adapterPosition))
+                    activity!!.onBackPressed()
                 }
             }
         }
         recyclerView.layoutManager = LinearLayoutManager(mContext)
         recyclerView.adapter = adapter
-    }
-
-    private fun startService(music_url: String) {
-        val intent = Intent(mContext, PlayMusicService::class.java)
-        intent.putExtra("music_url",music_url)
-        activity!!.bindService(intent, connection, BIND_AUTO_CREATE)
-    }
-
-    var playMusicService: PlayMusicService? = null
-    var connection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {
-        }
-
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val myBind = service as (PlayMusicService.MyBind)
-            playMusicService = myBind.service
-            playMusicService!!.setData(lists, position)
-        }
-    }
-
-    open fun Next() {
-        playMusicService!!.next()
-    }
-
-    open fun Pause() {
-        playMusicService!!.pause()
     }
 
     private fun DelMusic(roomId: String?, id: Int) {
@@ -232,3 +206,5 @@ class MySongBookFragment : BaseFragment() {
         }
     }
 }
+
+

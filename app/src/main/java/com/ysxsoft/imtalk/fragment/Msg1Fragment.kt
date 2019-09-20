@@ -43,6 +43,7 @@ class Msg1Fragment : BaseFragment() {
     var mLuRecyclerViewAdapter: LuRecyclerViewAdapter? = null
     var mAdapter: MsgChatListAdapter? = null
     var myBroadcast: MyBroadcast? = null
+
     override fun onResume() {
         super.onResume()
         val intentFilter = IntentFilter("RECEIVEMESSAGE")

@@ -92,6 +92,16 @@ public class HomeRoomBean {
             private int uid;
             private String icon;
 
+            public String getIs_lock() {
+                return is_lock;
+            }
+
+            public void setIs_lock(String is_lock) {
+                this.is_lock = is_lock;
+            }
+
+            private String is_lock;
+
             public String getMemCount() {
                 return memCount;
             }

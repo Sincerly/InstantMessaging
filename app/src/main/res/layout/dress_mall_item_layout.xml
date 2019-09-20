@@ -4,8 +4,8 @@
     android:layout_height="150dp"
     android:gravity="center"
     android:id="@+id/ll_bg"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
     android:layout_marginTop="10dp"
     android:background="@drawable/gray_shape"
     android:layout_gravity="center"
@@ -22,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:textSize="12sp"
         android:gravity="center_horizontal"
         android:text="花环" />
 
@@ -37,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="66金币"
+            android:textSize="10sp"
             android:textColor="@color/btn_color" />
 
         <TextView

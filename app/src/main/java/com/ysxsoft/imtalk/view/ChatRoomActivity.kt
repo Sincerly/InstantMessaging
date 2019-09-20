@@ -78,6 +78,9 @@ import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
 import kotlinx.android.synthetic.main.view_input_num.*
 import okhttp3.Call
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -95,17 +98,19 @@ import java.util.ArrayList
  */
 class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
-    override fun setManager(uid: String?,cmd:String?) {
-        Log.d("》》》》","设置管理员成功====="+uid)
+
+    override fun setManager(uid: String?, cmd: String?) {
+        Log.d("》》》》", "设置管理员成功=====" + uid)
         AdminData()
         updateRoomInfo()
     }
+
     override fun onGoldMessage(nickname: String?, giftName: String?, goldNum: String?) {
-        if(giftEggManager!!!=null){
-            val d=NotifyManager.Data()
-            d.nickName=nickname;
-            d.giftName=giftName;
-            d.goldNum=goldNum;
+        if (giftEggManager!! != null) {
+            val d = NotifyManager.Data()
+            d.nickName = nickname;
+            d.giftName = giftName;
+            d.goldNum = goldNum;
             giftEggManager!!.addData(d)
             giftEggManager!!.start()
         }
@@ -114,14 +119,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
         //送礼物超过一定公屏消息
-        if(giftNotifyManager!!!=null){
+        if (giftNotifyManager!! != null) {
             giftNotifyManager!!.addData(roomPublicGiftMessageBean)
             giftNotifyManager!!.start()
         }
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
-        fair=isFair
+        fair = isFair
         //房间是否加锁  是否纯净模式  是否开启公屏
         isLockFair(isLock, isFair, isPure)
     }
@@ -158,7 +163,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         showPositionEmj(p, url)
     }
 
-    override fun onRoomGift(p: Int, toP:List<Int>, giftUrl: String, staticUrl: String) {
+    override fun onRoomGift(p: Int, toP: List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
         showPositionGift(p, toP, giftUrl, staticUrl)
     }
@@ -171,7 +176,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             IMClient.getInstance().quitChatRoom(room_id, null)
             RtcClient.getInstance().quitRtcRoom(room_id, null)
 //            finish()
-            removeUser(room_id!!,uid)
+            removeUser(room_id!!, uid)
         }
     }
 
@@ -183,11 +188,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     /**
      * 携带座驾进入
      */
-    override fun onRoomMemberChangeWithCar(memberCount: Int,carPic:String) {
+    override fun onRoomMemberChangeWithCar(memberCount: Int, carPic: String) {
         updateRoomInfo()
         updateRoomTitle(detailRoomInfo!!.roomInfo.room_name, detailRoomInfo!!.roomInfo.room_num, memberCount.toString())
-        if(carPic!=null&&!"".equals(carPic)){
-            CarUtils.playCar(this,carPic);
+        if (carPic != null && !"".equals(carPic)) {
+            CarUtils.playCar(this, carPic);
         }
     }
 
@@ -298,7 +303,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var giftEggManager: NotifyManager? = null
     var giftNotifyManager: GiftNotifyManager? = null
 
-    var amdinType:Int?=-1
+    var amdinType: Int? = -1
+
     /**
      * 监听来电状态进行房间的静音和禁麦操作
      */
@@ -347,6 +353,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         // 保持屏幕常亮
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         handler = Handler()
+        EventBus.getDefault().register(this);
         setLightStatusBar(false)
         initStatusBar(topView)
         setTitle("这是哈哈哈的房间")
@@ -359,8 +366,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val intentFilter = IntentFilter("BGCHANG")
         registerReceiver(bgChangBroadCast, intentFilter)
         ShareData()
-        giftEggManager=NotifyManager(mContext as Activity?)
-        giftNotifyManager=GiftNotifyManager(mContext as Activity?)
+        giftEggManager = NotifyManager(mContext as Activity?)
+        giftNotifyManager = GiftNotifyManager(mContext as Activity?)
     }
 
     private fun initroomManager() {
@@ -376,15 +383,15 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         val messageList = detailRoomInfo!!.getMessageList()
 
         //加入一条自己进入房间的消息
-        val carName=SharedPreferencesUtils.getCarName(mContext)
-        val carPic=SharedPreferencesUtils.getCarPic(mContext)
+        val carName = SharedPreferencesUtils.getCarName(mContext)
+        val carPic = SharedPreferencesUtils.getCarPic(mContext)
 
-        val message = IMClient.getInstance().createLocalEnterRoomMessage(AuthManager.getInstance().currentUserId, room_id, nikeName!!, icon!!,carName,carPic)
+        val message = IMClient.getInstance().createLocalEnterRoomMessage(AuthManager.getInstance().currentUserId, room_id, nikeName!!, icon!!, carName, carPic)
         chatMessageList.add(message)
 
         //播放自己的座驾
-        if(carPic!=null&&!"".equals(carPic)){
-            CarUtils.playCar(this,carPic)
+        if (carPic != null && !"".equals(carPic)) {
+            CarUtils.playCar(this, carPic)
         }
 
         //设置聊天信息
@@ -567,7 +574,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_online.setOnClickListener {
-            OnlineListActivity.starOnlineListActivity(mContext,room_id!!)
+            OnlineListActivity.starOnlineListActivity(mContext, room_id!!)
         }
 
         img_right_img.setOnClickListener {
@@ -605,13 +612,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_room_level.setOnClickListener {
-//            RoomLevelsDialog(mContext, room_id).show()
+            //            RoomLevelsDialog(mContext, room_id).show()
             RoomLevelDialog(mContext, room_id!!)
                     .show()
         }
 
         tv_music.setOnClickListener {
             voiceDialog = SongVoiceDialog(mContext)
+            val tv_song_name1 = voiceDialog!!.findViewById<TextView>(R.id.tv_song_name1)
+            if (musicbean != null) {
+                tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
+            }
             val seekBar = voiceDialog!!.findViewById<AppCompatSeekBar>(R.id.seekBar)
             seekBar.progress = AudioUtils.getCurrentAudioVolume(mContext)
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -627,16 +638,22 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             })
             voiceDialog!!.setSongVoiceListener(object : SongVoiceDialog.SongVoiceListener {
                 override fun StopSong() {
-                    val running = PlayMusicService().isRunning
-                    if (running){
-                        PlayMusicService().pause()
+                    if (playMusicService != null) {
+                        playMusicService!!.pause()
                     }
                 }
 
                 override fun NextSong() {
-                    val running = PlayMusicService().isRunning
-                    if (running){
-                        PlayMusicService().next()
+                    if (playMusicService != null) {
+                       var position = musicbean!!.position
+                        playMusicService!!.next()
+                        position++
+                        if (position>musicbean!!.list.size){
+                            position==0
+                            tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
+                        }else{
+                            tv_song_name1.setText(musicbean!!.list.get(position).music_name)
+                        }
                     }
                 }
 
@@ -689,12 +706,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             eggDialog.setOnEggOpenListener(object : EggDialog.OnEggOpenListener {
                 override fun onEggOpened(data: List<EggBean.DataBean>) {
                     //创建消息
-                    for(item in data){
-                        val msg=EggChatMessage()
-                        msg.giftName=item.sg_name
-                        msg.giftPrice="0"//TODO: Sincerly 是否需要价格？
-                        msg.name=mydatabean!!.data!!.nickname
-                        msg.giftSendUserId=AuthManager.getInstance().currentUserId
+                    for (item in data) {
+                        val msg = EggChatMessage()
+                        msg.giftName = item.sg_name
+                        msg.giftPrice = "0"//TODO: Sincerly 是否需要价格？
+                        msg.name = mydatabean!!.data!!.nickname
+                        msg.giftSendUserId = AuthManager.getInstance().currentUserId
                         val message = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, msg)
                         RongIMClient.getInstance().sendMessage(message, null, null, object : IRongCallback.ISendMessageCallback {
                             override fun onAttached(p0: Message?) {
@@ -777,7 +794,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         chatroom_gift.setOnClickListener {
-            showGiftBagDialog("","")
+            showGiftBagDialog("", "")
         }
 
         //聊天列表
@@ -785,7 +802,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         chatroom_list_chat.setAdapter(chatListAdapter)
         chatListAdapter!!.setOnGiftEggItemClickListener(object : RoomChatListAdapter.OnGiftEggItemClickListener {
             override fun onClickUser(userId: String?) {
-                showMessageUserInfoDialog(userId.toString(),room_id!!)
+                showMessageUserInfoDialog(userId.toString(), room_id!!)
 
             }
         })
@@ -799,8 +816,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         enableKeyboardStateListener(true)
     }
 
-    private fun showGiftBagDialog(targetUid:String,targetNickName:String) {
-        val giftBagDialog = GiftBagDialog(mContext, room_id!!,targetUid,targetNickName)
+    private fun showGiftBagDialog(targetUid: String, targetNickName: String) {
+        val giftBagDialog = GiftBagDialog(mContext, room_id!!, targetUid, targetNickName)
         giftBagDialog.setonGiftListener(object : GiftBagDialog.OnGiftListener {
             override fun needInputed() {
                 //需要显示输入数量
@@ -813,9 +830,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 d.showDialog()
             }
 
-            override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String,targetUserName: String) {
+            override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String, targetUserName: String) {
                 showPositionGift(targetPosition, toPosition, gifPic, pic)
-                if("".equals(targetUserId)){
+                if ("".equals(targetUserId)) {
                     //发送小屏消息
                     for (bean in dataList) {
                         if (bean.isChoosed) {
@@ -870,8 +887,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             Log.d("tag", "onError:" + p0!!.content.toString())
                         }
                     });
-                }else{
-                    //赠送给别人 发送小屏消息
+                } else {
+                    //赠送的是别人发送小屏消息
                     val giftChatMessage = GiftChatMessage()
                     giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
                     giftChatMessage.toName = targetUserName//接收人
@@ -1045,8 +1062,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     private fun initRoom(room_id: String) {
-        if (!TextUtils.isEmpty(detailRoomInfo!!.roomInfo.user_ts)){
-            ImageLoadUtil.GlideHeadImageLoad(mContext,detailRoomInfo!!.roomInfo.user_ts,img_head_wear)
+        if (!TextUtils.isEmpty(detailRoomInfo!!.roomInfo.user_ts)) {
+            ImageLoadUtil.GlideHeadImageLoad(mContext, detailRoomInfo!!.roomInfo.user_ts, img_head_wear)
         }
 
         if ("0".equals(detailRoomInfo!!.roomInfo.room_gift_tx)) {//礼物值：0 关闭；1 开启
@@ -1061,7 +1078,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         } else {
             img_w_lock.visibility = View.VISIBLE
         }
-
+        //判断房主是否离开
+        UpdateOwner(detailRoomInfo!!)
         //设置房间背景
         updateRoomBg(detailRoomInfo!!.roomInfo.room_bg)
         //设置房间话题
@@ -1074,8 +1092,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         chatroom_list_chat.setOnItemClickListener(object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (chatListAdapter!!.messageList.get(position) != null && chatListAdapter!!.messageList.size > 0 && !TextUtils.isEmpty(chatListAdapter!!.messageList.get(position).senderUserId)) {
-                    val viewType=chatListAdapter!!.getItemViewType(position);
-                    if(viewType==VIEW_TYPE_GIFT||viewType==VIEW_TYPE_EGG){
+                    val viewType = chatListAdapter!!.getItemViewType(position);
+                    if (viewType == VIEW_TYPE_GIFT || viewType == VIEW_TYPE_EGG) {
                         //送礼物消息和砸金蛋房间内消息移至 OnGiftEggListener
                         return
                     }
@@ -1109,8 +1127,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun ScmClick() {
 
                     }
+
                     override fun clickGiveGift(uid: String, nickname: String) {
-                        showGiftBagDialog(detailRoomInfo!!.roomInfo.uid,nickname)
+                        showGiftBagDialog(detailRoomInfo!!.roomInfo.uid, nickname)
                     }
 
                     override fun clickPrivateChat() {
@@ -1252,8 +1271,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                 }
 
-                override fun clickGiveGift(uid: String,nickname: String) {
-                    showGiftBagDialog(uid,nickname)
+                override fun clickGiveGift(uid: String, nickname: String) {
+                    showGiftBagDialog(uid, nickname)
                     //GiftBagDialog(mContext, room_id).show()
                 }
 
@@ -1289,6 +1308,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
     }
 
+    private fun UpdateOwner(detailRoomInfo: DetailRoomInfo) {
+        if ("0".equals(detailRoomInfo.roomInfo.is_wheat)) {
+            img_leave.visibility = View.VISIBLE
+        } else {
+            img_leave.visibility = View.GONE
+        }
+    }
 
     private fun updataRoomTalk(room_desc: String?) {
         if (AuthManager.getInstance().currentUserId.equals(detailRoomInfo!!.roomInfo.uid)) {
@@ -1433,7 +1459,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     //设置房主的个人信息
     private fun updataRoomManager() {
-        ImageLoadUtil.GlideHeadImageLoad(mContext, detailRoomInfo!!.roomInfo.icon, img_head)
+        ImageLoadUtil.GlideHeadImageLoad(BaseApplication.mContext!!, detailRoomInfo!!.roomInfo.icon, img_head)
         tv_name.setText(detailRoomInfo!!.roomInfo.nickname)
         when (detailRoomInfo!!.roomInfo.sex) {
             "1" -> {
@@ -1636,7 +1662,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveGift(uid: String, nikeName: String) {
-                        showGiftBagDialog(uid,nikeName)
+                        showGiftBagDialog(uid, nikeName)
                     }
 
                     override fun clickPrivateChat() {
@@ -1728,8 +1754,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         override fun blackList() {
                             BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
                         }
+
                         override fun clickGiveGift(uid: String, nickname: String) {
-                        showGiftBagDialog(userId,nickname)
+                            showGiftBagDialog(userId, nickname)
                         }
 
                         override fun clickPrivateChat() {
@@ -1882,8 +1909,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             override fun ScmClick() {
 
                             }
+
                             override fun clickGiveGift(uid: String, nickname: String) {
-                                showGiftBagDialog(userId,nickname)
+                                showGiftBagDialog(userId, nickname)
                             }
 
                             override fun clickPrivateChat() {
@@ -2293,6 +2321,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         roomManager!!.getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                 if (roomDetailInfo != null) {
+                    UpdateOwner(roomDetailInfo)
                     detailRoomInfo = roomDetailInfo
                     detailRoomInfo!!.roomInfo.setMemCount(roomDetailInfo.roomInfo.getMemCount())
                     updateMicSeatState(roomDetailInfo.micPositions)
@@ -2344,8 +2373,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 if (t.code == 0) {
                                     IMClient.getInstance().quitChatRoom(room_id, null)
                                     RtcClient.getInstance().quitRtcRoom(room_id, null)
-                                    removeUser(room_id!!,uid)
-//                                    finish()
+                                    removeUser(room_id!!, uid)
+
 //                                    val intent = Intent(mContext, PlayMusicService::class.java)
 //                                    stopService(intent)
 //                                    unbindService(connection)
@@ -2391,11 +2420,29 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 if (t.code == 0) {
                                     IMClient.getInstance().quitChatRoom(room_id, null)
                                     RtcClient.getInstance().quitRtcRoom(room_id, null)
-                                    joinChatRoom(toString)
-                                    finish()
-//                                    val intent = Intent(mContext, PlayMusicService::class.java)
-//                                    stopService(intent)
-//                                    unbindService(connection)
+                                    val map = HashMap<String, String>()
+                                    map.put("room_id", room_id!!)
+                                    map.put("uid", uid)
+                                    val body = RetrofitUtil.createJsonRequest(map)
+                                    NetWork.getService(ImpService::class.java)
+                                            .remove_user(body)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(object : Observer<CommonBean> {
+                                                override fun onError(e: Throwable?) {
+                                                }
+
+                                                override fun onNext(t: CommonBean?) {
+                                                    if (t!!.code == 0) {
+                                                        joinChatRoom(toString)
+                                                        finish()
+                                                    }
+                                                }
+
+                                                override fun onCompleted() {
+                                                }
+                                            })
+
 
                                 }
                             }
@@ -2569,10 +2616,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
                 message.targetUserId = SpUtils.getSp(mContext, "uid")
-                val carName=SharedPreferencesUtils.getCarName(mContext)
-                val carPic=SharedPreferencesUtils.getCarPic(mContext)
-                message.carName=carName//座驾名称
-                message.carPic=carPic//座驾图片
+                val carName = SharedPreferencesUtils.getCarName(mContext)
+                val carPic = SharedPreferencesUtils.getCarPic(mContext)
+                message.carName = carName//座驾名称
+                message.carPic = carPic//座驾图片
                 message.targetPosition = -1
                 message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
                 val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
@@ -2691,6 +2738,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 if (result != null) {
+                    updateMicSeatState(result.micPositions)
+
                     val room_gift_tx = result.roomInfo.room_gift_tx
                     fair = result.roomInfo.room_is_fair
                     val is_lock = result.roomInfo.is_lock
@@ -2731,14 +2780,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        EventBus.getDefault().unregister(this);
         unregisterReceiver(headsetPlugReceiver)
         unregisterReceiver(bgChangBroadCast)
-
         if (audioManager != null) {
             audioManager!!.setMode(AudioManager.MODE_NORMAL)
         }
         if (telephonyManager != null && roomPhoneStateListener != null) {
             telephonyManager!!.listen(roomPhoneStateListener, TelephonyManager.PHONE_TYPE_NONE)
+        }
+        if (playMusicService != null) {
+            playMusicService!!.stop()
         }
     }
 
@@ -2983,8 +3035,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                             Handler(Looper.getMainLooper()).postDelayed({
                                                 //移除特效动画
                                                 f.removeView(svgaImageView)
-                                            }, (s*1000).toLong())
+                                            }, (s * 1000).toLong())
                                         }
+
                                         override fun onError() {
                                         }
                                     }, true)
@@ -3050,8 +3103,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     //移除特效动画
                                     f.removeView(svgaImageView)
-                                }, (s*1000).toLong())
+                                }, (s * 1000).toLong())
                             }
+
                             override fun onError() {
                             }
                         }, true)
@@ -3382,21 +3436,21 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 //        Glide.with(mContext).load(giftImgUrl).into(imageView)
     }
 
-    fun removeUser(roomId:String,uid:String){
+    fun removeUser(roomId: String, uid: String) {
         val map = HashMap<String, String>()
-        map.put("room_id",roomId)
-        map.put("uid",uid)
+        map.put("room_id", roomId)
+        map.put("uid", uid)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .remove_user(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<CommonBean>{
+                .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: CommonBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             finish()
                         }
                     }
@@ -3404,5 +3458,29 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onCompleted() {
                     }
                 })
+    }
+
+    var musicbean: EventBusBean? = null
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(bean: EventBusBean) {
+        musicbean = bean
+        startService()
+    }
+
+    private fun startService() {
+        val intent = Intent(mContext, PlayMusicService::class.java)
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    var playMusicService: PlayMusicService? = null
+    var connection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val myBind = service as (PlayMusicService.MyBind)
+            playMusicService = myBind.service
+            playMusicService!!.setData(musicbean!!.list, musicbean!!.position)
+        }
     }
 }
