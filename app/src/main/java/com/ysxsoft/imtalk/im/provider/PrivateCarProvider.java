@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.im.provider;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
@@ -46,8 +47,12 @@ public class PrivateCarProvider extends IContainerItemProvider.MessageProvider<P
         ViewHolder holder = (ViewHolder) v.getTag();
         if (message.getMessageDirection() == Message.MessageDirection.SEND) {//消息方向，自己发送的
             holder.bg.setBackgroundResource(io.rong.imkit.R.drawable.rc_ic_bubble_right);
+            holder.name.setTextColor(Color.parseColor("#FFFFFF"));
+            holder.toName.setTextColor(Color.parseColor("#FFFFFF"));
         } else {
             holder.bg.setBackgroundResource(io.rong.imkit.R.drawable.rc_ic_bubble_left);
+            holder.name.setTextColor(Color.parseColor("#000000"));
+            holder.toName.setTextColor(Color.parseColor("#000000"));
         }
         Glide.with(v.getContext()).load(content.getCarUrl()).into(holder.logo);
         holder.name.setText(content.getCarName()+" x"+content.getCarNum());
