@@ -16,8 +16,12 @@ import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ThreadManager
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog
+import com.ysxsoft.imtalk.im.message.PrivateCarMessage
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
+import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
+import com.ysxsoft.imtalk.im.provider.PrivateCarProvider
 import com.ysxsoft.imtalk.im.provider.PrivateGiftProvider
+import com.ysxsoft.imtalk.im.provider.PrivateHeaderProvider
 import com.ysxsoft.imtalk.rong.MyExtensionModule
 import io.rong.imkit.DefaultExtensionModule
 import io.rong.imkit.IExtensionModule
@@ -98,6 +102,10 @@ class BaseApplication : MyApplication() {
     fun initMessageAndTemplate() {
         RongIM.registerMessageType(PrivateGiftMessage::class.java)
         RongIM.registerMessageTemplate(PrivateGiftProvider())
+        RongIM.registerMessageType(PrivateCarMessage::class.java)
+        RongIM.registerMessageTemplate(PrivateCarProvider())
+        RongIM.registerMessageType(PrivateHeaderMessage::class.java)
+        RongIM.registerMessageTemplate(PrivateHeaderProvider())
     }
 
     fun setMyExtensionModule() {

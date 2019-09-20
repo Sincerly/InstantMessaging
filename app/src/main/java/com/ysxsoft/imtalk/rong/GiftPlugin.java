@@ -11,7 +11,9 @@ import android.util.Log;
 import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.bean.RoomMicListBean;
 import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
+import com.ysxsoft.imtalk.im.message.PrivateCarMessage;
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage;
+import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage;
 import com.ysxsoft.imtalk.widget.dialog.GiftBagDialog;
 import com.ysxsoft.imtalk.widget.dialog.InputDialog;
 import com.ysxsoft.imtalk.widget.dialog.SendGiftDialog;
@@ -88,8 +90,11 @@ public class GiftPlugin implements IPluginModule,IPluginRequestPermissionResultC
                         Log.e("tag","onError:");
                     }
                 });
+
+                PrivateCarMessage.sendMessage(rongExtension.getTargetId(),"1","座驾名称",pic,"Sincerly");//赠送座驾
+                PrivateHeaderMessage.sendMessage(rongExtension.getTargetId(),"1","头像名称",pic,"Sincerly");//赠送头像
             }
-        });
+       });
         sendGiftDialog.show();
     }
 

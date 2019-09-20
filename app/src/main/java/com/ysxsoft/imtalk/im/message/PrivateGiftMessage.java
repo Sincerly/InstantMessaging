@@ -76,6 +76,7 @@ public class PrivateGiftMessage extends MessageContent {
             jsonObj.put("giftName", getGiftName());
             jsonObj.put("giftNum", getGiftNum());
             jsonObj.put("giftUrl", getGiftUrl());
+            jsonObj.put("toName", getToName());
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
             return bytes;
         } catch (UnsupportedEncodingException e) {
