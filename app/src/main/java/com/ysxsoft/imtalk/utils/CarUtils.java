@@ -47,7 +47,7 @@ public class CarUtils {
         FrameLayout f = activity.findViewById(android.R.id.content);
         if (carUrl.endsWith(".svga")) {
             //加载svga
-            String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + AppUtil.INSTANCE.getCurrentPageName(activity) + "/svags/";
+            String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ChatRoomActivity/svags/";
             File file = new File(SDPATH);
             if (!file.exists()) {
                 file.mkdirs();
@@ -159,7 +159,7 @@ public class CarUtils {
         }
         if (carUrl.endsWith(".svga")) {
             //加载svga
-            String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + AppUtil.INSTANCE.getCurrentPageName(activity) + "/svags/";
+            String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ChatRoomActivity/svags/";
             File file = new File(SDPATH);
             if (!file.exists()) {
                 file.mkdirs();
@@ -266,7 +266,7 @@ public class CarUtils {
     }
 
     private static void downloadGift(Activity activity, String url, OnDownLoadComplteListener listener) {
-        String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + AppUtil.INSTANCE.getCurrentPageName(activity) + "/svags/";
+        String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ChatRoomActivity/svags/";
         int index = url.lastIndexOf("/");
         String destFileName = url.substring(index, url.length());
         OkHttpUtils.get()
@@ -299,32 +299,109 @@ public class CarUtils {
         RxPermissions rxPermissions=new RxPermissions(activity);
         if(rxPermissions.isGranted(READ_EXTERNAL_STORAGE)&&rxPermissions.isGranted(WRITE_EXTERNAL_STORAGE)){
             //拥有读写权限
-//            NetWork.INSTANCE.getService(ImpService.class)
-//                .DressMall("1")
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(new Observer<DressMallBean>(){
-//
-//                        @Override
-//                        public void onNext(DressMallBean dressMallBean) {
-//                            if (dressMallBean.getCode()==0){
-//                                List<DressMallBean.DataBean> d=dressMallBean.getData();
-//                                for (int i = 0; i < ; i++) {
-//
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCompleted() {
-//
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//
-//                        }
-//                    });
+            //下载座驾
+            NetWork.INSTANCE.getService(ImpService.class)
+                .DressMall("1")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<DressMallBean>(){
+
+                        @Override
+                        public void onNext(DressMallBean dressMallBean) {
+                            if (dressMallBean.getCode()==0){
+                                List<DressMallBean.DataBean> d=dressMallBean.getData();
+                                if(d==null){
+                                    return;
+                                }
+                                for (int i = 0; i <d.size() ; i++) {
+                                    DressMallBean.DataBean item=d.get(i);
+                                    String url=item.getGif_pic();
+
+                                    int index = url.lastIndexOf("/");
+                                    String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ChatRoomActivity/svags/";
+                                    String destFileName = url.substring(index, url.length());
+                                    File downloadFile = new File(SDPATH + destFileName);
+                                    if (!downloadFile.exists()) {
+                                        OkHttpUtils.get()
+                                                .url(url)
+                                                .build()
+                                                .execute(new FileCallBack(SDPATH,destFileName) {
+                                                    @Override
+                                                    public void onError(Call call, Exception e, int id) {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onResponse(File file, int id) {
+                                                    }
+                                                });
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+                    });
+
+            //下载礼物
+            NetWork.INSTANCE.getService(ImpService.class)
+                    .DressMall("3")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<DressMallBean>(){
+
+                        @Override
+                        public void onNext(DressMallBean dressMallBean) {
+                            if (dressMallBean.getCode()==0){
+                                List<DressMallBean.DataBean> d=dressMallBean.getData();
+                                if(d==null){
+                                    return;
+                                }
+                                for (int i = 0; i <d.size() ; i++) {
+                                    DressMallBean.DataBean item=d.get(i);
+                                    String url=item.getGif_pic();
+
+                                    int index = url.lastIndexOf("/");
+                                    String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ChatRoomActivity/svags/";
+                                    String destFileName = url.substring(index, url.length());
+                                    File downloadFile = new File(SDPATH + destFileName);
+                                    if (!downloadFile.exists()) {
+                                        OkHttpUtils.get()
+                                                .url(url)
+                                                .build()
+                                                .execute(new FileCallBack(SDPATH,destFileName) {
+                                                    @Override
+                                                    public void onError(Call call, Exception e, int id) {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onResponse(File file, int id) {
+                                                    }
+                                                });
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+                    });
         }
     }
 }
