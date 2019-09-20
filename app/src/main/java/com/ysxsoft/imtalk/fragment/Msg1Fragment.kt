@@ -44,7 +44,8 @@ class Msg1Fragment : BaseFragment() {
     var mAdapter: MsgChatListAdapter? = null
     var myBroadcast: MyBroadcast? = null
 
-    override fun initUi() {
+    override fun onResume() {
+        super.onResume()
         val intentFilter = IntentFilter("RECEIVEMESSAGE")
         if (myBroadcast == null) {
             myBroadcast = MyBroadcast()
@@ -67,12 +68,6 @@ class Msg1Fragment : BaseFragment() {
 
         requestHeadData()
         conversionList()
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-
     }
 
     var userInfo: UserInfo? = null

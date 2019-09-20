@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
@@ -169,6 +170,12 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                     helper.getView<TextView>(R.id.tv_Content).text = item.room_name
+                    if (TextUtils.isEmpty(item.memCount)){
+                        helper.getView<TextView>(R.id.tv_person).text = "0"
+                    }else{
+                        helper.getView<TextView>(R.id.tv_person).text = item.memCount
+                    }
+
                     helper.itemView.setOnClickListener {
                         roomLock(item.room_id.toString())
                     }
@@ -181,6 +188,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                     helper.getView<TextView>(R.id.tv_Content).text = item.room_name
+                    if (TextUtils.isEmpty(item.memCount)){
+                        helper.getView<TextView>(R.id.tv_person).text = "0"
+                    }else{
+                        helper.getView<TextView>(R.id.tv_person).text = item.memCount
+                    }
                     helper.itemView.setOnClickListener {
                         roomLock(item.room_id.toString())
                     }
@@ -194,7 +206,12 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
 //                helper.getView<ImageView>(R.id.ivAvatar).displayRes(R.mipmap.icon_def)
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                helper.getView<TextView>(R.id.tv_name).text = item.room_name /*+ "  " + item.room_id*/
+                helper.getView<TextView>(R.id.tv_name).text = item.room_name
+                if (!"0".equals(item.is_lock)){
+                    helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.VISIBLE
+                }else{
+                    helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.GONE
+                }
                 if (TextUtils.isEmpty(item.label_name)){
                     helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
                 }else{
@@ -280,6 +297,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeRoomBean.DataBean.RoomListBean) {
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                 helper.getView<TextView>(R.id.tv_Content).text = item.room_name
+                if (TextUtils.isEmpty(item.memCount)){
+                    helper.getView<TextView>(R.id.tv_person).text = "0"
+                }else{
+                    helper.getView<TextView>(R.id.tv_person).text = item.memCount
+                }
                 helper.itemView.setOnClickListener {
                     roomLock(item.room_id.toString())
                 }
@@ -295,7 +317,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             override fun convert(helper: BaseViewHolder, item: HomeRoomBean.DataBean.RoomListBean) {
                 ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
                 helper.getView<TextView>(R.id.tv_name).text = item.room_name
-
+                if (!"0".equals(item.is_lock)){
+                    helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.VISIBLE
+                }else{
+                    helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.GONE
+                }
                 if (TextUtils.isEmpty(item.label_name)){
                     helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
                 }else{
@@ -324,6 +350,12 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
     }
 
     fun joinChatRoom(roomId: String,lock_pwd:String) {
+        if (mydatabean==null){
+            showToastMessage("请稍后")
+            return
+        }
+        activity!!.sendBroadcast(Intent("WINDOW"))
+
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId,lock_pwd, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 val message = RoomMemberChangedMessage()

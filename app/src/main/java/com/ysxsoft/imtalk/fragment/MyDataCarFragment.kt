@@ -66,6 +66,7 @@ class MyDataCarFragment : BaseFragment() {
         }
 
     }
+
     private fun fouceData() {
         NetWork.getService(ImpService::class.java)
                 .fans_status(SpUtils.getSp(mContext,"uid"),uid!!)
@@ -104,7 +105,7 @@ class MyDataCarFragment : BaseFragment() {
                                     helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
                                 }
                             }
-                            recyclerView.layoutManager = GridLayoutManager(mContext,2)
+                            recyclerView.layoutManager = GridLayoutManager(mContext,3)
                             recyclerView.adapter = myHearadapter
 
                         }

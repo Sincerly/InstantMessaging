@@ -1,5 +1,6 @@
 package com.ysxsoft.imtalk.music
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -20,6 +21,7 @@ import com.ysxsoft.imtalk.chatroom.utils.ToastUtils
 import com.ysxsoft.imtalk.widget.CircleImageView
 
 import android.content.Context.WINDOW_SERVICE
+import android.content.IntentFilter
 import android.net.Uri
 import android.util.Log
 import android.view.animation.Animation
@@ -55,7 +57,7 @@ import rx.schedulers.Schedulers
  * Create By 胡
  * on 2019/9/8 0008
  */
-class CustomeWindow{
+class CustomeWindow {
     private var windowManager: WindowManager? = null
     private var layoutParams: WindowManager.LayoutParams? = null
     private var displayView: View? = null
@@ -63,16 +65,33 @@ class CustomeWindow{
     private var mWindowHeight: Int = 0
     private var imageView: CircleImageView? = null
     var mydatabean: UserInfoBean? = null
-    var isShowing:Boolean=false
-    var icon:String?=null
-    constructor(context: Context, icon: String?):super(){
-        this.icon=icon
+    var isShowing: Boolean = false
+    var icon: String? = null
+    var myBroadCast: MyBroadCast? = null
+
+    constructor(context: Context, icon: String?) : super() {
+        this.icon = icon
         initView()
+        myBroadCast = MyBroadCast()
+        val filter = IntentFilter("WINDOW")
+        if (IsShowing()) {
+            BaseApplication.mContext!!.registerReceiver(myBroadCast, filter)
+        }
     }
+
+    inner class MyBroadCast : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if ("WINDOW".equals(intent!!.action)) {
+                dismiss()
+            }
+        }
+    }
+
 
     init {//初始化代码块
         requestMyData()
     }
+
     private fun requestMyData() {
         NetWork.getService(ImpService::class.java)
                 .GetUserInfo(AuthManager.getInstance().currentUserId)
@@ -98,7 +117,7 @@ class CustomeWindow{
     }
 
     private fun initView() {
-        isShowing=true
+        isShowing = true
         windowManager = BaseApplication.mContext!!.getSystemService(WINDOW_SERVICE) as WindowManager
         layoutParams = WindowManager.LayoutParams()
         mWindowWidth = windowManager!!.defaultDisplay.width
@@ -113,17 +132,17 @@ class CustomeWindow{
         layoutParams!!.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         layoutParams!!.width = WindowManager.LayoutParams.WRAP_CONTENT
         layoutParams!!.height = WindowManager.LayoutParams.WRAP_CONTENT
-        layoutParams!!.x = mWindowWidth-100
+        layoutParams!!.x = mWindowWidth - 100
         layoutParams!!.y = mWindowHeight - 500
     }
 
-     fun IsShowing():Boolean{
+    fun IsShowing(): Boolean {
         return isShowing
     }
 
     fun show() {
         requestMyData()
-        isShowing=true
+        isShowing = true
         val layoutInflater = LayoutInflater.from(BaseApplication.mContext!!)
         displayView = layoutInflater.inflate(R.layout.floatwindow_layout, null)
         imageView = displayView!!.findViewById(R.id.img_head)
@@ -131,8 +150,8 @@ class CustomeWindow{
         windowManager!!.addView(displayView, layoutParams)
         val viewById = displayView!!.findViewById<FrameLayout>(R.id.fl)
         viewById.setOnClickListener {
-            if (mydatabean!=null){
-                if (mydatabean!!.data!=null){
+            if (mydatabean != null) {
+                if (mydatabean!!.data != null) {
                     quiteRoom("1")
                 }
             }
@@ -142,8 +161,8 @@ class CustomeWindow{
 //        }
         Glide.with(BaseApplication.mContext!!).load(icon).into(imageView!!)
 
-        var rotate  =  RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        val lin =  LinearInterpolator();
+        var rotate = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        val lin = LinearInterpolator();
         rotate.setInterpolator(lin);
         rotate.setDuration(5000);//设置动画持续周期
         rotate.setRepeatCount(-1);//设置重复次数
@@ -194,21 +213,21 @@ class CustomeWindow{
     }
 
 
-    fun removeUser(roomId:String,uid:String){
+    fun removeUser(roomId: String, uid: String) {
         val map = HashMap<String, String>()
-        map.put("room_id",roomId)
-        map.put("uid",uid)
+        map.put("room_id", roomId)
+        map.put("uid", uid)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .remove_user(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<CommonBean>{
+                .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: CommonBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             dismiss()
                             IMClient.getInstance().quitChatRoom(mydatabean!!.data.now_roomId, null)
                             RtcClient.getInstance().quitRtcRoom(mydatabean!!.data.now_roomId, null)
@@ -255,19 +274,21 @@ class CustomeWindow{
 
 
     fun dismiss() {
-        isShowing=false
+        BaseApplication.mContext!!.unregisterReceiver(myBroadCast)
+
+        isShowing = false
         if (windowManager != null && displayView != null) {
             windowManager!!.removeView(displayView)
         }
-        if (imageView!=null){
+        if (imageView != null) {
             imageView!!.clearAnimation()
         }
     }
 
     fun joinChatRoom(roomId: String) {
-        RoomManager.getInstance().joinRoom(AuthManager.getInstance().currentUserId, roomId,"", object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(AuthManager.getInstance().currentUserId, roomId, "", object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                if (result!=null) {
+                if (result != null) {
                     val intent = Intent(BaseApplication.mContext!!, ChatRoomActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     intent.putExtra("room_id", roomId)

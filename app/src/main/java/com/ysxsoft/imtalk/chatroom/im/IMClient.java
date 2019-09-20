@@ -84,7 +84,7 @@ public class IMClient {
             RongIMClient.registerMessageType(RoomNameChangedMessage.class);//房间名称
             RongIMClient.registerMessageType(MicPositionGiftValueMessage.class);//房间礼物值是否显示
             RongIMClient.registerMessageType(RoomIsLockMessage.class);//房间是否加锁  是否纯净模式  是否开启公屏
-            RongIMClient.registerMessageType(RoomAdminChangeMessage.class);//房间是否加锁  是否纯净模式  是否开启公屏
+            RongIMClient.registerMessageType(RoomAdminChangeMessage.class);//设置 或移除管理员
 
             RongIMClient.registerMessageType(RoomPublicGiftMessage.class);//礼物公屏幕消息
             RongIMClient.registerMessageType(GiftChatMessage.class);//礼物小屏消息

@@ -95,8 +95,8 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                         if (t!!.code == 0) {
                             mydatabean = t
                             //保存座驾名称 座驾图片
-                            SharedPreferencesUtils.saveCarName(mContext,mydatabean!!.data.user_zj_name);
-                            SharedPreferencesUtils.saveCarPic(mContext,mydatabean!!.data.user_zj_pic)
+                            SharedPreferencesUtils.saveCarName(mContext, mydatabean!!.data.user_zj_name);
+                            SharedPreferencesUtils.saveCarPic(mContext, mydatabean!!.data.user_zj_pic)
                         }
                     }
 
@@ -150,7 +150,11 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                             adapter1 = object : BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_home_recommend, roomLists0) {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<ImageView>(R.id.ivPhoto))
-
+                                    if (TextUtils.isEmpty(item.memCount)) {
+                                        helper.getView<TextView>(R.id.tv_person).text = "0"
+                                    } else {
+                                        helper.getView<TextView>(R.id.tv_person).text = item.memCount
+                                    }
                                     if (TextUtils.isEmpty(item.label_name)) {
                                         helper.getView<TextView>(R.id.tvContent).setText("#" + "暂无" + "  " + item.room_name)
                                     } else {
@@ -178,6 +182,11 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.icon, helper!!.getView<CircleImageView>(R.id.ivAvatar))
                                     helper.getView<TextView>(R.id.tv_name).setText(item.room_name)
+                                    if (!"0".equals(item.is_lock)) {
+                                        helper.getView<ImageView>(R.id.img_b_lock)!!.visibility = View.VISIBLE
+                                    } else {
+                                        helper.getView<ImageView>(R.id.img_b_lock)!!.visibility = View.GONE
+                                    }
                                     if (TextUtils.isEmpty(item.label_name)) {
                                         helper.getView<TextView>(R.id.tv_Tag).text = "#" + "暂无"
                                     } else {
@@ -305,7 +314,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
     private fun initClickListernr() {
         //签到
-        ivSign.visibility=View.GONE
+        ivSign.visibility = View.GONE
         ivSign.setOnClickListener {
             startActivity(QDActivity::class.java)
 //            val dialog = DatePickerDialog(mContext)

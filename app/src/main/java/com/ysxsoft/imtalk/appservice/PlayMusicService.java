@@ -29,7 +29,6 @@ public class PlayMusicService extends Service {
     private int position = 0;
     private boolean isRunning = false;
 
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -102,6 +101,7 @@ public class PlayMusicService extends Service {
         if (musics != null && musics.size() > 0) {
             musicPlay(musics.get(position).getMusic_url());
         }
+
     }
 
     public void next() {
@@ -113,6 +113,7 @@ public class PlayMusicService extends Service {
             position = 0;
             musicPlay(musics.get(position).getMusic_url());
         }
+
     }
 
     public void stop() {
@@ -134,14 +135,20 @@ public class PlayMusicService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        if (mediaPlayer != null) {
-//            isRunning = false;
-//            stop();
-//        }
+        if (mediaPlayer != null) {
+            isRunning = false;
+            stop();
+        }
+    }
+    public interface OnMusicPosition{
+        void postion(int position);
     }
 
+    public OnMusicPosition onMusicPosition;
+    public void setOnMusicPosition(OnMusicPosition onMusicPosition){
+        this.onMusicPosition = onMusicPosition;
+    }
 }

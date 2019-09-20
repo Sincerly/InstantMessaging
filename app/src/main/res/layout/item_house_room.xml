@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
     android:background="?android:attr/selectableItemBackground"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
 
     <com.ysxsoft.imtalk.widget.CircleImageView
@@ -20,18 +20,25 @@
 
     <TextView
         android:id="@+id/tv_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
         android:ellipsize="end"
         android:lines="1"
         android:singleLine="true"
         android:text="某某"
-        android:layout_marginLeft="10dp"
         android:textColor="#ff282828"
         android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivAvatar"
         app:layout_constraintTop_toTopOf="@+id/ivAvatar" />
+
+    <ImageView
+        android:id="@+id/img_b_lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/img_b_lock"
+        android:visibility="gone"
+        app:layout_constraintLeft_toRightOf="@+id/tv_name" />
 
     <TextView
         android:id="@+id/tv_Tag"
