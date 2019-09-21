@@ -17,6 +17,7 @@ import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.id.*
+import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.adapter.DressMallAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DressMallBean
@@ -40,9 +41,11 @@ import java.lang.ref.WeakReference
 class DressMallActivity : BaseActivity() {
 
     companion object {
-        fun startDressMallActivity(mContext: Context, uid: String) {
+        fun startDressMallActivity(mContext: Context, uid: String,myself: String,nikeName:String) {
             val intent = Intent(mContext, DressMallActivity::class.java)
             intent.putExtra("uid", uid)
+            intent.putExtra("myself", myself)
+            intent.putExtra("nikeName", nikeName)
             mContext.startActivity(intent)
         }
     }
@@ -53,12 +56,17 @@ class DressMallActivity : BaseActivity() {
 
     var currentFragment: BaseFragment? = null
     var uid: String? = null
+    var myself: String? = null
+    var nikeName: String? = null
     var myBroadCast: MyBroadCast? = null
-
+    var headwearFragment=HeadwearFragment()
+    var carFragment=CarFragment()
     private var tagP = "0"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         uid = intent.getStringExtra("uid")
+        myself = intent.getStringExtra("myself")
+        nikeName = intent.getStringExtra("nikeName")
 //dress_mall_item_layout  theme_frame_bg
         setLightStatusBar(false)
         initStatusBar(topView)
@@ -105,12 +113,23 @@ class DressMallActivity : BaseActivity() {
 
     private fun initView() {
         replaceFragment()
+        val bundle = Bundle();
+        bundle.putString("myself", myself);
+        bundle.putString("uid", uid);
+        bundle.putString("nikeName", nikeName);
+        headwearFragment!!.setArguments(bundle);//数据传递到fragment中
+
         tv_headwear.setOnClickListener {
             tagP = "0"
             if (tv_headwear.isSelected) {
                 return@setOnClickListener
             }
             replaceFragment()
+            val bundle = Bundle();
+            bundle.putString("myself", myself);
+            bundle.putString("uid", uid);
+            bundle.putString("nikeName", nikeName);
+            headwearFragment!!.setArguments(bundle);//数据传递到fragment中
         }
         tv_car.setOnClickListener {
             tagP = "1"
@@ -118,6 +137,11 @@ class DressMallActivity : BaseActivity() {
                 return@setOnClickListener
             }
             replaceFragment()
+            val bundle = Bundle();
+            bundle.putString("myself", myself);
+            bundle.putString("uid", uid);
+            bundle.putString("nikeName", nikeName);
+            carFragment!!.setArguments(bundle);//数据传递到fragment中
         }
         tv_title_right.setOnClickListener {
             startActivity(MyDressActivity::class.java)
@@ -133,8 +157,8 @@ class DressMallActivity : BaseActivity() {
         currentFragment = supportFragmentManager.findFragmentByTag(tagP) as BaseFragment?
         if (currentFragment == null) {
             when (tagP) {
-                "0" -> currentFragment = HeadwearFragment()
-                "1" -> currentFragment = CarFragment()
+                "0" -> currentFragment = headwearFragment
+                "1" -> currentFragment = carFragment
             }
             currentFragment?.let { supportFragmentManager.beginTransaction().add(R.id.fm, it, tagP).commit() }
         } else {

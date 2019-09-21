@@ -50,6 +50,7 @@ class MyDataCarFragment : BaseFragment() {
             ll_fs.visibility = View.VISIBLE
             tv_car.visibility = View.VISIBLE
         }
+        fouceData()
         requestData()
         initView()
     }
@@ -62,7 +63,7 @@ class MyDataCarFragment : BaseFragment() {
             RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
         tv_car.setOnClickListener {//送座驾
-
+            RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
 
     }
@@ -79,6 +80,15 @@ class MyDataCarFragment : BaseFragment() {
 
                     override fun onNext(t: FouceOnBean?) {
                         showToastMessage(t!!.msg)
+                        if (t!!.code==0){
+                            if (t.data==1){//未关注
+                                img_fouce.setImageResource(R.mipmap.img_w_add)
+                                tv_fouce.setText("关注")
+                            }else{//已关注  取消
+                                img_fouce.setImageResource(R.mipmap.img_w_dui)
+                                tv_fouce.setText("已关注")
+                            }
+                        }
                     }
 
                     override fun onCompleted() {

@@ -11,10 +11,12 @@ import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.adapter.DressMallAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DressMallBean
 import com.ysxsoft.imtalk.bean.SGiftBean
+import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.AppUtil
 import com.ysxsoft.imtalk.utils.BaseFragment
@@ -59,9 +61,17 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     var beas: List<DressMallBean.DataBean>? = null
     var auto_id: String? = null
     var headwarurl: String? = null
+    var name: String? = null
+    var myself: String? = null
+    var uid: String? = null
+    var nikeName: String? = null
 
     override fun onResume() {
         super.onResume()
+        val bundle = this.arguments//得到从Activity传来的数据
+        myself = bundle!!.getString("myself")
+        uid = bundle!!.getString("uid")
+        nikeName = bundle!!.getString("nikeName")
         initView()
     }
 
@@ -93,6 +103,7 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val bean = mDataAdapter!!.dataList.get(position)
+           name = bean.name
             headwarurl = bean.pic
             auto_id = bean.id.toString()
             tv_money1.setText(bean.gold + "金币")
@@ -120,7 +131,12 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                     override fun call(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
-                            startActivity(MyDressActivity::class.java)
+                            if ("myself".equals(myself)){
+                                startActivity(MyDressActivity::class.java)
+                            }else{
+                                PrivateHeaderMessage.sendMessage(uid, "1", name, headwarurl, nikeName)//赠送头像
+                            }
+                            activity!!.onBackPressed()
                         }
                     }
                 })

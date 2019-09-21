@@ -99,10 +99,10 @@
             android:id="@+id/tv_marque_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:setTextSize="12sp"
             app:setDirection="bottom_to_top"
+            app:setGravity="center"
             app:setSingleLine="false"
-            app:setGravity="center" />
+            app:setTextSize="12sp" />
 
 
     </LinearLayout>
@@ -110,7 +110,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="15dp"
         android:background="@drawable/gray_shape"
         android:orientation="vertical">
@@ -124,10 +124,9 @@
         <View style="@style/gray_line_style" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/group_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp" />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 

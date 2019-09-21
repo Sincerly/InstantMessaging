@@ -640,5 +640,8 @@ interface ImpService {
     @POST("users/reportUser")
     fun reportUser(@Body body: RequestBody): Observable<CommonBean>
 
+     @POST("group/groupId")
+    fun groupId(@Body body: RequestBody): Observable<GroupIdBean>
+
 
 }

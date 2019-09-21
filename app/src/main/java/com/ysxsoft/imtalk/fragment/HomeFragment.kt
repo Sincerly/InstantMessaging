@@ -144,8 +144,17 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                         if (t!!.code == 0) {
                             tv1.setText(t.data.get(0).cname)
                             tv2.setText(t.data.get(1).cname)
-                            roomLists0 = t.data.get(0).roomList
-                            roomLists1 = t.data.get(1).roomList
+                            if (t.data.size>0){
+                                when(t.data.size){
+                                    1->{
+                                        roomLists0 = t.data.get(0).roomList
+                                    }
+                                    2->{
+                                        roomLists0 = t.data.get(0).roomList
+                                        roomLists1 = t.data.get(1).roomList
+                                    }
+                                }
+                            }
 
                             adapter1 = object : BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_home_recommend, roomLists0) {
                                 override fun convert(helper: BaseViewHolder?, item: HomeRoomListBean.DataBean.RoomListBean?) {
@@ -160,9 +169,12 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                     } else {
                                         helper.getView<TextView>(R.id.tvContent).setText("#" + item.label_name + "  " + item.room_name)
                                     }
-
+                                    if (!"0".equals(item.is_lock)){
+                                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                                    }else{
+                                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                                    }
                                     helper.itemView.setOnClickListener {
-                                        //                                        ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
                                         roomLock(item.room_id.toString())
                                     }
                                 }
@@ -222,15 +234,6 @@ class HomeFragment : BaseFragment(), OnBannerListener {
     var roomLists1: MutableList<HomeRoomListBean.DataBean.RoomListBean>? = null
     @Volatile
     private var isJoiningRoom = false // 是否正有加入房间操作
-    var connection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {
-        }
-
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val myBinder = service as (FloatingDisplayService.MyBinder)
-            startActivity(ChatRoomActivity::class.java)
-        }
-    }
 
     override fun onResume() {
         super.onResume()

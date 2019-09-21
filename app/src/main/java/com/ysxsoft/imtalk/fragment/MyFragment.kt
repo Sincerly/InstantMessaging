@@ -147,7 +147,7 @@ class MyFragment : BaseFragment() {
         //装扮商城
         tv2.setOnClickListener {
 //            startActivity(DressMallActivity::class.java)
-            DressMallActivity.startDressMallActivity(mContext,AuthManager.getInstance().currentUserId)
+            DressMallActivity.startDressMallActivity(mContext,AuthManager.getInstance().currentUserId,"myself",dataBean!!.nickname)
         }
         //实名认证
         tv3.setOnClickListener {
@@ -164,7 +164,8 @@ class MyFragment : BaseFragment() {
         }
         //我的等级
         tv5.setOnClickListener {
-            startActivity(MyDjActivity::class.java)
+//            startActivity(MyDjActivity::class.java)
+            MyDjActivity.starMyDjActivity(mContext, "1")
         }
         tv6.visibility=View.GONE
         //我的邀请

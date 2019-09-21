@@ -34,7 +34,7 @@ class MyDjActivity : BaseActivity() {
         return R.layout.user_levels_layout
     }
 
-    var flag: String? = null
+    var flag: String? =null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         flag = intent.getStringExtra("flag")

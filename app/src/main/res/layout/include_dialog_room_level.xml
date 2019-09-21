@@ -112,7 +112,8 @@
         app:layout_constraintEnd_toEndOf="@id/ivJiangtai"
         app:layout_constraintTop_toTopOf="@id/ivJiangtai"
         android:layout_marginTop="22dp"
-        android:textSize="16sp"
+        android:textSize="13sp"
+        android:maxLength="6"
         android:textColor="@color/white"
         />
     <TextView
@@ -123,7 +124,7 @@
         app:layout_constraintEnd_toEndOf="@id/ivJiangtai"
         app:layout_constraintTop_toBottomOf="@id/tvTop1Name"
         android:layout_marginTop="8dp"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:textColor="#FFFFFF"
         />
     <TextView
@@ -135,7 +136,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvTop1Id"
         android:layout_marginTop="8dp"
         android:text="NO.1"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:textColor="@color/white"
         />
     <TextView
@@ -145,7 +146,8 @@
         app:layout_constraintStart_toStartOf="@+id/relTop2"
         app:layout_constraintEnd_toStartOf="@id/relTop1"
         app:layout_constraintBottom_toTopOf="@+id/tvTop2Id"
-        android:textSize="16sp"
+        android:textSize="12sp"
+        android:maxLength="6"
         android:textColor="@color/white"
         />
     <TextView
@@ -166,7 +168,7 @@
         app:layout_constraintEnd_toStartOf="@id/relTop1"
         app:layout_constraintBottom_toBottomOf="@+id/ivJiangtai"
         android:layout_marginBottom="16dp"
-        android:textSize="13sp"
+        android:textSize="10sp"
         android:textColor="@color/white"
         />
     <TextView
@@ -177,7 +179,8 @@
         app:layout_constraintEnd_toEndOf="@id/relTop3"
         app:layout_constraintBottom_toTopOf="@id/tvTop3Id"
         android:layout_marginTop="12dp"
-        android:textSize="16sp"
+        android:textSize="12sp"
+        android:maxLength="6"
         android:textColor="@color/white"
         />
     <TextView
@@ -187,7 +190,7 @@
         app:layout_constraintStart_toEndOf="@+id/relTop1"
         app:layout_constraintEnd_toEndOf="@id/relTop3"
         app:layout_constraintBottom_toTopOf="@id/tvTop3"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:textColor="#FFFFFF"
         />
     <TextView
@@ -198,7 +201,7 @@
         app:layout_constraintEnd_toEndOf="@id/relTop3"
         app:layout_constraintBottom_toBottomOf="@id/ivJiangtai"
         android:layout_marginBottom="8dp"
-        android:textSize="13sp"
+        android:textSize="10sp"
         android:textColor="@color/white"
         />
 

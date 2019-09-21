@@ -82,6 +82,7 @@ class CustomeWindow {
     inner class MyBroadCast : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("WINDOW".equals(intent!!.action)) {
+                quiteRoom("1")
                 dismiss()
             }
         }

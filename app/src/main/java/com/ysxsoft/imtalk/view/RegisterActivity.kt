@@ -96,6 +96,7 @@ class RegisterActivity : BaseActivity() {
                     }
 
                     override fun onNext(t: RegisterBean?) {
+                        showToastMessage(t!!.msg)
                         if (t!!.code == 0) {
                             loginToIM(t.data.token)
                             SpUtils.saveSp(mContext, "chat_token", t.data.token)

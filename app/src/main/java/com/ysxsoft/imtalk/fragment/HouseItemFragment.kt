@@ -82,6 +82,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
         position = arguments?.getInt(ARG_POSITION) ?: position
         pids = arguments!!.getString("pids")
     }
+
     private fun requestMyData() {
         NetWork.getService(ImpService::class.java)
                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -111,7 +112,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<BannerBean> {
                     override fun onError(e: Throwable?) {
-                        showToastMessage("HouseItemFragment=LunBoData" + e!!.message.toString())
+                        Log.d("tag","HouseItemFragment=LunBoData" + e!!.message.toString())
                     }
 
                     override fun onNext(t: BannerBean?) {
@@ -175,7 +176,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     }else{
                         helper.getView<TextView>(R.id.tv_person).text = item.memCount
                     }
-
+                    if (!"0".equals(item.is_lock)){
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                    }else{
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                    }
                     helper.itemView.setOnClickListener {
                         roomLock(item.room_id.toString())
                     }
@@ -183,6 +188,47 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             }
             recyclerView.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL)
             recyclerView.adapter = adapterRecommend1
+
+            adapterHouse1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_room,roomLists!!.subList(3, roomLists!!.size)) {
+                override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
+                    ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
+                    helper.getView<TextView>(R.id.tv_name).text = item.room_name
+                    if (!"0".equals(item.is_lock)){
+                        helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.VISIBLE
+                    }else{
+                        helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.GONE
+                    }
+                    if (TextUtils.isEmpty(item.label_name)){
+                        helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
+                    }else{
+                        helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                    }
+                    if (TextUtils.isEmpty(item.memCount)){
+                        helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
+                    }else{
+                        helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
+                    }
+                    helper.itemView.setOnClickListener {
+                        roomLock(item.room_id.toString())
+                    }
+                }
+            }
+            recyclerViewRoom.layoutManager = LinearLayoutManager(mContext)
+            recyclerViewRoom.adapter = adapterHouse1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         } else {
             adapterRecommend1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_recommend, roomLists) {
                 override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
@@ -193,6 +239,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     }else{
                         helper.getView<TextView>(R.id.tv_person).text = item.memCount
                     }
+                    if (!"0".equals(item.is_lock)){
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                    }else{
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                    }
                     helper.itemView.setOnClickListener {
                         roomLock(item.room_id.toString())
                     }
@@ -201,35 +252,6 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             recyclerView.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL)
             recyclerView.adapter = adapterRecommend1
         }
-
-        adapterHouse1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_room, roomLists) {
-            override fun convert(helper: BaseViewHolder, item: HomeFRoomBean.DataBean.RoomListBean) {
-//                helper.getView<ImageView>(R.id.ivAvatar).displayRes(R.mipmap.icon_def)
-                ImageLoadUtil.GlideGoodsImageLoad(mContext, item.icon, helper.getView<ImageView>(R.id.ivAvatar))
-                helper.getView<TextView>(R.id.tv_name).text = item.room_name
-                if (!"0".equals(item.is_lock)){
-                    helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.VISIBLE
-                }else{
-                    helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.GONE
-                }
-                if (TextUtils.isEmpty(item.label_name)){
-                    helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
-                }else{
-                    helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
-                }
-                if (TextUtils.isEmpty(item.memCount)){
-                    helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
-                }else{
-                    helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
-                }
-                helper.itemView.setOnClickListener {
-                    //                    ChatRoomActivity.starChatRoomActivity(mContext, item.room_id.toString())
-                    roomLock(item.room_id.toString())
-                }
-            }
-        }
-        recyclerViewRoom.layoutManager = LinearLayoutManager(mContext)
-        recyclerViewRoom.adapter = adapterHouse1
 
     }
 
@@ -302,6 +324,12 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 }else{
                     helper.getView<TextView>(R.id.tv_person).text = item.memCount
                 }
+                if (!"0".equals(item.is_lock)){
+                    helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                }else{
+                    helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                }
+
                 helper.itemView.setOnClickListener {
                     roomLock(item.room_id.toString())
                 }
@@ -385,7 +413,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             }
 
             override fun onFail(errorCode: Int) {
-                showToastMessage("HouseItemFragment==加入房间==" + errorCode)
+                Log.d("tag","HouseItemFragment==加入房间==" + errorCode)
             }
         })
     }

@@ -71,7 +71,7 @@ public class ZSAliBean {
             private int type;
             private String diamond;
             private String blv;
-            private int money;
+            private String money;
             private String account_number;
             private String account_name;
 
@@ -107,11 +107,11 @@ public class ZSAliBean {
                 this.blv = blv;
             }
 
-            public int getMoney() {
+            public String getMoney() {
                 return money;
             }
 
-            public void setMoney(int money) {
+            public void setMoney(String money) {
                 this.money = money;
             }
 
