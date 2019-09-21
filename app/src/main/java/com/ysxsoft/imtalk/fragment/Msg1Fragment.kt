@@ -96,10 +96,12 @@ class Msg1Fragment : BaseFragment() {
                 }
                 when (type) {
                     Conversation.ConversationType.PRIVATE -> {
-                        RongIM.getInstance().startPrivateChat(getActivity(), targetId, userInfo!!.nikeName)
+                        if (userInfo!=null){
+                            RongIM.getInstance().startPrivateChat(getActivity(), targetId, userInfo!!.nikeName)
+                        }
                     }
                     Conversation.ConversationType.GROUP -> {
-                        RongIM.getInstance().startGroupChat(getActivity(), targetId, "标题");
+                        RongIM.getInstance().startGroupChat(getActivity(), targetId, "嗨嗨聊天群组");
                     }
                     Conversation.ConversationType.SYSTEM -> {
 

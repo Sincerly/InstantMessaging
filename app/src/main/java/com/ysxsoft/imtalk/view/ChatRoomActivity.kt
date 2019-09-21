@@ -123,6 +123,23 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             giftNotifyManager!!.addData(roomPublicGiftMessageBean)
             giftNotifyManager!!.start()
         }
+        roomManager!!.getRoomDetailInfo1(room_id,object :ResultCallback<DetailRoomInfo>{
+            override fun onSuccess(result: DetailRoomInfo?) {
+               if (result!=null){
+                   if ("0".equals(result.roomInfo.room_gift_tx)){
+                       UpdataTips(result.micPositions!!, false)
+                   }else{
+                       tv_room_manager.setText(result.roomInfo.gifts)
+                       UpdataTips(result.micPositions!!, true)
+                   }
+               }
+            }
+
+            override fun onFail(errorCode: Int) {
+
+            }
+        })
+
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
@@ -175,6 +192,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         if (AuthManager.getInstance().currentUserId.equals(uid)) {
             IMClient.getInstance().quitChatRoom(room_id, null)
             RtcClient.getInstance().quitRtcRoom(room_id, null)
+            sendBroadcast(Intent("WINDOW"))
             showToastMessage("你已被踢出房间")
 //            finish()
             removeUser(room_id!!, uid)
@@ -674,8 +692,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         et_chat.setOnClickListener {
             ll_isShow.visibility = View.GONE
             ll_send.visibility = View.VISIBLE
-            AppUtil.openKeyboard(mContext)
-
         }
 
         tv_send.setOnClickListener {
@@ -1656,7 +1672,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun blackList() {
                         BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
-//                        ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
+                        ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
                     }
 
                     override fun clickGiveGift(uid: String, nikeName: String) {
@@ -1751,7 +1767,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                         override fun blackList() {
                             BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
-//                            ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
+                            ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
                         }
 
                         override fun clickGiveGift(uid: String, nickname: String) {
