@@ -212,13 +212,15 @@ class GiftBagDialog : ABSDialog {
                                         }
                                     }else{
                                         if (AuthManager.getInstance().currentUserId.equals(bean.uid.toString())) {
+                                            //过滤掉自己所在的麦位
                                         } else {
-                                            if (sort == 0) {
-                                                //加入房主
-                                                data.add(8)
-                                            } else {
-                                                //加入其它用户
-                                                data.add(sort - 1)
+                                            if (bean.uid.toString().equals(targetUserId)) {
+                                                //拿到目标人所在的位置
+                                                if (sort == 0) {
+                                                    data.add(8)
+                                                } else {
+                                                    data.add(sort - 1)
+                                                }
                                             }
                                         }
                                     }
