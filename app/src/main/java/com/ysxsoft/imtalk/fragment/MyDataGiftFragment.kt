@@ -105,8 +105,6 @@ class MyDataGiftFragment : BaseFragment() {
     }
 
 
-
-
     private fun fouceData() {
         NetWork.getService(ImpService::class.java)
                 .fans_status(SpUtils.getSp(mContext,"uid"),uid!!)

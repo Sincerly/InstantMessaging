@@ -119,7 +119,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
-            if (memberMessage.getUserInfo() != null||memberMessage.getRoomMemberAction()!= RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
+            if (memberMessage.getUserInfo() != null) {
                 viewHolder.nickNameTv.setText(memberMessage.getUserInfo().getName() + ":");
             }
             RoomMemberChangedMessage.RoomMemberAction roomMemberAction = memberMessage.getRoomMemberAction();
@@ -129,9 +129,11 @@ public class RoomChatListAdapter extends BaseAdapter {
                     carName="乘着"+memberMessage.getCarName();
                 }
                 viewHolder.messageTv.setText((carName)+context.getString(R.string.chatroom_user_enter));
-            }/*else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
+            }else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {
+                viewHolder.nickNameTv.setVisibility(View.GONE);
+                viewHolder.messageTv.setVisibility(View.GONE);
                 viewHolder.messageTv.setText(R.string.chatroom_user_quit);
-            }*/ else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
+            } else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.KICK) {
                 viewHolder.messageTv.setText(R.string.chatroom_user_kick);
             }
         } else if (viewType == VIEW_TYPE_GIFT) {

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.ysxsoft.imtalk.bean.CommonBean;
 import com.ysxsoft.imtalk.bean.RoomPublicGiftMessageBean;
 import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.im.IMClient;
@@ -34,6 +35,7 @@ import com.ysxsoft.imtalk.chatroom.model.RoomUserListBean;
 import com.ysxsoft.imtalk.chatroom.net.HttpClient;
 import com.ysxsoft.imtalk.chatroom.net.SealMicRequest;
 import com.ysxsoft.imtalk.chatroom.net.model.CreateRoomResult;
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil;
 import com.ysxsoft.imtalk.chatroom.rtc.RtcClient;
 import com.ysxsoft.imtalk.chatroom.task.callback.HandleRequestWrapper;
 import com.ysxsoft.imtalk.chatroom.task.callback.RequestWrapper;
@@ -45,6 +47,8 @@ import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
 import com.ysxsoft.imtalk.chatroom.utils.SpUtils;
 import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
+import com.ysxsoft.imtalk.impservice.ImpService;
+import com.ysxsoft.imtalk.utils.NetWork;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +71,10 @@ import io.rong.imlib.model.Message;
 import io.rong.imlib.model.UserInfo;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
+import okhttp3.RequestBody;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class RoomManager {
     /**
@@ -191,6 +199,35 @@ public class RoomManager {
             }
         });
     }
+    //解禁用户
+    private void removeUser(String roomId, String uid) {
+        HashMap map = new HashMap<String, String>();
+        map.put("room_id", roomId);
+        map.put("uid", uid);
+        RequestBody body = RetrofitUtil.createJsonRequest(map);
+        NetWork.INSTANCE.getService(ImpService.class)
+                .remove_user(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<CommonBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(CommonBean commonBean) {
+                        if (commonBean.getCode() == 0){
+
+                        }
+                    }
+                });
+    }
 
     /**
      * 获得当前聊天室
@@ -222,6 +259,7 @@ public class RoomManager {
                             currentRoom.setAudiences(dataResult.getAudiences());
                             currentRoom.setMicPositions(dataResult.getMicPositions());
                             currentRoom.setAdminListInfo(dataResult.getAdminListInfo());//2019-8-10 add
+                            currentRoom = dataResult;//2019-9-20 add
 
                             //检测角色是否发生了改变
                             final Role newRole = initCurrentRole();
@@ -451,7 +489,7 @@ public class RoomManager {
                 // 加入麦位上可发言的用户
                 for (MicPositionsBean micInfo : micPositions) {
                     String state = micInfo.getIs_wheat();
-                    if (!"0".equals(state) && !"0".equals(micInfo.getUid()) && !"0".equals(micInfo.getIs_lock_wheat())) {
+                    if (!"0".equals(state) && !"0".equals(micInfo.getUid()) && !"0".equals(micInfo.getIs_lock_wheat()) && !"1".equals(micInfo.getIs_oc_wheat())) {
                         userList.add(micInfo.getUid());
                     }
                 }
@@ -627,7 +665,7 @@ public class RoomManager {
                                         @Override
                                         public void run() {
                                             roomEventlistener.onMessageEvent(message);
-                                            roomEventlistener.onRoomMemberChangeWithCar(memCount,memberChangedMessage.getCarPic());
+                                            roomEventlistener.onRoomMemberChangeWithCar(memCount, memberChangedMessage.getCarPic());
                                         }
                                     });
                                 }
@@ -895,8 +933,8 @@ public class RoomManager {
                                     } else {
                                         Log.e("tag", "收到砸金蛋公屏消息");
                                         //砸金蛋
-                                        if(roomEventlistener!=null){
-                                            roomEventlistener.onGoldMessage(msg.getNickname(),msg.getSgName(),"("+msg.getGoldNums()+"金币)");
+                                        if (roomEventlistener != null) {
+                                            roomEventlistener.onGoldMessage(msg.getNickname(), msg.getSgName(), "(" + msg.getGoldNums() + "金币)");
 //                                            threadManager.runOnUIThread(new Runnable() {
 //                                                @Override
 //                                                public void run() {
@@ -921,13 +959,13 @@ public class RoomManager {
                                 }
                             });
                         }
-                    }else if (message.getContent() instanceof RoomAdminChangeMessage){
+                    } else if (message.getContent() instanceof RoomAdminChangeMessage) {
                         if (roomEventlistener != null) {
                             threadManager.runOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     RoomAdminChangeMessage content = new RoomAdminChangeMessage(message.getContent().encode());
-                                    roomEventlistener.setManager(content.getIsAdmin(),content.getCmd());
+                                    roomEventlistener.setManager(content.getIsAdmin(), content.getCmd());
                                 }
                             });
                         }

@@ -186,8 +186,10 @@ class MainActivity : BaseActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (isBack) {
                 sendBroadcast(Intent("WINDOW"))
-                if (!TextUtils.isEmpty(dataBean!!.now_roomId)){
-                    quiteRoom(AuthManager.getInstance().currentUserId,"1")
+                if (dataBean!=null){
+                    if (!TextUtils.isEmpty(dataBean!!.now_roomId)){
+                        quiteRoom(AuthManager.getInstance().currentUserId,"1")
+                    }
                 }
                 finish()
             } else {

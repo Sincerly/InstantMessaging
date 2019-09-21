@@ -81,6 +81,7 @@ import okhttp3.Call
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.w3c.dom.Text
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -115,7 +116,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             giftEggManager!!.start()
         }
     }
-
 
     override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
         //送礼物超过一定公屏消息
@@ -175,6 +175,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         if (AuthManager.getInstance().currentUserId.equals(uid)) {
             IMClient.getInstance().quitChatRoom(room_id, null)
             RtcClient.getInstance().quitRtcRoom(room_id, null)
+            showToastMessage("你已被踢出房间")
 //            finish()
             removeUser(room_id!!, uid)
         }
@@ -232,7 +233,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onKickOffRoom() {
         showToastMessage(R.string.toast_chatroom_kick_off_from_room)
     }
-
 
     override fun onErrorLeaveRoom() {
         showToastMessage(R.string.toast_error_leave_room_because_error)
@@ -1133,11 +1133,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickPrivateChat() {
-                        RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, "标题");
+                        RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, micNickname);
                     }
 
                     override fun clickGiveZb() {
-                        DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid)
+                        DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid,"",detailRoomInfo!!.roomInfo.nickname)
                     }
 
                     override fun clickFoucsOn() {
@@ -1247,15 +1247,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 upperWheatDialog.show()
             }
         })
-        //                    for (bean in detailRoomInfo!!.roomUserList) {
-        //                        if (SpUtils.getSp(mContext, "uid").equals(bean.uid) && ("1".equals(bean.role) || "2".equals(bean.role))) {
-        //                            msgListDialog.show()
-        //                        }
-        //                    }
+
         if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid) || amdinType == 1) {
             msgListDialog.show()
         } else {
             val giveDialog = GiveDialog(mContext, userid, room_id)
+            val tv_nikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
             giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
             giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
             giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
@@ -1277,11 +1274,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickPrivateChat() {
-                    RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, "标题");
+                    RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, tv_nikeName.text.toString());
                 }
 
                 override fun clickGiveZb() {
-                    DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid)
+                    DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid,"",micNickname!!)
                 }
 
                 override fun clickFoucsOn() {
@@ -1358,11 +1355,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private fun enableRoomChatVoice(enable: Boolean) {
         roomManager!!.enableRoomChatVoice(enable, object : ResultCallback<Boolean> {
             override fun onSuccess(aBoolean: Boolean?) {
-                showToastMessage("设置启动房间聊天声音成功")
+                Log.d("tag","设置启动房间聊天声音成功")
             }
 
             override fun onFail(errorCode: Int) {
-                showToastMessage("设置启动房间聊天声音失败" + errorCode)
+                Log.d("tag","设置启动房间聊天声音失败" + errorCode)
             }
         })
     }
@@ -1380,7 +1377,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    showToastMessage("设置是否开启失败" + errorCode)
+                    Log.d("tag","设置是否开启失败" + errorCode)
                 }
             })
         } else {
@@ -1390,7 +1387,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    showToastMessage("设置是否关闭失败" + errorCode)
+                    Log.d("tag","设置是否关闭失败" + errorCode)
                 }
             })
         }
@@ -1659,6 +1656,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun blackList() {
                         BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
+//                        ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
                     }
 
                     override fun clickGiveGift(uid: String, nikeName: String) {
@@ -1670,7 +1668,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveZb() {
-                        DressMallActivity.startDressMallActivity(mContext, userId)
+                        DressMallActivity.startDressMallActivity(mContext, userId,"",nikeName!!)
                     }
 
                     override fun clickFoucsOn() {
@@ -1753,6 +1751,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                         override fun blackList() {
                             BlackManager(userId, room_id!!, "1", micNickname!!, micIcon!!)
+//                            ExitCurrentRoom(userId, "2", room_id!!, micNickname!!, micIcon!!)
                         }
 
                         override fun clickGiveGift(uid: String, nickname: String) {
@@ -1764,7 +1763,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
 
                         override fun clickGiveZb() {
-                            DressMallActivity.startDressMallActivity(mContext, userId)
+                            DressMallActivity.startDressMallActivity(mContext, userId,"",micNickname!!)
                         }
 
                         override fun clickFoucsOn() {
@@ -3462,7 +3461,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     var musicbean: EventBusBean? = null
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onMessageEvent(bean: EventBusBean) {
+    fun onMessageEvent1(bean: EventBusBean) {
         musicbean = bean
         startService()
     }

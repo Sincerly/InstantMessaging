@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -36,6 +36,16 @@
             tools:text="100" />
 
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/img_w_lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:src="@mipmap/img_w_lock"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPhoto"
+        app:layout_constraintRight_toRightOf="@id/ivPhoto" />
 
     <TextView
         android:id="@+id/tvContent"

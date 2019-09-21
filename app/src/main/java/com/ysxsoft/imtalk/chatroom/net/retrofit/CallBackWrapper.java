@@ -4,6 +4,7 @@ import com.ysxsoft.imtalk.chatroom.constant.ErrorCode;
 import com.ysxsoft.imtalk.chatroom.constant.ServerErrorCode;
 import com.ysxsoft.imtalk.chatroom.net.RequestCallBack;
 import com.ysxsoft.imtalk.chatroom.net.model.Result;
+import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
 
 import retrofit2.Call;
@@ -46,11 +47,13 @@ public class CallBackWrapper<R> implements Callback<Result<R>> {
                         errorCode = ErrorCode.RESULT_FAILED;
                 }
                 mCallBack.onFail(errorCode.getCode());
+                ToastUtils.showToast(body.getMsg());
             }
         } else {
             SLog.e(SLog.TAG_NET, "url:" + call.request().url().toString() + ", no response body");
             mCallBack.onFail(ErrorCode.RESULT_ERROR.getCode());
         }
+
     }
 
     @Override

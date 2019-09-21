@@ -82,6 +82,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
         position = arguments?.getInt(ARG_POSITION) ?: position
         pids = arguments!!.getString("pids")
     }
+
     private fun requestMyData() {
         NetWork.getService(ImpService::class.java)
                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -111,7 +112,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<BannerBean> {
                     override fun onError(e: Throwable?) {
-                        showToastMessage("HouseItemFragment=LunBoData" + e!!.message.toString())
+                        Log.d("tag","HouseItemFragment=LunBoData" + e!!.message.toString())
                     }
 
                     override fun onNext(t: BannerBean?) {
@@ -175,7 +176,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     }else{
                         helper.getView<TextView>(R.id.tv_person).text = item.memCount
                     }
-
+                    if (!"0".equals(item.is_lock)){
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                    }else{
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                    }
                     helper.itemView.setOnClickListener {
                         roomLock(item.room_id.toString())
                     }
@@ -192,6 +197,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<TextView>(R.id.tv_person).text = "0"
                     }else{
                         helper.getView<TextView>(R.id.tv_person).text = item.memCount
+                    }
+                    if (!"0".equals(item.is_lock)){
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                    }else{
+                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
                     }
                     helper.itemView.setOnClickListener {
                         roomLock(item.room_id.toString())
@@ -302,6 +312,12 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 }else{
                     helper.getView<TextView>(R.id.tv_person).text = item.memCount
                 }
+                if (!"0".equals(item.is_lock)){
+                    helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
+                }else{
+                    helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                }
+
                 helper.itemView.setOnClickListener {
                     roomLock(item.room_id.toString())
                 }
@@ -385,7 +401,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             }
 
             override fun onFail(errorCode: Int) {
-                showToastMessage("HouseItemFragment==加入房间==" + errorCode)
+                Log.d("tag","HouseItemFragment==加入房间==" + errorCode)
             }
         })
     }

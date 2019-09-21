@@ -156,6 +156,7 @@ public class MicSeatView extends FrameLayout {
     private void lockMicSeat() {
         micSeatIv.setImageDrawable(getResources().getDrawable(R.drawable.chatroom_bg_mic_seat_lock));
         micSeatIv.setBackground(null);
+        tv_room_manager.setVisibility(View.GONE);
         img_head_wear.setImageBitmap(null);
     }
 
@@ -166,6 +167,7 @@ public class MicSeatView extends FrameLayout {
     private void setMicSeatEmpty() {
         micSeatIv.setImageDrawable(getResources().getDrawable(R.drawable.img_seat));
         micSeatIv.setBackground(null);
+        tv_room_manager.setVisibility(View.GONE);
         img_head_wear.setImageBitmap(null);
     }
 

@@ -91,8 +91,8 @@ public class GiftPlugin implements IPluginModule,IPluginRequestPermissionResultC
                     }
                 });
 
-                PrivateCarMessage.sendMessage(rongExtension.getTargetId(),"1","座驾名称",pic,"Sincerly");//赠送座驾
-                PrivateHeaderMessage.sendMessage(rongExtension.getTargetId(),"1","头像名称",pic,"Sincerly");//赠送头像
+//                PrivateCarMessage.sendMessage(rongExtension.getTargetId(),"1","座驾名称",pic,"Sincerly");//赠送座驾
+//                PrivateHeaderMessage.sendMessage(rongExtension.getTargetId(),"1","头像名称",pic,"Sincerly");//赠送头像
             }
        });
         sendGiftDialog.show();

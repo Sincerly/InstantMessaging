@@ -11,9 +11,12 @@ import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.adapter.DressMallAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DressMallBean
+import com.ysxsoft.imtalk.im.message.PrivateCarMessage
+import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.MyDressActivity
@@ -55,8 +58,17 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     val mHandler = PreviewHandler()
     var beas: List<DressMallBean.DataBean>? = null
     var auto_id: String? = null
+    var myself: String? = null
+    var uid: String? = null
+    var nikeName: String? = null
+    var name: String? = null
+    var carPic: String? = null
     override fun onResume() {
         super.onResume()
+        val bundle = this.arguments//得到从Activity传来的数据
+        myself = bundle!!.getString("myself")
+        uid = bundle!!.getString("uid")
+        nikeName = bundle!!.getString("nikeName")
         initView()
     }
 
@@ -87,6 +99,8 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         mRecyclerView.addItemDecoration(divider)
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val bean = mDataAdapter!!.dataList.get(position)
+             carPic = bean.pic
+            name = bean.name
             auto_id = bean.id.toString()
             tv_money1.setText(bean.gold + "金币")
             tv_day1.setText("/" + bean.days + "天")
@@ -109,7 +123,12 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                     override fun call(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
-                            startActivity(MyDressActivity::class.java)
+                            if ("myself".equals(myself)){
+                                startActivity(MyDressActivity::class.java)
+                            }else{
+                                PrivateCarMessage.sendMessage(uid, "1", name, carPic, nikeName)//赠送头像
+                            }
+                            activity!!.onBackPressed()
                         }
                     }
                 })

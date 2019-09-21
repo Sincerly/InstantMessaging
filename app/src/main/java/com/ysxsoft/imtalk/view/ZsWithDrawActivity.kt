@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.OrderBean
@@ -19,6 +20,7 @@ import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.dialog.WithdrawDialog
 import kotlinx.android.synthetic.main.title_layout.*
 import kotlinx.android.synthetic.main.zs_withdraw_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -40,7 +42,7 @@ class ZsWithDrawActivity : BaseActivity() {
         tv_title_right.setText("提现记录")
         setTitle("钻石提现")
         initView()
-
+        ZsALiPay()
     }
 
     private fun initView() {
@@ -143,13 +145,21 @@ class ZsWithDrawActivity : BaseActivity() {
                 .TxBank(SpUtils.getSp(mContext, "uid"), ed_money.text.toString().trim(), "2", bank_id!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<OrderBean> {
-                    override fun call(t: OrderBean?) {
+                .subscribe(object :Observer<OrderBean>{
+                    override fun onError(e: Throwable?) {
+
+                    }
+
+                    override fun onNext(t: OrderBean?) {
                         if (t!!.code == 0) {
                             startActivity(PaymentCompletionActivity::class.java)
                         } else {
                             showToastMessage(t.msg)
                         }
+                    }
+
+                    override fun onCompleted() {
+
                     }
 
                 })
@@ -160,13 +170,19 @@ class ZsWithDrawActivity : BaseActivity() {
                 .TxAli(SpUtils.getSp(mContext, "uid"), ed_money.text.toString().trim(), "1")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<OrderBean> {
-                    override fun call(t: OrderBean?) {
+                .subscribe(object : Observer<OrderBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: OrderBean?) {
                         if (t!!.code == 0) {
                             startActivity(PaymentCompletionActivity::class.java)
                         } else {
                             showToastMessage(t.msg)
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 
@@ -178,14 +194,21 @@ class ZsWithDrawActivity : BaseActivity() {
                 .zsTxBank(SpUtils.getSp(mContext, "uid"), "2")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<ZSBankBean> {
-                    override fun call(t: ZSBankBean?) {
+                .subscribe(object : Observer<ZSBankBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: ZSBankBean?) {
                         if (t!!.code == 0) {
 //                            tv_withdraw_acount.setText(t.data.bank_name)
 //                            tv_add_bank_card.visibility = View.GONE
                             tv_money.setText(t.data.rs.money.toString())
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
 
     }
@@ -196,8 +219,12 @@ class ZsWithDrawActivity : BaseActivity() {
                 .zsTxAli(SpUtils.getSp(mContext, "uid"), "1")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<ZSAliBean> {
-                    override fun call(t: ZSAliBean?) {
+                .subscribe(object :Observer<ZSAliBean>{
+                    override fun onError(e: Throwable?) {
+                        Log.d("tag",e!!.message.toString())
+                    }
+
+                    override fun onNext(t: ZSAliBean?) {
                         if (t!!.code == 0) {
                             if (TextUtils.isEmpty(t.data.rs.account_number)) {
                                 tv_withdraw_acount.setHint("您还未添加支付宝，")
@@ -209,6 +236,9 @@ class ZsWithDrawActivity : BaseActivity() {
                                 tv_withdraw_acount.setText(t.data.rs.account_number)
                             }
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 
