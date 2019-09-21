@@ -76,7 +76,7 @@ public class NotifyManager {
      * @param goldNum  金币数量
      */
     public void addView(String nickname,String giftName,String goldNum) {
-        if(isPaused=true){
+        if(isPaused==true){
             Log.e("tag","暂停中...");
             return;
         }else{

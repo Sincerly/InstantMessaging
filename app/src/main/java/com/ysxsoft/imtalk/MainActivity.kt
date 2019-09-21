@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -12,8 +13,6 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.LinearLayoutManager
 import com.luck.picture.lib.permissions.RxPermissions
 import com.ysxsoft.imtalk.fragment.*
-import com.ysxsoft.imtalk.utils.BaseActivity
-import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.widget.dialog.QDDialog
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
@@ -31,8 +30,7 @@ import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.ActivityPageManager
-import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.LoginActivity
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
@@ -70,6 +68,7 @@ class MainActivity : BaseActivity() {
                     override fun accept(t: Boolean?) {
                         if (t!!) {
                             //申请的权限全部允许
+
                         } else {
                             //只要有一个权限被拒绝，就会执行
 //                            showToastMessage("未授权权限，部分功能不能使用")
@@ -80,6 +79,21 @@ class MainActivity : BaseActivity() {
         initView()
         requestData()
         requestMyData()
+
+        RxPermissions(this).request(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(object : Consumer<Boolean> {
+                    override fun accept(t: Boolean?) {
+                        if (t!!) {
+                            //申请的权限全部允许
+                            CarUtils.downloadAll(mContext as Activity?)
+                        } else {
+                            //只要有一个权限被拒绝，就会执行
+//                            showToastMessage("未授权权限，部分功能不能使用")
+                        }
+                    }
+                })
     }
 
     var dataBean: UserInfoBean.DataBean? = null

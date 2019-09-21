@@ -12,13 +12,13 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <View style="@style/gray_line_style" />
+    <View style="@style/gray_line_style" android:background="#F5F5F5" />
 
 
     <RadioGroup
         android:id="@+id/rg_home"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="?android:attr/actionBarSize"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:gravity="center_vertical"
