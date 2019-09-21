@@ -199,9 +199,9 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.GONE
                     }
                     if (TextUtils.isEmpty(item.label_name)){
-                        helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
+                        helper.getView<TextView>(R.id.tv_Tag).text = "暂无"
                     }else{
-                        helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                        helper.getView<TextView>(R.id.tv_Tag).text =  item.label_name
                     }
                     if (TextUtils.isEmpty(item.memCount)){
                         helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
@@ -215,18 +215,6 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
             }
             recyclerViewRoom.layoutManager = LinearLayoutManager(mContext)
             recyclerViewRoom.adapter = adapterHouse1
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         } else {
@@ -351,9 +339,9 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     helper.getView<ImageView>(R.id.img_b_lock)!!.visibility=View.GONE
                 }
                 if (TextUtils.isEmpty(item.label_name)){
-                    helper.getView<TextView>(R.id.tv_Tag).text = "#" +"暂无"
+                    helper.getView<TextView>(R.id.tv_Tag).text = "暂无"
                 }else{
-                    helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                    helper.getView<TextView>(R.id.tv_Tag).text = item.label_name
                 }
                 if (TextUtils.isEmpty(item.memCount)){
                     helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
@@ -432,7 +420,6 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 
                     override fun onNext(t: RoomLockBean?) {
                         if (t!!.code == 0) {
-
                             RoomManager.getInstance().getRoomDetailInfo1(roomId,object :ResultCallback<DetailRoomInfo>{
                                 override fun onSuccess(result: DetailRoomInfo?) {
                                     if (result!=null){
@@ -460,6 +447,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                             })
                         }
                     }
+
                     override fun onCompleted() {
                     }
                 })

@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.adapter
 import android.content.Context
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean
 import com.ysxsoft.imtalk.com.ListBaseAdapter
@@ -26,6 +27,8 @@ class WheatAdapter(mContext: Context):ListBaseAdapter<MicPositionsBean>(mContext
             holder.getView<ImageView>(R.id.wheat_dui)!!.visibility = View.VISIBLE
             holder.getView<ImageView>(R.id.chatroom_item_iv_mic_seat)!!.visibility = View.GONE
         }
+        holder.getView<TextView>(R.id.tv_mic)!!.setText(mDataList.size.toString()+"号麦")
+
         holder.itemView.setOnClickListener {
             if (onWheatListener!=null){
                 onWheatListener!!.onWheat(position)

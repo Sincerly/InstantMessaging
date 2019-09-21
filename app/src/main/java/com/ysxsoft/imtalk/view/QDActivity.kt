@@ -331,10 +331,18 @@ class QDActivity : BaseActivity() {
                                     tv_jb3.setText(t.data.sign_list.get(2).sign_gold.toString() + "金币")
                                 }
                                 2 -> {
-                                    tv_jb3.setText(t.data.sign_list.get(2).sign_gold.toString() + "座驾")
+                                    if (t.data.sign_list.get(2).sign_gold==0){
+                                        tv_jb3.setText("座驾")
+                                    }else{
+                                        tv_jb3.setText(t.data.sign_list.get(2).sign_gold.toString() + "座驾")
+                                    }
                                 }
                                 3 -> {
-                                    tv_jb3.setText(t.data.sign_list.get(2).sign_gold.toString() + "头饰")
+                                    if (t.data.sign_list.get(2).sign_gold==0){
+                                        tv_jb3.setText("头饰")
+                                    }else{
+                                        tv_jb3.setText(t.data.sign_list.get(2).sign_gold.toString() + "头饰")
+                                    }
                                 }
                             }
 
@@ -383,10 +391,18 @@ class QDActivity : BaseActivity() {
                                     tv_jb7.setText(t.data.sign_list.get(6).sign_gold.toString() + "金币")
                                 }
                                 2 -> {
-                                    tv_jb7.setText(t.data.sign_list.get(6).sign_gold.toString() + "座驾")
+                                    if (t.data.sign_list.get(6).sign_gold==0){
+                                        tv_jb7.setText("座驾")
+                                    }else{
+                                        tv_jb7.setText(t.data.sign_list.get(6).sign_gold.toString() + "座驾")
+                                    }
                                 }
                                 3 -> {
-                                    tv_jb7.setText(t.data.sign_list.get(6).sign_gold.toString() + "头饰")
+                                    if (t.data.sign_list.get(6).sign_gold==0){
+                                        tv_jb7.setText("头饰")
+                                    }else{
+                                        tv_jb7.setText(t.data.sign_list.get(6).sign_gold.toString() + "头饰")
+                                    }
                                 }
                             }
 

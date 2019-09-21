@@ -165,9 +165,9 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                         helper.getView<TextView>(R.id.tv_person).text = item.memCount
                                     }
                                     if (TextUtils.isEmpty(item.label_name)) {
-                                        helper.getView<TextView>(R.id.tvContent).setText("#" + "暂无" + "  " + item.room_name)
+                                        helper.getView<TextView>(R.id.tvContent).setText("暂无" + "  " + item.room_name)
                                     } else {
-                                        helper.getView<TextView>(R.id.tvContent).setText("#" + item.label_name + "  " + item.room_name)
+                                        helper.getView<TextView>(R.id.tvContent).setText(item.label_name + "  " + item.room_name)
                                     }
                                     if (!"0".equals(item.is_lock)){
                                         helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
@@ -200,9 +200,9 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                         helper.getView<ImageView>(R.id.img_b_lock)!!.visibility = View.GONE
                                     }
                                     if (TextUtils.isEmpty(item.label_name)) {
-                                        helper.getView<TextView>(R.id.tv_Tag).text = "#" + "暂无"
+                                        helper.getView<TextView>(R.id.tv_Tag).text = "暂无"
                                     } else {
-                                        helper.getView<TextView>(R.id.tv_Tag).text = "#" + item.label_name
+                                        helper.getView<TextView>(R.id.tv_Tag).text =  item.label_name
                                     }
                                     if (TextUtils.isEmpty(item.memCount)) {
                                         helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"

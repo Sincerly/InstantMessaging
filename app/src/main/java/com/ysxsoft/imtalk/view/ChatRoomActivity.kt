@@ -607,7 +607,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickSmall() {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (playMusicService != null) {
+                        playMusicService!!.stop()
+                    }
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                         if (!Settings.canDrawOverlays(mContext)) {
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                         } else {
@@ -985,6 +988,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: HomeHLBean?) {
                         if (t!!.code == 0) {
+                            if (playMusicService != null) {
+                                playMusicService!!.stop()
+                            }
                             RandomQuiteRoom(SpUtils.getSp(mContext, "uid"), "1", t.data.room_id.toString())
                         }
                     }
@@ -1007,7 +1013,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    showToastMessage("启用房间声音失败==" + errorCode)
+                    Log.d("tag","启用房间声音失败==" + errorCode)
                 }
             })
         } else {
@@ -1018,7 +1024,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    showToastMessage("关闭房间声音失败==" + errorCode)
+                    Log.d("tag","关闭房间声音失败==" + errorCode)
                 }
             })
         }
