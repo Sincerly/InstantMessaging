@@ -23,7 +23,7 @@ class WiningRecordAdapter(mContext: Context) :ListBaseAdapter<AwardRecodeBean.Da
         val bean = mDataList.get(position)
         val c=holder.getView<CircleImageView>(R.id.img_head2)!!
         Glide.with(mContext).load(bean.aw_images).into(c)
-        holder.getView<TextView>(R.id.tv_nikeName)!!.setText(bean.aw_name+"x"+bean.nums)
+        holder.getView<TextView>(R.id.tv_nikeName)!!.setText(bean.aw_name)
         holder.getView<TextView>(R.id.tv_time)!!.setText(bean.add_time)
         holder.getView<TextView>(R.id.tv_money)!!.setText(bean.aw_gold+"金币")
     }
