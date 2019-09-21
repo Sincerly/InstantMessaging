@@ -80,7 +80,7 @@ class MainActivity : BaseActivity() {
         requestData()
         requestMyData()
 
-        RxPermissions(this).request(Manifest.permission.CAMERA,
+        RxPermissions(this).request(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(object : Consumer<Boolean> {
