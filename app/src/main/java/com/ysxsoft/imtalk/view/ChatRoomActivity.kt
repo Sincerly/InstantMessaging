@@ -1093,6 +1093,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             UpdataTips(detailRoomInfo!!.getMicPositions(), false)
         } else {
             tv_room_manager.visibility = View.VISIBLE
+            tv_room_manager.setText(detailRoomInfo!!.roomInfo.gifts)
             UpdataTips(detailRoomInfo!!.getMicPositions(), true)
         }
         if ("0".equals(detailRoomInfo!!.roomInfo.is_lock)) {
@@ -2315,11 +2316,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     updateRoomTitle(roomDetailInfo.roomInfo.room_name, roomDetailInfo.roomInfo.room_num, detailRoomInfo!!.roomInfo.memCount.toString())
                     //设置房主信息
 //                    updataRoomManager()
-//                    if ("1".equals(detailRoomInfo!!.roomInfo.room_pure)) {//纯净模式：0 关闭；1 开启
-//                        UpdataTips(detailRoomInfo!!.getMicPositions(), false)
-//                    } else {
-//                        UpdataTips(detailRoomInfo!!.getMicPositions(), true)
-//                    }
+                    if ("1".equals(roomDetailInfo!!.roomInfo.room_pure)) {//纯净模式：0 关闭；1 开启
+                        tv_room_manager.visibility = View.VISIBLE
+                        tv_room_manager.setText(roomDetailInfo.roomInfo.gifts)
+                        UpdataTips(roomDetailInfo!!.getMicPositions(), false)
+                    } else {
+                        tv_room_manager.visibility = View.GONE
+                        UpdataTips(roomDetailInfo!!.getMicPositions(), true)
+                    }
                 }
             }
 
