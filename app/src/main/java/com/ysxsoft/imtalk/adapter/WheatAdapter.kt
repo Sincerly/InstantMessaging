@@ -16,7 +16,7 @@ import com.ysxsoft.imtalk.com.SuperViewHolder
 class WheatAdapter(mContext: Context):ListBaseAdapter<MicPositionsBean>(mContext){
     override val layoutId: Int
         get() = R.layout.wheat_item_layout
-
+    var position=1
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
 
         val bean = mDataList.get(position)
@@ -27,7 +27,7 @@ class WheatAdapter(mContext: Context):ListBaseAdapter<MicPositionsBean>(mContext
             holder.getView<ImageView>(R.id.wheat_dui)!!.visibility = View.VISIBLE
             holder.getView<ImageView>(R.id.chatroom_item_iv_mic_seat)!!.visibility = View.GONE
         }
-        holder.getView<TextView>(R.id.tv_mic)!!.setText(mDataList.size.toString()+"号麦")
+        holder.getView<TextView>(R.id.tv_mic)!!.setText((position+1).toString()+"号麦")
 
         holder.itemView.setOnClickListener {
             if (onWheatListener!=null){

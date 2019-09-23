@@ -1135,6 +1135,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         img_head.setOnClickListener {
             if (!SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid)) {
                 val giveDialog = GiveDialog(mContext, detailRoomInfo!!.roomInfo.uid, room_id)
+                var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
                 giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
                 giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
                 giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
@@ -1155,7 +1156,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickPrivateChat() {
-                        RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, micNickname);
+                        RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, findNikeName.text.toString());
                     }
 
                     override fun clickGiveZb() {
@@ -1686,7 +1687,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickPrivateChat() {
-                        RongIM.getInstance().startPrivateChat(mContext, userId, "标题");
+                        RongIM.getInstance().startPrivateChat(mContext, userId, micNickname);
                     }
 
                     override fun clickGiveZb() {
@@ -1781,7 +1782,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
 
                         override fun clickPrivateChat() {
-                            RongIM.getInstance().startPrivateChat(mContext, userId, "标题");
+                            RongIM.getInstance().startPrivateChat(mContext, userId, micNickname);
                         }
 
                         override fun clickGiveZb() {
@@ -1842,41 +1843,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 } else if ((currentRole is Linker) && (preMicPosition != -1)) {
                     JumpMic(AuthManager.getInstance().currentUserId, preMicPosition, micPosition)
                 }
-
-/*                when (currentRole) {
-                    Listener() -> {
-                        JoinMic(AuthManager.getInstance().currentUserId, micPosition)
-                    }
-                    Linker() -> {
-                        if (preMicPosition != -1) {
-                            ExitMic(AuthManager.getInstance().currentUserId, preMicPosition)
-                            JoinMic(AuthManager.getInstance().currentUserId, micPosition)
-                        }
-                    }
-                }
-                val seatMicDialog = UpperSeatMicDialog(mContext)
-                seatMicDialog.findViewById<TextView>(R.id.tv_btsm).visibility = View.GONE
-                seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).visibility = View.GONE
-                seatMicDialog.findViewById<TextView>(R.id.tv_bm).visibility = View.GONE
-                seatMicDialog.setOnDialogClickListener(object : UpperSeatMicDialog.OnDialogClickListener {
-                    override fun SMclick(view: TextView) {
-                        JoinMic(SpUtils.getSp(mContext, "uid"), micPosition)
-                    }
-
-                    override fun BTSMclick(view: TextView) {
-                        OnLineActivity.starOnLineActivity(mContext, detailRoomInfo!!.roomInfo.room_id)
-                    }
-
-                    override fun CSMclick(view: TextView) {
-
-                    }
-
-                    override fun BMclick(view: TextView) {
-
-                    }
-
-                })
-                seatMicDialog.show()*/
             } else { //非房主
                 if ((SpUtils.getSp(mContext, "uid")).equals(userId)) { //麦位是自己
                     val seatMicDialog = UpperSeatMicDialog(mContext)
@@ -1936,7 +1902,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
 
                             override fun clickPrivateChat() {
-                                RongIM.getInstance().startPrivateChat(mContext, userId, "标题");
+                                RongIM.getInstance().startPrivateChat(mContext, userId, micNickname);
                             }
 
                             override fun clickGiveZb() {

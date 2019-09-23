@@ -50,7 +50,8 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun initView() {
-        img_logo.setImageBitmap(AppUtil.getLogoBitmap(mContext))
+//        img_logo.setImageBitmap(AppUtil.getLogoBitmap(mContext))
+        img_logo.setImageDrawable(AppUtil.getLogoBitmap(mContext))
         //忘记密码
         tv_forget_password.setOnClickListener {
             startActivity(ForgetPswActivity::class.java)

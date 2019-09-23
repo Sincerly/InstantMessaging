@@ -12,6 +12,7 @@ import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.bean.FouceOnBean
 import com.ysxsoft.imtalk.bean.SGiftBean
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
@@ -56,13 +57,16 @@ class MyDataCarFragment : BaseFragment() {
     }
 
     private fun initView() {
-        tv_fouce.setOnClickListener {//关注
+        tv_fouce.setOnClickListener {
+            //关注
             fouceData()
         }
-        tv_msg.setOnClickListener {//私信
+        tv_msg.setOnClickListener {
+            //私信
             RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
-        tv_car.setOnClickListener {//送座驾
+        tv_car.setOnClickListener {
+            //送座驾
             RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
 
@@ -70,21 +74,21 @@ class MyDataCarFragment : BaseFragment() {
 
     private fun fouceData() {
         NetWork.getService(ImpService::class.java)
-                .fans_status(SpUtils.getSp(mContext,"uid"),uid!!)
+                .fans_status(SpUtils.getSp(mContext, "uid"), uid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<FouceOnBean> {
                     override fun onError(e: Throwable?) {
-                        Log.d("MyDataCarFragment",e!!.message.toString())
+                        Log.d("MyDataCarFragment", e!!.message.toString())
                     }
 
                     override fun onNext(t: FouceOnBean?) {
                         showToastMessage(t!!.msg)
-                        if (t!!.code==0){
-                            if (t.data==1){//未关注
+                        if (t!!.code == 0) {
+                            if (t.data == 1) {//未关注
                                 img_fouce.setImageResource(R.mipmap.img_w_add)
                                 tv_fouce.setText("关注")
-                            }else{//已关注  取消
+                            } else {//已关注  取消
                                 img_fouce.setImageResource(R.mipmap.img_w_dui)
                                 tv_fouce.setText("已关注")
                             }
@@ -100,7 +104,7 @@ class MyDataCarFragment : BaseFragment() {
 
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
-                .my_gift(uid!!, "2")
+                .my_gift(uid!!, "1")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<SGiftBean> {
@@ -111,11 +115,22 @@ class MyDataCarFragment : BaseFragment() {
                                 override fun convert(helper: BaseViewHolder?, item: SGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
                                     helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
-                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
-                                    helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
+//                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
+//                                    helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
+                                    when (item.is_use) {
+                                        0 -> {
+                                            helper.getView<TextView>(R.id.tv_day)!!.setText("未使用")
+                                        }
+                                        1 -> {
+                                            helper.getView<TextView>(R.id.tv_day)!!.setText("已使用")
+                                        }
+                                        2 -> {
+                                            helper.getView<TextView>(R.id.tv_day)!!.setText("已过期")
+                                        }
+                                    }
                                 }
                             }
-                            recyclerView.layoutManager = GridLayoutManager(mContext,3)
+                            recyclerView.layoutManager = GridLayoutManager(mContext, 3)
                             recyclerView.adapter = myHearadapter
 
                         }

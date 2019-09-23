@@ -21,6 +21,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import com.ysxsoft.imtalk.adapter.PhotosAdpater
+import com.ysxsoft.imtalk.appservice.CheckService
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.QdSignListBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
@@ -52,7 +53,8 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LitePal.getDatabase()
-
+        val intent = Intent(mContext, CheckService::class.java)
+        startService(intent)
         RxPermissions(this).request(Manifest.permission.CAMERA,
                 Manifest.permission.READ_PHONE_STATE,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -115,7 +117,6 @@ class MainActivity : BaseActivity() {
                     override fun onCompleted() {
                     }
                 })
-
     }
 
     override fun onResume() {
@@ -137,7 +138,7 @@ class MainActivity : BaseActivity() {
                     override fun onNext(t: QdSignListBean?) {
                         if (t!!.code == 0) {
                             if (t.data.is_signs == 1) {
-                                QDDialog(mContext).show()
+//                                QDDialog(mContext).show()
                             }
                         }
                     }

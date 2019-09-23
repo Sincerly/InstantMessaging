@@ -153,7 +153,7 @@ class MyDataGiftFragment : BaseFragment() {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
 //                                    helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext,item.pic,helper.getView<ImageView>(R.id.img_tupian)!!)
-                                    helper.getView<TextView>(R.id.tv_jb)!!.setText(item.gold + "金币")
+                                    helper.getView<TextView>(R.id.tv_jb)!!.setText(item.award_num.toString())
                                 }
                             }
                             recyclerView1.layoutManager = GridLayoutManager(mContext,3)
@@ -175,13 +175,24 @@ class MyDataGiftFragment : BaseFragment() {
                 .subscribe(object : Action1<SGiftBean> {
                     override fun call(t: SGiftBean?) {
                         if (t!!.code == 0) {
-                            tv_myhead.setText("我的头饰（" + t.data.sum + ")")
+                            tv_myhead.setText("头饰(" + t.data.sum + ")")
                             myHearadapter = object : BaseQuickAdapter<SGiftBean.DataBean.ListInfoBean, BaseViewHolder>(R.layout.my_data_gift_item_layout, t.data.listInfo) {
                                 override fun convert(helper: BaseViewHolder?, item: SGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
                                     helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
-                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
-                                    helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
+//                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
+//                                    helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
+                                    when (item.is_use) {
+                                        0 -> {
+                                            helper.getView<TextView>(R.id.tv_day)!!.setText("未使用")
+                                        }
+                                        1 -> {
+                                            helper.getView<TextView>(R.id.tv_day)!!.setText("已使用")
+                                        }
+                                        2 -> {
+                                            helper.getView<TextView>(R.id.tv_day)!!.setText("已过期")
+                                        }
+                                    }
                                 }
                             }
                             recyclerView.layoutManager = GridLayoutManager(mContext,3)

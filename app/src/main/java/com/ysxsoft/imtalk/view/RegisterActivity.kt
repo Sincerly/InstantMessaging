@@ -26,7 +26,7 @@ class RegisterActivity : BaseActivity() {
     }
 
     private fun initView() {
-        img_logo.setImageBitmap(AppUtil.getLogoBitmap(mContext))
+        img_logo.setImageDrawable(AppUtil.getLogoBitmap(mContext))
 
         tv_get_code.setOnClickListener {
             if (TextUtils.isEmpty(et_phone.text.toString().trim())) {

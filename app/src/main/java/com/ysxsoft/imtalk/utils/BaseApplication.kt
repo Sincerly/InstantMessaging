@@ -15,6 +15,7 @@ import com.ysxsoft.imtalk.chatroom.net.HttpClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ThreadManager
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication
+import com.ysxsoft.imtalk.chatroom.utils.ToastUtils
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog
 import com.ysxsoft.imtalk.im.message.PrivateCarMessage
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
@@ -23,6 +24,7 @@ import com.ysxsoft.imtalk.im.provider.PrivateCarProvider
 import com.ysxsoft.imtalk.im.provider.PrivateGiftProvider
 import com.ysxsoft.imtalk.im.provider.PrivateHeaderProvider
 import com.ysxsoft.imtalk.rong.MyExtensionModule
+import com.ysxsoft.imtalk.widget.dialog.OnLineDialog
 import io.rong.imkit.DefaultExtensionModule
 import io.rong.imkit.IExtensionModule
 import io.rong.imkit.RongExtensionManager
@@ -139,7 +141,7 @@ class BaseApplication : MyApplication() {
             if (p0 != null) {
                 try {
                     saveUserInfo(p0)
-                }catch (e:Exception){
+                } catch (e: Exception) {
                 }
             }
             val intent = Intent("RECEIVEMESSAGE")

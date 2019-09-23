@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
+import android.support.v4.app.FragmentTransaction
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -58,9 +61,6 @@ class MyDataActivity : BaseActivity() {
     var myself: String? = null
     var room: String? = null
     var is_room: String? = null
-    var mydatagiftfragment = MyDataGiftFragment()
-    var mydatacarfragment = MyDataCarFragment()
-    var mydatafragment = MyDataFragment()
     var bean: UserInfoBean.DataBean? = null
     var mybean: UserInfoBean.DataBean? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +86,7 @@ class MyDataActivity : BaseActivity() {
             setTitle("TA的资料")
 
             img_right.setOnClickListener {
-                ReportDialog(mContext,uid!!).show()
+                ReportDialog(mContext, uid!!).show()
             }
 
         }
@@ -162,31 +162,22 @@ class MyDataActivity : BaseActivity() {
 
     }
 
+    //    var bundle: Bundle? = null
     private fun initView() {
-
-
         ll_fouce.setOnClickListener {
             FouceOnActivity.startFouceOnActivity(mContext, uid!!)
         }
+
         ll_fance.setOnClickListener {
             FansActivity.startFansActivity(mContext, uid!!)
         }
 
-        val bundle = Bundle();
-        bundle.putString("uid", uid);
-        bundle.putString("nikeName",bean!!.nickname);
-        bundle.putString("myself", myself);
-        mydatafragment.setArguments(bundle);//数据传递到fragment中
         replaceFragment()
+
         tv_data.setOnClickListener {
             if (tv_data.isSelected) {
                 return@setOnClickListener
             }
-            val bundle = Bundle();
-            bundle.putString("uid", uid);
-            bundle.putString("nikeName", bean!!.nickname);
-            bundle.putString("myself", myself);
-            mydatafragment.setArguments(bundle);//数据传递到fragment中
             tagP = "0"
             replaceFragment()
         }
@@ -195,12 +186,6 @@ class MyDataActivity : BaseActivity() {
             if (tv_gift.isSelected) {
                 return@setOnClickListener
             }
-            val bundle = Bundle();
-            bundle.putString("uid", uid);
-            bundle.putString("nikeName", bean!!.nickname);
-            bundle.putString("myself", myself);
-            mydatagiftfragment.setArguments(bundle);//数据传递到fragment中
-
             tagP = "1"
             replaceFragment()
         }
@@ -209,11 +194,6 @@ class MyDataActivity : BaseActivity() {
             if (tv_car.isSelected) {
                 return@setOnClickListener
             }
-            val bundle = Bundle();
-            bundle.putString("uid", uid);
-            bundle.putString("nikeName", bean!!.nickname);
-            bundle.putString("myself", myself);
-            mydatacarfragment.setArguments(bundle);//数据传递到fragment中
             tagP = "2"
             replaceFragment()
         }
@@ -225,7 +205,9 @@ class MyDataActivity : BaseActivity() {
                 return@setOnClickListener
             }
             if (TextUtils.equals("SearchActivity", myself)) {
-                roomLock(bean!!.now_roomId.toString())
+                if (bean != null) {
+                    roomLock(bean!!.now_roomId.toString())
+                }
             } else {
                 joinChatRoom(bean!!.now_roomId, "")
             }
@@ -244,14 +226,14 @@ class MyDataActivity : BaseActivity() {
                     showToastMessage("Ta没有房间")
                 }
             } else {
-                if (!TextUtils.isEmpty(mybean!!.now_roomId)&&!TextUtils.isEmpty(bean!!.roomId)){
+                if (!TextUtils.isEmpty(mybean!!.now_roomId) && !TextUtils.isEmpty(bean!!.roomId)) {
                     roomLock(bean!!.roomId.toString())
-                }else{
-                    if (TextUtils.isEmpty(bean!!.roomId)){
+                } else {
+                    if (TextUtils.isEmpty(bean!!.roomId)) {
                         showToastMessage("Ta没有房间")
                         return@setOnClickListener
                     }
-                    if (!TextUtils.isEmpty(mybean!!.now_roomId)){
+                    if (!TextUtils.isEmpty(mybean!!.now_roomId)) {
                         quiteRoom(AuthManager.getInstance().currentUserId, "1")
                     }
                 }
@@ -316,33 +298,35 @@ class MyDataActivity : BaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<RoomLockBean> {
                     override fun onError(e: Throwable?) {
+                        Log.d("tag++++++", e!!.message.toString())
                     }
 
                     override fun onNext(t: RoomLockBean?) {
-                        if (t!!.code == 0) {
+                        showToastMessage(t!!.msg)
+                        if (t.code == 0) {
                             RoomManager.getInstance().getRoomDetailInfo1(roomId, object : ResultCallback<DetailRoomInfo> {
                                 override fun onSuccess(result: DetailRoomInfo?) {
                                     if (result != null) {
                                         if (AuthManager.getInstance().currentUserId.equals(result.roomInfo.uid)) {
-                                            joinChatRoom(bean!!.roomId, "")
+                                            joinChatRoom(roomId, "")
                                         } else {
-                                            var roomLock = t.data
-                                            if (roomLock == 1) {
+                                            if (t.data == 1) {
                                                 val roomLockDialog = RoomLockDialog(mContext)
                                                 roomLockDialog.setEdClickListener(object : RoomLockDialog.EdClickListener {
                                                     override fun setData(string: String) {
-                                                        joinChatRoom(bean!!.roomId, string)
+                                                        joinChatRoom(roomId, string)
                                                     }
                                                 })
                                                 roomLockDialog.show()
                                             } else {
-                                                joinChatRoom(bean!!.roomId, "")
+                                                joinChatRoom(roomId, "")
                                             }
                                         }
                                     }
                                 }
 
                                 override fun onFail(errorCode: Int) {
+                                    Log.d("tag>>>>>>>>>>>>", errorCode.toString())
                                 }
                             })
                         }
@@ -357,18 +341,18 @@ class MyDataActivity : BaseActivity() {
      * 加入他的房间
      */
     fun joinChatRoom(roomId: String, lock_pwd: String) {
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, lock_pwd, object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(AuthManager.getInstance().currentUserId, roomId, lock_pwd, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 val message = RoomMemberChangedMessage()
                 message.setCmd(1)
-                val carName=SharedPreferencesUtils.getCarName(mContext)
-                val carPic=SharedPreferencesUtils.getCarPic(mContext)
-                message.carName=carName//座驾名称
-                message.carPic=carPic//座驾图片
+                val carName = SharedPreferencesUtils.getCarName(mContext)
+                val carPic = SharedPreferencesUtils.getCarPic(mContext)
+                message.carName = carName//座驾名称
+                message.carPic = carPic//座驾图片
                 message.targetUserId = SpUtils.getSp(mContext, "uid")
                 message.targetPosition = -1
-                message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mybean!!.nickname, Uri.parse(mybean!!.icon))
-                val obtain = Message.obtain(result!!.roomInfo.room_id, Conversation.ConversationType.CHATROOM, message)
+                message.userInfo = io.rong.imlib.model.UserInfo(AuthManager.getInstance().currentUserId, mybean!!.nickname, Uri.parse(mybean!!.icon))
+                val obtain = Message.obtain(roomId, Conversation.ConversationType.CHATROOM, message)
                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                     override fun onAttached(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
@@ -386,7 +370,7 @@ class MyDataActivity : BaseActivity() {
             }
 
             override fun onFail(errorCode: Int) {
-
+                Log.d("tag>>>>>>>>>>>>", errorCode.toString())
             }
         })
     }
@@ -404,11 +388,32 @@ class MyDataActivity : BaseActivity() {
         currentFragment = supportFragmentManager.findFragmentByTag(tagP) as BaseFragment?
         if (currentFragment == null) {
             when (tagP) {
-                "0" -> currentFragment = mydatafragment
-                "1" -> currentFragment = mydatagiftfragment
-                "2" -> currentFragment = mydatacarfragment
+                "0" -> {
+                    currentFragment = MyDataFragment()
+                    var bundle = Bundle();
+                    bundle.putString("uid", uid);
+                    bundle.putString("nikeName", bean!!.nickname);
+                    bundle.putString("myself", myself);
+                    currentFragment!!.setArguments(bundle)
+                }
+                "1" -> {
+                    currentFragment = MyDataGiftFragment()
+                    var bundle = Bundle();
+                    bundle.putString("uid", uid);
+                    bundle.putString("nikeName", bean!!.nickname);
+                    bundle.putString("myself", myself);
+                    currentFragment!!.setArguments(bundle)
+                }
+                "2" -> {
+                    currentFragment = MyDataCarFragment()
+                    var bundle = Bundle();
+                    bundle.putString("uid", uid);
+                    bundle.putString("nikeName", bean!!.nickname);
+                    bundle.putString("myself", myself);
+                    currentFragment!!.setArguments(bundle)
+                }
             }
-            currentFragment?.let { supportFragmentManager.beginTransaction().add(R.id.fm, it, tagP).commit() }
+            currentFragment!!.let { supportFragmentManager.beginTransaction().add(R.id.fm, it, tagP).commit() }
         } else {
             supportFragmentManager.beginTransaction().show(currentFragment!!).commit()
         }

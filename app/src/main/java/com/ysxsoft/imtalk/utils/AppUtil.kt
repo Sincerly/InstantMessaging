@@ -11,6 +11,9 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.location.LocationManager
 import android.media.AudioManager
 import android.media.RingtoneManager
@@ -309,8 +312,7 @@ object AppUtil {
      *
      * @param context
      */
-    @Synchronized
-    fun getLogoBitmap(context: Context): Bitmap {
+    fun getLogoBitmap(context: Context): Drawable {
         var packageManager: PackageManager? = null
         var applicationInfo: ApplicationInfo? = null
         try {
@@ -323,9 +325,9 @@ object AppUtil {
         val d = packageManager!!.getApplicationIcon(applicationInfo) //xxx根据自己的情况获取drawable
         val w = d.getIntrinsicWidth()
         val h = d.getIntrinsicHeight()
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-//        val bd = d as BitmapDrawable
-        return bitmap
+//        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+//        val bd = d as Bitmap
+        return d
     }
 
     /**

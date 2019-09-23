@@ -23,6 +23,8 @@ class FamilyFragment:BaseFragment(){
     private fun initView() {
         initStatusBar(topView)
         img_back.visibility = View.GONE;
+        tv_left.visibility = View.GONE;
+        tv_right.visibility = View.GONE;
         tv_left.text = "发现"
         tv_right.text = "家族"
         replaceFragment()

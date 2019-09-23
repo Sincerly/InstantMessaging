@@ -16,12 +16,14 @@ import android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.widget.dialog.OnLineDialog
 import io.rong.imkit.RongIM
 import io.rong.imlib.RongIMClient
 import kotlinx.android.synthetic.main.title_layout.*
@@ -295,6 +297,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
             override fun onError(errorCode: RongIMClient.ErrorCode) {
                 SLog.e(TAG, "RongIMClient connect onError:" + errorCode.value + "-" + errorCode.message)
+            }
+        })
+        //单点登录
+        RongIM.setConnectionStatusListener(object : RongIMClient.ConnectionStatusListener {
+            override fun onChanged(p0: RongIMClient.ConnectionStatusListener.ConnectionStatus?) {
+                if (p0!!.value==3) {
+                    OnLineDialog(mContext).show()
+                }
             }
         })
     }

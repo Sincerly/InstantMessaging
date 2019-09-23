@@ -166,4 +166,9 @@ class DressMallActivity : BaseActivity() {
         }
 
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(myBroadCast)
+    }
 }
