@@ -20,7 +20,6 @@ import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -76,12 +75,10 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
-import kotlinx.android.synthetic.main.view_input_num.*
 import okhttp3.Call
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.w3c.dom.Text
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -90,7 +87,6 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.lang.reflect.InvocationTargetException
 import kotlin.collections.HashMap
-import java.net.URL
 import java.util.ArrayList
 
 /**
@@ -723,11 +719,19 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         img_gold_egg.setOnClickListener {
             val eggDialog = EggDialog(mContext)
             eggDialog.setOnEggOpenListener(object : EggDialog.OnEggOpenListener {
-                override fun onEggOpened(data: List<EggBean.DataBean>) {
+                override fun onEggOpened(data: List<EggBean.DataBean>,map:HashMap<String,ArrayList<EggBean.DataBean>>) {
                     //创建消息
                     for (item in data) {
                         val msg = EggChatMessage()
-                        msg.giftName = item.sg_name
+                        if(map.containsKey(item.gift_id)){
+                            if(map.get(item.gift_id)!=null){
+                                msg.giftName = item.sg_name+"x"+ map.get(item.gift_id)!!.size
+                            }else{
+                                msg.giftName = item.sg_name+"x1"
+                            }
+                        }else{
+                            msg.giftName = item.sg_name+"x1"
+                        }
                         msg.giftPrice = "0"//TODO: Sincerly 是否需要价格？
                         msg.name = mydatabean!!.data!!.nickname
                         msg.giftSendUserId = AuthManager.getInstance().currentUserId
@@ -748,6 +752,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         if (chatListAdapter != null) {
                             chatMessageList.add(message!!)
                         }
+                        //显示本地公屏消息
+                        android.os.Handler(Looper.getMainLooper()).postDelayed({
+                            if("1".equals(item.is_big_money)){
+                                //超过大额
+                                onGoldMessage(mydatabean!!.data!!.nickname, item.sg_name, "(" + item.aw_gold + "金币)")
+                            }
+                        }, 300)
                     }
                     runOnUiThread {
                         chatListAdapter!!.notifyDataSetChanged()
@@ -849,10 +860,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 d.showDialog()
             }
 
-            override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String, targetUserName: String) {
+            override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String, targetUserName: String, data: MutableList<GiftSendBean.DataBean>) {
                 showPositionGift(targetPosition, toPosition, gifPic, pic)
                 if ("".equals(targetUserId)) {
-                    //发送小屏消息
+                    //全麦赠送/ 多人
                     for (bean in dataList) {
                         if (bean.isChoosed) {
                             val giftChatMessage = GiftChatMessage()
@@ -860,6 +871,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             giftChatMessage.toName = bean.nickname//接收人
                             giftChatMessage.giftName = gifName//礼物名称
                             giftChatMessage.giftPic = gifPic//礼物图片
+                            giftChatMessage.giftStaticPic=pic//礼物静态图片
                             giftChatMessage.giftNum = gifNum//礼物数量
                             giftChatMessage.fromUid = AuthManager.getInstance().currentUserId.toString()
                             giftChatMessage.toUid = bean.uid.toString()
@@ -881,10 +893,27 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                     Log.d("tag", "onError:" + p0!!.content.toString())
                                 }
                             });
+
                         }
                     }
                     chatListAdapter!!.notifyDataSetChanged()
                     chatroom_list_chat.smoothScrollToPosition(chatListAdapter!!.count)
+
+                    //创建聊天室礼物通知消息
+                    for (msg in data){
+                        if("1".equals(msg.is_big_money)){
+                            var messageBean = RoomPublicGiftMessageBean();
+                            messageBean.setSendName(msg.send_name);
+                            messageBean.setSendIcon(msg.send_icon);
+                            messageBean.setSlName(msg.sl_name);
+                            messageBean.setSlIcon(msg.sl_icon);
+                            messageBean.setGiftPic(msg.gift_pic);
+                            messageBean.setGiftNums(msg.gift_nums);
+                            android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                onGiftMessage(messageBean)
+                            }, 1000)
+                        }
+                    }
 
                     //发送礼物消息
                     val roomGiftMessage = RoomGiftMessage()
@@ -907,12 +936,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
                     });
                 } else {
-                    //赠送的是别人发送小屏消息
+                    //单独赠送
                     val giftChatMessage = GiftChatMessage()
                     giftChatMessage.name = mydatabean!!.data!!.nickname//发送人
                     giftChatMessage.toName = targetUserName//接收人
                     giftChatMessage.giftName = gifName//礼物名称
                     giftChatMessage.giftPic = gifPic//礼物图片
+                    giftChatMessage.giftStaticPic = pic//礼物静态图片
                     giftChatMessage.giftNum = gifNum//礼物数量
                     giftChatMessage.fromUid = AuthManager.getInstance().currentUserId.toString()
                     giftChatMessage.toUid = targetUid.toString()
@@ -3013,8 +3043,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     //分发动画结束之后 显示特效
-                                    val svgaImageView = SVGAImageView(mContext)
+                                    var svgaImageView = SVGAImageView(mContext)
+                                    svgaImageView.scaleType=ImageView.ScaleType.FIT_XY
                                     val parser = SVGAParser(mContext)
+                                    //铺满全屏
+                                    val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                                    svgaImageView.layoutParams=layoutParams;
                                     f.addView(svgaImageView)
                                     val inputStream = FileInputStream(downloadFile)
                                     parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
@@ -3081,8 +3115,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         //分发动画结束之后 显示特效
-                        val svgaImageView = SVGAImageView(this)
+                        var svgaImageView = SVGAImageView(this)
+                        svgaImageView.scaleType=ImageView.ScaleType.FIT_XY
                         val parser = SVGAParser(this)
+                        //铺满全屏
+                        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                        svgaImageView.layoutParams=layoutParams;
                         f.addView(svgaImageView)
                         val inputStream = FileInputStream(downloadFile)
                         parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {

@@ -24,13 +24,15 @@ class GridBageAdpater(mContext: Context) : ListBaseAdapter<BageListBean.DataBean
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideGoodsImageLoad(mContext, bean.aw_images, holder.getView<ImageView>(R.id.img_gift)!!)
-        holder.getView<TextView>(R.id.tv_gold)!!.setText(bean.aw_name+"x"+bean.gift_num)
-//        holder.getView<TextView>(R.id.tv_gold)!!.visibility=View.GONE
+        holder.getView<TextView>(R.id.tv_name)!!.setText(bean.aw_name+"x"+bean.gift_num)
+        holder.getView<TextView>(R.id.tv_gold)!!.setText(bean.aw_gold+"金币")
         if (bean.isSelect) {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.drawable.theme_fragme)
+            holder.getView<TextView>(R.id.tv_name)!!.setTextColor(Color.parseColor("#FF38C9"))
             holder.getView<TextView>(R.id.tv_gold)!!.setTextColor(Color.parseColor("#FF38C9"))
         } else {
             holder.getView<LinearLayout>(R.id.ll_bg)!!.setBackgroundResource(R.color.transparent)
+            holder.getView<TextView>(R.id.tv_name)!!.setTextColor(Color.parseColor("#686868"))
             holder.getView<TextView>(R.id.tv_gold)!!.setTextColor(Color.parseColor("#686868"))
         }
         holder.itemView.setOnClickListener {

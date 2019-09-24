@@ -40,8 +40,8 @@ public class NotifyManager {
     public void start() {
         isRunning = true;
         if (data.size() > 0) {
-            Data d=data.get(0);
-            addView(d.getNickName(),d.getGiftName(),d.getGoldNum());
+            Data d = data.get(0);
+            addView(d.getNickName(), d.getGiftName(), d.getGoldNum());
         }
     }
 
@@ -71,16 +71,17 @@ public class NotifyManager {
 
     /**
      * 添加一个通知
+     *
      * @param nickname 昵称
      * @param giftName 礼物名称
      * @param goldNum  金币数量
      */
-    public void addView(String nickname,String giftName,String goldNum) {
-        if(isPaused==true){
-            Log.e("tag","暂停中...");
+    public void addView(String nickname, String giftName, String goldNum) {
+        if (isPaused == true) {
+            Log.e("tag", "暂停中...");
             return;
-        }else{
-            Log.e("tag","播放中...");
+        } else {
+            Log.e("tag", "播放中...");
         }
         View v = View.inflate(context, R.layout.view_gold_notifycation, null);
         TextView name = v.findViewById(R.id.name);
@@ -93,7 +94,7 @@ public class NotifyManager {
         FrameLayout rootView = context.findViewById(android.R.id.content);
         rootView.measure(0, 0);
         int halfWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth() / 2;
-        int maxWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth()*3/2;
+        int maxWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth() * 3 / 2;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         v.setLayoutParams(layoutParams);
 
@@ -128,7 +129,7 @@ public class NotifyManager {
                 }).start();
     }
 
-    public static class Data{
+    public static class Data {
         private String nickName;
         private String giftName;
         private String goldNum;
@@ -158,13 +159,13 @@ public class NotifyManager {
         }
     }
 
-    public boolean isPaused=false;
+    public boolean isPaused = false;
 
-    public void pause(){
-        isPaused=true;
+    public void pause() {
+        isPaused = true;
     }
 
-    public void resume(){
-        isPaused=false;
+    public void resume() {
+        isPaused = false;
     }
 }

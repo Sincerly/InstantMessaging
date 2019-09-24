@@ -9,12 +9,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.chatroom.im.message.EggChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils;
+import com.ysxsoft.imtalk.widget.CircleImageView;
 
 import java.util.List;
 
@@ -92,6 +94,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.giftFromName = contentView.findViewById(R.id.fromName);
             viewHolder.giftToName = contentView.findViewById(R.id.toName);
             viewHolder.giftInfo = contentView.findViewById(R.id.giftInfo);
+            viewHolder.giftPic = contentView.findViewById(R.id.giftPic);
             contentView.setTag(viewHolder);
         } else if (viewType == VIEW_TYPE_EGG) {
             //砸金蛋消息
@@ -140,9 +143,11 @@ public class RoomChatListAdapter extends BaseAdapter {
             GiftChatMessage giftChatMessage = (GiftChatMessage) message.getContent();
             viewHolder.giftFromName.setText(giftChatMessage.getName());
             viewHolder.giftToName.setText(giftChatMessage.getToName());
-            viewHolder.giftInfo.setText(giftChatMessage.getGiftName() + "x" + giftChatMessage.getGiftNum());
+//            viewHolder.giftInfo.setText(giftChatMessage.getGiftName() + "x" + giftChatMessage.getGiftNum());
             viewHolder.giftFromName.setOnClickListener(new OnUserClickListener(giftChatMessage.getFromUid()));
             viewHolder.giftToName.setOnClickListener(new OnUserClickListener(giftChatMessage.getToUid()));
+            Glide.with(context).load(giftChatMessage.getGiftStaticPic()).into(viewHolder.giftPic);
+            viewHolder.giftInfo.setText("x" + giftChatMessage.getGiftNum());
         } else if (viewType == VIEW_TYPE_EGG) {
             EggChatMessage eggChatMessage = (EggChatMessage) message.getContent();
             viewHolder.eggFromName.setText(eggChatMessage.getName());//砸金蛋人
@@ -186,6 +191,7 @@ public class RoomChatListAdapter extends BaseAdapter {
         TextView giftFromName;
         TextView giftToName;
         TextView giftInfo;
+        CircleImageView giftPic;
         //礼物end
         //砸金蛋start
         TextView eggFromName;

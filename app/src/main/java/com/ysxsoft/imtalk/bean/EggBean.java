@@ -35,8 +35,23 @@ public class EggBean extends CommonBean {
         private String sg_name;
         private String aw_pic;
         private String aw_gif;
-        private String sg_gif;
-        private String sg_pic;
+        //修改之后字段
+        private String sg_gif;//动态
+        private String sg_pic;//图片
+        private String aw_name;//名称
+        private String aw_gold;//金币
+        private String sg_gold;//金币
+        private String gift_id;//砸金蛋礼物id
+        private String is_big_money;//1超过大额
+        private String uid;
+
+        public String getSg_gold() {
+            return sg_gold == null ? "" : sg_gold;
+        }
+
+        public void setSg_gold(String sg_gold) {
+            this.sg_gold = sg_gold;
+        }
 
         public int getRid() {
             return rid;
@@ -84,6 +99,46 @@ public class EggBean extends CommonBean {
 
         public void setSg_pic(String sg_pic) {
             this.sg_pic = sg_pic;
+        }
+
+        public String getAw_name() {
+            return aw_name == null ? "" : aw_name;
+        }
+
+        public void setAw_name(String aw_name) {
+            this.aw_name = aw_name;
+        }
+
+        public String getAw_gold() {
+            return aw_gold == null ? "" : aw_gold;
+        }
+
+        public void setAw_gold(String aw_gold) {
+            this.aw_gold = aw_gold;
+        }
+
+        public String getGift_id() {
+            return gift_id == null ? "" : gift_id;
+        }
+
+        public void setGift_id(String gift_id) {
+            this.gift_id = gift_id;
+        }
+
+        public String getIs_big_money() {
+            return is_big_money == null ? "" : is_big_money;
+        }
+
+        public void setIs_big_money(String is_big_money) {
+            this.is_big_money = is_big_money;
+        }
+
+        public String getUid() {
+            return uid == null ? "" : uid;
+        }
+
+        public void setUid(String uid) {
+            this.uid = uid;
         }
     }
 }

@@ -134,7 +134,6 @@ public class PrivateCarMessage extends MessageContent {
      * @param toUserName
      */
     public static void sendMessage(String targetId,String carNum,String carName,String picUrl,String toUserName){
-        //rongExtension.getTargetId()
         PrivateCarMessage message=new PrivateCarMessage();
         message.setCarNum(carNum);
         message.setCarName(carName);

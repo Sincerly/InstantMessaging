@@ -56,6 +56,15 @@ public class DressMallBean {
         private String gold;
         private int days;
         private String pic;
+        private long size;
+
+        public long getSize() {
+            return size;
+        }
+
+        public void setSize(long size) {
+            this.size = size;
+        }
 
         public String getGif_pic() {
             return gif_pic;
