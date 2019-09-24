@@ -150,6 +150,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                     boxViewLayout.removeAllViews()
                                     gifDrawable!!.start(); //开始播放
                                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
+                                    gifDrawable!!.reset()
                                     Thread(object:Runnable{
                                         override fun run() {
                                             if(onEggOpenListener!=null){
