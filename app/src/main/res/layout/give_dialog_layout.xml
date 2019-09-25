@@ -225,6 +225,15 @@
             android:gravity="center"
             android:textSize="11sp"
             android:visibility="gone" />
+        <TextView
+            android:id="@+id/zw1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@mipmap/img_black_list"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:visibility="gone" />
 
 
     </LinearLayout>

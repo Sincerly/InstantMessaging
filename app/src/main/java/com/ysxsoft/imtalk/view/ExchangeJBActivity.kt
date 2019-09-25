@@ -94,19 +94,17 @@ class ExchangeJBActivity : BaseActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!TextUtils.isEmpty(s) && !"0".equals(s)) {
-                    val decimal = BigDecimal(s.toString())
-                    val dec = BigDecimal(thbl!!.split(".")[0])
-                    val divide = decimal.multiply(dec)
-                    tv_zs.setText(divide.toString())
+//                    val decimal = BigDecimal(s.toString())
+//                    val dec = BigDecimal(thbl!!.split(".")[0])
+//                    val divide = decimal.multiply(dec)
+//                    tv_zs.setText(divide.toString())
                     tv_ok.isEnabled = true
                 } else {
-                    tv_zs.setText("0")
+//                    tv_zs.setText("0")
                     tv_ok.isEnabled = false
                 }
             }
         })
-//        tv_current_jb.setText()
-//        tv_zs.setText()
         tv_ok.setOnClickListener {
             exchangData()
         }

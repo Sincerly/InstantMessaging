@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Process
 import android.support.multidex.MultiDex
 import android.util.Log
+import cat.ereza.customactivityoncrash.CustomActivityOnCrash
 import com.umeng.commonsdk.UMConfigure
 import com.umeng.socialize.PlatformConfig
 import com.ysxsoft.imtalk.chatroom.im.IMClient
@@ -52,7 +53,7 @@ class BaseApplication : MyApplication() {
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
-
+        CustomActivityOnCrash.install(this);
         UMConfigure.init(this, "5d650e274ca3578df70008cb", "umeng", UMConfigure.DEVICE_TYPE_PHONE, "");//58edcfeb310c93091c000be2 5965ee00734be40b580001a0
 
         LitePal.initialize(this)//初始化LitePal数据库

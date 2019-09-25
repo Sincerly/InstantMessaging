@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.RoomMemListBean
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
@@ -95,8 +96,14 @@ class OnlineListActivity : BaseActivity() {
                                             helper.getView<TextView>(R.id.tvTag)!!.visibility=View.GONE
                                         }
                                     }
+                                    helper.itemView.setOnClickListener {
+                                        if (AuthManager.getInstance().currentUserId.equals(item.uid)){
+                                            MyDataActivity.startMyDataActivity(mContext,item.uid,"myself")
+                                        }else{
+                                            MyDataActivity.startMyDataActivity(mContext,item.uid,"")
+                                        }
 
-
+                                    }
                                     val show = if (helper?.adapterPosition ?: 0 == 0) View.GONE else View.VISIBLE
                                     helper?.getView<View>(R.id.viewLines)?.visibility = show
                                 }

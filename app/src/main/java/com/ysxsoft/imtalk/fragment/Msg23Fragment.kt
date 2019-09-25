@@ -54,10 +54,6 @@ class Msg23Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     val mHandler = PreviewHandler()
     var page = 1
     var flag = 0
-    override fun onResume() {
-        super.onResume()
-
-    }
 
     override fun initUi() {
         initView()

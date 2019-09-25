@@ -8,16 +8,21 @@ import android.support.design.widget.TabLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.RoomLevelsAdapter
 import com.ysxsoft.imtalk.adapter.SupperStarAdapter
 import com.ysxsoft.imtalk.adapter.TyrantListAdapter
+import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.SupperStarBean
 import com.ysxsoft.imtalk.bean.TyrantListBean
 import com.ysxsoft.imtalk.com.RoomStarBean
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
+import com.ysxsoft.imtalk.view.DressMallActivity
 import com.ysxsoft.imtalk.view.MyDataActivity
+import io.rong.imkit.RongIM
 import kotlinx.android.synthetic.main.dialog_room_level.*
 import kotlinx.android.synthetic.main.dialog_room_level.recyclerView
 import kotlinx.android.synthetic.main.include_crown_bronze.*
@@ -25,6 +30,7 @@ import kotlinx.android.synthetic.main.include_crown_gold.*
 import kotlinx.android.synthetic.main.include_crown_silver.*
 import kotlinx.android.synthetic.main.include_dialog_room_level.*
 import kotlinx.android.synthetic.main.room_level_dialog_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -91,7 +97,118 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
         mAdapter1 = SupperStarAdapter(context)
         mAdapter2 = TyrantListAdapter(context)
         recyclerView.layoutManager = LinearLayoutManager(context)
+        mAdapter1.setOnSupperStarListener(object :SupperStarAdapter.OnSupperStarListener{
+            override fun onClick(position: Int) {
+                val bean = mAdapter1.dataList.get(position)
+                val giveDialog = GiveDialog(context,bean.uid.toString(), roomid)
+                var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
+                giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+                giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                    override fun BmClick() {
 
+                    }
+
+                    override fun BtxmClick() {
+
+                    }
+
+                    override fun ScmClick() {
+
+                    }
+
+                    override fun clickGiveGift(uid: String, nickname: String) {
+                        RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                    }
+
+                    override fun clickPrivateChat() {
+                        RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                    }
+
+                    override fun clickGiveZb() {
+                        DressMallActivity.startDressMallActivity(context, roomid, "", bean.nickname)
+                    }
+
+                    override fun clickFoucsOn() {
+                        FocusOnData(SpUtils.getSp(context, "uid"), roomid, "1")
+                    }
+
+                    override fun setManager() {
+
+                    }
+
+                    override fun removeManager() {
+
+                    }
+
+                    override fun setExit() {
+
+                    }
+
+                    override fun blackList() {
+
+                    }
+                })
+                giveDialog.show()
+
+            }
+        })
+        mAdapter2.setOnTyrantListener(object :TyrantListAdapter.OnTyrantListener{
+            override fun onClick(position: Int) {
+                val bean = mAdapter2.dataList.get(position)
+                val giveDialog = GiveDialog(context,bean.uid.toString(), roomid)
+                var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
+                giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+                giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                    override fun BmClick() {
+
+                    }
+
+                    override fun BtxmClick() {
+
+                    }
+
+                    override fun ScmClick() {
+
+                    }
+
+                    override fun clickGiveGift(uid: String, nickname: String) {
+                        RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                    }
+
+                    override fun clickPrivateChat() {
+                        RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                    }
+
+                    override fun clickGiveZb() {
+                        DressMallActivity.startDressMallActivity(context, roomid, "", bean.nickname)
+                    }
+
+                    override fun clickFoucsOn() {
+                        FocusOnData(SpUtils.getSp(context, "uid"), roomid, "1")
+                    }
+
+                    override fun setManager() {
+
+                    }
+
+                    override fun removeManager() {
+
+                    }
+
+                    override fun setExit() {
+
+                    }
+
+                    override fun blackList() {
+
+                    }
+                })
+                giveDialog.show()
+
+            }
+        })
     }
 
     /**
@@ -219,6 +336,58 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop1Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop1Id.text = ttid
+                        ivTop1.setOnClickListener {
+                            val giveDialog = GiveDialog(context,data[i].uid.toString(), roomid)
+                            var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
+                            giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                            giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+                            giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                                override fun BmClick() {
+
+                                }
+
+                                override fun BtxmClick() {
+
+                                }
+
+                                override fun ScmClick() {
+
+                                }
+
+                                override fun clickGiveGift(uid: String, nickname: String) {
+                                    RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                                }
+
+                                override fun clickPrivateChat() {
+                                    RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                                }
+
+                                override fun clickGiveZb() {
+                                    DressMallActivity.startDressMallActivity(context, roomid, "", data[i].nickname)
+                                }
+
+                                override fun clickFoucsOn() {
+                                    FocusOnData(SpUtils.getSp(context, "uid"), roomid, "1")
+                                }
+
+                                override fun setManager() {
+
+                                }
+
+                                override fun removeManager() {
+
+                                }
+
+                                override fun setExit() {
+
+                                }
+
+                                override fun blackList() {
+
+                                }
+                            })
+                            giveDialog.show()
+                        }
                     }
                 1 ->
                     if (data.size >= 2) {
@@ -227,6 +396,58 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop2Id.text = ttid
                         tvTop2.text = "距前一名"+ data[i].next_user
+                        ivTop2.setOnClickListener {
+                            val giveDialog = GiveDialog(context,data[i].uid.toString(), roomid)
+                            var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
+                            giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                            giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+                            giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                                override fun BmClick() {
+
+                                }
+
+                                override fun BtxmClick() {
+
+                                }
+
+                                override fun ScmClick() {
+
+                                }
+
+                                override fun clickGiveGift(uid: String, nickname: String) {
+                                    RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                                }
+
+                                override fun clickPrivateChat() {
+                                    RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                                }
+
+                                override fun clickGiveZb() {
+                                    DressMallActivity.startDressMallActivity(context, roomid, "", data[i].nickname)
+                                }
+
+                                override fun clickFoucsOn() {
+                                    FocusOnData(SpUtils.getSp(context, "uid"), roomid, "1")
+                                }
+
+                                override fun setManager() {
+
+                                }
+
+                                override fun removeManager() {
+
+                                }
+
+                                override fun setExit() {
+
+                                }
+
+                                override fun blackList() {
+
+                                }
+                            })
+                            giveDialog.show()
+                        }
                     }
                 2 ->
                     if (data.size >= 3) {
@@ -235,8 +456,85 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop3Id.text = ttid
                         tvTop3.text = "距前一名"+ data[i].next_user
+                        ivTop3.setOnClickListener {
+                            val giveDialog = GiveDialog(context,data[i].uid.toString(), roomid)
+                            var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
+                            giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                            giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+                            giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                                override fun BmClick() {
+
+                                }
+
+                                override fun BtxmClick() {
+
+                                }
+
+                                override fun ScmClick() {
+
+                                }
+
+                                override fun clickGiveGift(uid: String, nickname: String) {
+                                    RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                                }
+
+                                override fun clickPrivateChat() {
+                                    RongIM.getInstance().startPrivateChat(context, roomid, findNikeName.text.toString());
+                                }
+
+                                override fun clickGiveZb() {
+                                    DressMallActivity.startDressMallActivity(context, roomid, "", data[i].nickname)
+                                }
+
+                                override fun clickFoucsOn() {
+                                    FocusOnData(SpUtils.getSp(context, "uid"), roomid, "1")
+                                }
+
+                                override fun setManager() {
+
+                                }
+
+                                override fun removeManager() {
+
+                                }
+
+                                override fun setExit() {
+
+                                }
+
+                                override fun blackList() {
+
+                                }
+                            })
+                            giveDialog.show()
+                        }
                     }
             }
         }
+    }
+    /**
+     * 关注
+     */
+    private fun FocusOnData(sp: String, userId: String, s: String) {
+        val map = HashMap<String, String>()
+        map.put("uid",userId)
+        map.put("fs_id",sp)
+        map.put("flag", "1")
+//        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .fans(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        ToastUtils.showToast(context,t!!.msg)
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
     }
 }

@@ -75,6 +75,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.avatarIv = contentView.findViewById(R.id.chatroom_item_chatlist_iv_avatar);
             viewHolder.nickNameTv = contentView.findViewById(R.id.chatroom_item_chatlist_tv_nickname);
             viewHolder.messageTv = contentView.findViewById(R.id.chatroom_item_chatlit_tv_message);
+            viewHolder.zsvalue = contentView.findViewById(R.id.tv_zs_num);
             contentView.setTag(viewHolder);
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             LayoutInflater inflater = LayoutInflater.from(context);
@@ -116,6 +117,7 @@ public class RoomChatListAdapter extends BaseAdapter {
                 viewHolder.nickNameTv.setText(textMessage.getUserInfo().getName() + ":");
             }
             viewHolder.messageTv.setText(textMessage.getContent());
+            viewHolder.zsvalue.setText(textMessage.getExtra());
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
@@ -182,6 +184,7 @@ public class RoomChatListAdapter extends BaseAdapter {
         ImageView avatarIv;
         TextView nickNameTv;
         TextView messageTv;
+        TextView zsvalue;
         //礼物start
         TextView giftFromName;
         TextView giftToName;

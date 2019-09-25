@@ -11,6 +11,7 @@ import com.ysxsoft.imtalk.bean.FansListBean
 import com.ysxsoft.imtalk.com.ListBaseAdapter
 import com.ysxsoft.imtalk.com.SuperViewHolder
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
+import com.ysxsoft.imtalk.view.MyDataActivity
 import com.ysxsoft.imtalk.widget.CircleImageView
 import io.rong.imkit.RongIM
 
@@ -52,6 +53,9 @@ class MsgFsAdapter(mContext: Context) : ListBaseAdapter<FansListBean.DataBean>(m
         }
         holder.itemView.setOnClickListener {
             RongIM.getInstance().startPrivateChat(mContext, bean.fs_id, bean.nickname);
+        }
+        holder.getView<CircleImageView>(R.id.iv_tx)!!.setOnClickListener {
+            MyDataActivity.startMyDataActivity(mContext,bean.fs_id.toString(),"")
         }
     }
 

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
@@ -13,21 +12,21 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.youth.banner.listener.OnBannerListener
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.*
+import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.chatroom.task.ResultCallback
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.music.CustomeWindow
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.BannerDetailActivity
 import com.ysxsoft.imtalk.view.ChatRoomActivity
@@ -182,7 +181,17 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
                     }
                     helper.itemView.setOnClickListener {
-                        roomLock(item.room_id.toString())
+                        if (mydatabean!=null) {
+                            if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
+                                    roomLock(item.room_id.toString())
+                                } else {
+                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", mydatabean!!.data.now_roomId)
+                                }
+                            }else{
+                                roomLock(item.room_id.toString())
+                            }
+                        }
                     }
                 }
             }
@@ -209,13 +218,22 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                     }
                     helper.itemView.setOnClickListener {
-                        roomLock(item.room_id.toString())
+                        if (mydatabean!=null) {
+                            if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
+                                    roomLock(item.room_id.toString())
+                                } else {
+                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", mydatabean!!.data.now_roomId)
+                                }
+                            }else{
+                                roomLock(item.room_id.toString())
+                            }
+                        }
                     }
                 }
             }
             recyclerViewRoom.layoutManager = LinearLayoutManager(mContext)
             recyclerViewRoom.adapter = adapterHouse1
-
 
         } else {
             adapterRecommend1 = object : BaseQuickAdapter<HomeFRoomBean.DataBean.RoomListBean, BaseViewHolder>(R.layout.item_house_recommend, roomLists) {
@@ -233,7 +251,17 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
                     }
                     helper.itemView.setOnClickListener {
-                        roomLock(item.room_id.toString())
+                        if (mydatabean!=null) {
+                            if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
+                                    roomLock(item.room_id.toString())
+                                } else {
+                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", mydatabean!!.data.now_roomId)
+                                }
+                            }else{
+                                roomLock(item.room_id.toString())
+                            }
+                        }
                     }
                 }
             }
@@ -318,8 +346,16 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
                 }
 
-                helper.itemView.setOnClickListener {
-                    roomLock(item.room_id.toString())
+                if (mydatabean!=null) {
+                    if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                        if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
+                            roomLock(item.room_id.toString())
+                        } else {
+                            quiteRoom(AuthManager.getInstance().currentUserId, "1", mydatabean!!.data.now_roomId)
+                        }
+                    }else{
+                        roomLock(item.room_id.toString())
+                    }
                 }
             }
         }
@@ -348,8 +384,16 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 }else{
                     helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                 }
-                helper.itemView.setOnClickListener {
-                    roomLock(item.room_id.toString())
+                if (mydatabean!=null) {
+                    if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                        if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
+                            roomLock(item.room_id.toString())
+                        } else {
+                            quiteRoom(AuthManager.getInstance().currentUserId, "1", item.room_id.toString())
+                        }
+                    }else{
+                        roomLock(item.room_id.toString())
+                    }
                 }
             }
         }
@@ -391,7 +435,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag",p0!!.content.toString())
-                        ChatRoomActivity.starChatRoomActivity(mContext, roomId,mydatabean!!.data.nickname,mydatabean!!.data.icon)
+                        if (TextUtils.equals(mydatabean!!.data.now_roomId, roomId)) {
+                            ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"identical")
+                        }else{
+                            ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"")
+                        }
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
@@ -453,6 +501,75 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 })
     }
 
+    /**
+     * 退出房间
+     */
+    private fun quiteRoom(uid: String, kick: String, newRoomId: String) {
+        val message = RoomMemberChangedMessage()
+        message.setCmd(2)//离开房间
+        message.targetUserId = uid
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
+        val obtain = Message.obtain(mydatabean!!.data.now_roomId, Conversation.ConversationType.CHATROOM, message)
+
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+                Log.d("tag", p0!!.content.toString())
+            }
+
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(uid, kick, mydatabean!!.data.now_roomId!!)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                                showToastMessage(e!!.message.toString())
+                            }
+
+                            override fun onNext(t: CommonBean?) {
+                                showToastMessage(t!!.msg)
+                                if (t.code == 0) {
+                                    IMClient.getInstance().quitChatRoom(mydatabean!!.data.now_roomId, null)
+                                    RtcClient.getInstance().quitRtcRoom(mydatabean!!.data.now_roomId, null)
+                                    removeUser(mydatabean!!.data.now_roomId!!, uid,newRoomId)
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
+            }
+
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                Log.d("tag", p0!!.content.toString())//23409
+            }
+        });
+    }
+
+    fun removeUser(roomId: String, uid: String, newRoomId: String) {
+        val map = HashMap<String, String>()
+        map.put("room_id", roomId)
+        map.put("uid", uid)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .remove_user(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        if (t!!.code == 0) {
+                            roomLock(newRoomId)
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
     companion object {
         @JvmStatic
         fun newInstance(param1: Int, pids: String) =

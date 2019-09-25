@@ -1,17 +1,17 @@
 package com.ysxsoft.imtalk.view
 
+import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
-import android.support.v4.app.FragmentTransaction
+import android.support.v4.widget.NestedScrollView
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.bean.FouceOnBean
 import com.ysxsoft.imtalk.bean.RoomLockBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
 import com.ysxsoft.imtalk.chatroom.im.IMClient
@@ -27,6 +27,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.dialog.ReportDialog
 import com.ysxsoft.imtalk.widget.dialog.RoomLockDialog
+import io.rong.imkit.RongIM
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
@@ -63,6 +64,7 @@ class MyDataActivity : BaseActivity() {
     var is_room: String? = null
     var bean: UserInfoBean.DataBean? = null
     var mybean: UserInfoBean.DataBean? = null
+    var data: Int? = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         uid = intent.getStringExtra("uid")
@@ -78,6 +80,15 @@ class MyDataActivity : BaseActivity() {
             img_right.setOnClickListener {
                 startActivity(PersonDataActivity::class.java)
             }
+
+            ll_fouce.setOnClickListener {
+                FouceOnActivity.startFouceOnActivity(mContext, uid!!)
+            }
+
+            ll_fance.setOnClickListener {
+                FansActivity.startFansActivity(mContext, uid!!)
+            }
+            llshow.visibility = View.GONE
         } else {
             tv_za_ta.visibility = View.VISIBLE
             tv_t_room.visibility = View.VISIBLE
@@ -88,7 +99,7 @@ class MyDataActivity : BaseActivity() {
             img_right.setOnClickListener {
                 ReportDialog(mContext, uid!!).show()
             }
-
+            llshow.visibility = View.VISIBLE
         }
         requestMySelfData()
         requestData()
@@ -101,6 +112,37 @@ class MyDataActivity : BaseActivity() {
         super.onResume()
         requestMySelfData()
         requestData()
+        fouceData()
+    }
+
+    private fun fouceData() {
+        NetWork.getService(ImpService::class.java)
+                .fans_status(SpUtils.getSp(mContext, "uid"), uid!!)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<FouceOnBean> {
+                    override fun onError(e: Throwable?) {
+                        Log.d("MyDataGiftFragment", e!!.message.toString())
+                    }
+
+                    override fun onNext(t: FouceOnBean?) {
+                        if (t!!.code == 0) {
+                            data = t.data
+                            if (t.data == 1) {//未关注
+                                img_fouce.setImageResource(R.mipmap.img_w_add)
+                                tv_fouce.setText("关注")
+                            } else {//已关注  取消
+                                img_fouce.setImageResource(R.mipmap.img_w_dui)
+                                tv_fouce.setText("已关注")
+                            }
+                        }
+                    }
+
+                    override fun onCompleted() {
+
+                    }
+                })
+
     }
 
     private fun requestMySelfData() {
@@ -162,17 +204,14 @@ class MyDataActivity : BaseActivity() {
 
     }
 
-    //    var bundle: Bundle? = null
     private fun initView() {
-        ll_fouce.setOnClickListener {
-            FouceOnActivity.startFouceOnActivity(mContext, uid!!)
-        }
-
-        ll_fance.setOnClickListener {
-            FansActivity.startFansActivity(mContext, uid!!)
-        }
-
         replaceFragment()
+        if ("myself".equals(myself)) {
+            llshow.visibility = View.GONE
+        } else {
+            llshow.visibility = View.VISIBLE
+            tv_send_car.visibility = View.GONE
+        }
 
         tv_data.setOnClickListener {
             if (tv_data.isSelected) {
@@ -180,6 +219,13 @@ class MyDataActivity : BaseActivity() {
             }
             tagP = "0"
             replaceFragment()
+            if ("myself".equals(myself)) {
+                llshow.visibility = View.GONE
+            } else {
+                llshow.visibility = View.VISIBLE
+                tv_send_car.visibility = View.GONE
+            }
+
         }
 
         tv_gift.setOnClickListener {
@@ -188,6 +234,12 @@ class MyDataActivity : BaseActivity() {
             }
             tagP = "1"
             replaceFragment()
+            if ("myself".equals(myself)) {
+                llshow.visibility = View.GONE
+            } else {
+                llshow.visibility = View.VISIBLE
+                tv_send_car.visibility = View.GONE
+            }
         }
 
         tv_car.setOnClickListener {
@@ -196,6 +248,12 @@ class MyDataActivity : BaseActivity() {
             }
             tagP = "2"
             replaceFragment()
+            if ("myself".equals(myself)) {
+                llshow.visibility = View.GONE
+            } else {
+                llshow.visibility = View.VISIBLE
+                tv_send_car.visibility = View.VISIBLE
+            }
         }
 
         tv_za_ta.setOnClickListener {
@@ -226,19 +284,104 @@ class MyDataActivity : BaseActivity() {
                     showToastMessage("Ta没有房间")
                 }
             } else {
-                if (!TextUtils.isEmpty(mybean!!.now_roomId) && !TextUtils.isEmpty(bean!!.roomId)) {
-                    roomLock(bean!!.roomId.toString())
-                } else {
-                    if (TextUtils.isEmpty(bean!!.roomId)) {
-                        showToastMessage("Ta没有房间")
-                        return@setOnClickListener
-                    }
-                    if (!TextUtils.isEmpty(mybean!!.now_roomId)) {
+                if (!TextUtils.isEmpty(mybean!!.now_roomId)){
+                    if (!TextUtils.isEmpty(bean!!.roomId)){
                         quiteRoom(AuthManager.getInstance().currentUserId, "1")
+                    }else{
+                        showToastMessage("Ta没有房间")
+                    }
+                }else{
+                    if (!TextUtils.isEmpty(bean!!.roomId)){
+                        roomLock(bean!!.roomId.toString())
+                    }else{
+                        showToastMessage("Ta没有房间")
                     }
                 }
+
+//                if (!TextUtils.isEmpty(mybean!!.now_roomId) && !TextUtils.isEmpty(bean!!.roomId)) {
+//                    roomLock(bean!!.roomId.toString())
+//                } else {
+//                    if (TextUtils.isEmpty(bean!!.roomId)) {
+//                        showToastMessage("Ta没有房间")
+//                        return@setOnClickListener
+//                    }
+//                    if (!TextUtils.isEmpty(mybean!!.now_roomId)) {
+//                        quiteRoom(AuthManager.getInstance().currentUserId, "1")
+//                    }
+//                }
             }
         }
+
+        tv_msg.setOnClickListener {
+            //私信
+            RongIM.getInstance().startPrivateChat(mContext, uid, bean!!.nickname);
+        }
+        tv_send_car.setOnClickListener {
+            //送座驾
+            RongIM.getInstance().startPrivateChat(mContext, uid, bean!!.nickname);
+        }
+
+        ll_add_fouce.setOnClickListener {
+            //关注
+            if (data == 1) {
+                FocusOnData(AuthManager.getInstance().currentUserId, uid!!, "1")
+            } else {
+                FocusOnData(AuthManager.getInstance().currentUserId, uid!!, "2")
+            }
+        }
+
+        NscrollView.setOnScrollChangeListener(object : NestedScrollView.OnScrollChangeListener {
+            override fun onScrollChange(p0: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
+                /**
+                 * 第一个参数NestedScrollView v:是NestedScrollView的对象
+                 *第二个参数:scrollX是目前的（滑动后）的X轴坐标
+                第三个参数:ScrollY是目前的（滑动后）的Y轴坐标
+                第四个参数:oldScrollX是之前的（滑动前）的X轴坐标
+                第五个参数:oldScrollY是之前的（滑动前）的Y轴坐标
+                 */
+                Log.e("tag","scrollY===="+scrollY)
+                Log.e("tag","oldScrollY====>>>>>>>>>>>"+oldScrollY)
+                if (scrollY - oldScrollY > AppUtil.dip2px(mContext, 0)) {
+                    llshow.visibility = View.GONE
+                } else {
+                    llshow.visibility = View.VISIBLE
+                }
+                if ("myself".equals(myself)) {
+                    llshow.visibility = View.GONE
+                }
+            }
+        })
+    }
+
+    /**
+     * 关注
+     */
+    private fun FocusOnData(sp: String, userId: String, s: String) {
+        val map = HashMap<String, String>()
+        map.put("uid", sp)
+        map.put("fs_id", userId)
+        map.put("flag", s)
+//        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .fans(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        showToastMessage(t!!.msg)
+                        if (t.code == 0) {
+                            finish()
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
     }
 
     /**
@@ -249,7 +392,7 @@ class MyDataActivity : BaseActivity() {
         message.setCmd(2)//离开房间
         message.targetUserId = uid
         message.targetPosition = -1
-        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mybean!!.nickname, Uri.parse(mybean!!.icon))
+        message.userInfo = io.rong.imlib.model.UserInfo(AuthManager.getInstance().currentUserId, mybean!!.nickname, Uri.parse(mybean!!.icon))
         val obtain = Message.obtain(bean!!.now_roomId, Conversation.ConversationType.CHATROOM, message)
 
         RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
@@ -273,7 +416,7 @@ class MyDataActivity : BaseActivity() {
                                     RtcClient.getInstance().quitRtcRoom(bean!!.now_roomId, null)
 //                                    joinChatRoom(bean!!.roomId)
                                     roomLock(bean!!.roomId.toString())
-                                    finish()
+//                                    finish()
                                 }
                             }
 
@@ -341,6 +484,7 @@ class MyDataActivity : BaseActivity() {
      * 加入他的房间
      */
     fun joinChatRoom(roomId: String, lock_pwd: String) {
+        sendBroadcast(Intent("WINDOW"))
         RoomManager.getInstance().joinRoom(AuthManager.getInstance().currentUserId, roomId, lock_pwd, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 val message = RoomMemberChangedMessage()
@@ -360,7 +504,7 @@ class MyDataActivity : BaseActivity() {
 
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
-                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, bean!!.nickname, bean!!.icon)
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, bean!!.nickname, bean!!.icon, "")
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {

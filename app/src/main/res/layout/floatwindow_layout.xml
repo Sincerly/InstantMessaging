@@ -9,8 +9,8 @@
 
     <com.ysxsoft.imtalk.widget.CircleImageView
         android:id="@+id/img_head"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_gravity="center"
         android:layout_marginBottom="2dp"
         android:src="@mipmap/img_normal_head" />

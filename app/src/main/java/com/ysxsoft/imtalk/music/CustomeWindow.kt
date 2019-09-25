@@ -1,5 +1,6 @@
 package com.ysxsoft.imtalk.music
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -83,7 +84,7 @@ class CustomeWindow {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("WINDOW".equals(intent!!.action)) {
                 quiteRoom("1")
-                dismiss()
+//                dismiss()
             }
         }
     }
@@ -157,9 +158,7 @@ class CustomeWindow {
                 }
             }
         }
-//        imageView!!.setOnClickListener {
-//            joinChatRoom(mydatabean!!.data.now_roomId)
-//        }
+
         Glide.with(BaseApplication.mContext!!).load(icon).into(imageView!!)
 
         var rotate = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -209,6 +208,8 @@ class CustomeWindow {
 
             override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
                 Log.d("tag", p0!!.content.toString())//23409
+                dismiss()
+                removeUser(AuthManager.getInstance().currentUserId, mydatabean!!.data.now_roomId)
             }
         });
     }
@@ -244,6 +245,7 @@ class CustomeWindow {
         private var x: Int = 0
         private var y: Int = 0
 
+        @SuppressLint("ClickableViewAccessibility")
         override fun onTouch(view: View, event: MotionEvent): Boolean {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -273,7 +275,6 @@ class CustomeWindow {
         }
     }
 
-
     fun dismiss() {
         BaseApplication.mContext!!.unregisterReceiver(myBroadCast)
 
@@ -295,6 +296,7 @@ class CustomeWindow {
                     intent.putExtra("room_id", roomId)
                     intent.putExtra("nikeName", mydatabean!!.data.nickname)
                     intent.putExtra("icon", mydatabean!!.data.icon)
+                    intent.putExtra("identical", "identical")
                     BaseApplication.mContext!!.startActivity(intent)
                     dismiss()
                 }

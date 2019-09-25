@@ -127,7 +127,7 @@ class HouseFragment : BaseFragment() {
         showToastMessage(R.string.toast_joining_room)
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate,object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon)
+                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"")
             }
 
             override fun onFail(errorCode: Int) {

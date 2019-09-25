@@ -46,11 +46,11 @@ class MyDataGiftFragment : BaseFragment() {
         uid = bundle!!.getString("uid")
         myself = bundle!!.getString("myself")
         nikeName = bundle!!.getString("nikeName")
-        if ("myself".equals(myself)) {
-            ll_fs.visibility = View.GONE
-        } else {
-            ll_fs.visibility = View.VISIBLE
-        }
+//        if ("myself".equals(myself)) {
+//            ll_fs.visibility = View.GONE
+//        } else {
+//            ll_fs.visibility = View.VISIBLE
+//        }
         fouceData()
         requestData()
         requestGiftData()
@@ -172,16 +172,17 @@ class MyDataGiftFragment : BaseFragment() {
                 .my_gift(uid!!, "2")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<SGiftBean> {
-                    override fun call(t: SGiftBean?) {
+                .subscribe(object : Observer<SGiftBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: SGiftBean?) {
                         if (t!!.code == 0) {
                             tv_myhead.setText("头饰(" + t.data.sum + ")")
                             myHearadapter = object : BaseQuickAdapter<SGiftBean.DataBean.ListInfoBean, BaseViewHolder>(R.layout.my_data_gift_item_layout, t.data.listInfo) {
                                 override fun convert(helper: BaseViewHolder?, item: SGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
                                     helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
-//                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
-//                                    helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
                                     when (item.is_use) {
                                         0 -> {
                                             helper.getView<TextView>(R.id.tv_day)!!.setText("未使用")
@@ -197,12 +198,11 @@ class MyDataGiftFragment : BaseFragment() {
                             }
                             recyclerView.layoutManager = GridLayoutManager(mContext,3)
                             recyclerView.adapter = myHearadapter
-
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
                 })
-
     }
-
-
 }

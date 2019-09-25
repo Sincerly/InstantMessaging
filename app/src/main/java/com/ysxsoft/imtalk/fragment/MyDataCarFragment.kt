@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.R.mipmap.myself
+import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.FouceOnBean
 import com.ysxsoft.imtalk.bean.SGiftBean
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
@@ -38,6 +39,7 @@ class MyDataCarFragment : BaseFragment() {
     var myself: String? = null
     var nikeName: String? = null
     private lateinit var myHearadapter: BaseQuickAdapter<SGiftBean.DataBean.ListInfoBean, BaseViewHolder>
+    var data: Int? = -1
     override fun onResume() {
         super.onResume()
         val bundle = this.arguments//得到从Activity传来的数据
@@ -69,6 +71,43 @@ class MyDataCarFragment : BaseFragment() {
             //送座驾
             RongIM.getInstance().startPrivateChat(getActivity(), uid, nikeName);
         }
+        ll_add_fouce.setOnClickListener {
+            //关注
+            if (data==1){
+                FocusOnData(AuthManager.getInstance().currentUserId,uid!!,"1")
+            }else{
+                FocusOnData(AuthManager.getInstance().currentUserId,uid!!,"2")
+            }
+        }
+    }
+    /**
+     * 关注
+     */
+    private fun FocusOnData(sp: String, userId: String, s: String) {
+        val map = HashMap<String, String>()
+        map.put("uid", sp)
+        map.put("fs_id", userId)
+        map.put("flag", s)
+//        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .fans(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        showToastMessage(t!!.msg)
+                        if (t.code == 0) {
+                            activity!!.onBackPressed()
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
 
     }
 
@@ -83,7 +122,6 @@ class MyDataCarFragment : BaseFragment() {
                     }
 
                     override fun onNext(t: FouceOnBean?) {
-                        showToastMessage(t!!.msg)
                         if (t!!.code == 0) {
                             if (t.data == 1) {//未关注
                                 img_fouce.setImageResource(R.mipmap.img_w_add)
@@ -107,16 +145,18 @@ class MyDataCarFragment : BaseFragment() {
                 .my_gift(uid!!, "1")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<SGiftBean> {
-                    override fun call(t: SGiftBean?) {
+                .subscribe(object :Observer<SGiftBean>{
+                    override fun onError(e: Throwable?) {
+
+                    }
+
+                    override fun onNext(t: SGiftBean?) {
                         if (t!!.code == 0) {
                             tv_carNum.setText("座驾(" + t.data.sum + ")")
                             myHearadapter = object : BaseQuickAdapter<SGiftBean.DataBean.ListInfoBean, BaseViewHolder>(R.layout.dress_mall_item_layout, t.data.listInfo) {
                                 override fun convert(helper: BaseViewHolder?, item: SGiftBean.DataBean.ListInfoBean?) {
                                     ImageLoadUtil.GlideGoodsImageLoad(mContext, item!!.pic, helper!!.getView<ImageView>(R.id.img_tupian))
                                     helper.getView<TextView>(R.id.tv_name)!!.setText(item.name)
-//                                    helper.getView<TextView>(R.id.tv_money)!!.setText(item.gold + "金币")
-//                                    helper.getView<TextView>(R.id.tv_day)!!.setText("/" + item.days + "天")
                                     when (item.is_use) {
                                         0 -> {
                                             helper.getView<TextView>(R.id.tv_day)!!.setText("未使用")
@@ -135,7 +175,10 @@ class MyDataCarFragment : BaseFragment() {
 
                         }
                     }
-                })
+
+                    override fun onCompleted() {
+                    }
+                } )
 
     }
 

@@ -48,10 +48,9 @@ class Msg22Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     var mLuRecyclerViewAdapter: LuRecyclerViewAdapter? = null
     val mHandler = PreviewHandler()
     var page = 1
-    override fun onResume() {
-        super.onResume()
-        initView()
 
+    override fun initUi() {
+        initView()
     }
 
     private fun initView() {

@@ -3,9 +3,11 @@ package com.ysxsoft.imtalk.widget.dialog
 import android.content.Context
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.RoomMwUserBean
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.view.MyDataActivity
 import com.ysxsoft.imtalk.widget.ABSDialog
 import kotlinx.android.synthetic.main.msg_list_dialog_layout.*
 import rx.Observer
@@ -36,9 +38,17 @@ class MsgListDialog : ABSDialog {
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID："+t.data.tt_id)
                             tv_familly.setText("所在家族："+t.data.fmy_name)
-                            tv_tuhao.setText(t.data.user_level)
+                            tv_tuhao.setText("豪"+t.data.user_level)
                             tv_mei.setText("魅 "+t.data.ml_level)
                             tv_zs.setText(t.data.user_level)
+
+                            img_head.setOnClickListener {
+                                if (AuthManager.getInstance().currentUserId.equals(userId)){
+                                    MyDataActivity.startMyDataActivity(this@MsgListDialog.context,t.data.uid.toString(),"myself")
+                                }else{
+                                    MyDataActivity.startMyDataActivity(this@MsgListDialog.context,t.data.uid.toString(),"")
+                                }
+                            }
                         }
                     }
 

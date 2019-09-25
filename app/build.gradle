@@ -148,4 +148,5 @@ dependencies {
     implementation 'com.zhy:okhttputils:2.6.2'
 
     implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.github.LetmeAlittle:errorLibrary:v1.0'
 }

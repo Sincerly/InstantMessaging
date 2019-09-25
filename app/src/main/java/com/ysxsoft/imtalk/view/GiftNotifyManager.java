@@ -14,6 +14,7 @@ import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.bean.RoomPublicGiftMessageBean;
 import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils;
 import com.ysxsoft.imtalk.utils.AppUtil;
+import com.ysxsoft.imtalk.utils.BaseApplication;
 import com.ysxsoft.imtalk.widget.CircleImageView;
 
 import java.util.ArrayList;
@@ -74,9 +75,9 @@ public class GiftNotifyManager {
         TextView sname = v.findViewById(R.id.sname);
         TextView tname = v.findViewById(R.id.tname);
         TextView num = v.findViewById(R.id.num);
-        Glide.with(context).load(d.getSendIcon()).into(sicon);
-        Glide.with(context).load(d.getGiftPic()).into(gpic);
-        Glide.with(context).load(d.getSlIcon()).into(ticon);
+        Glide.with(BaseApplication.mcontext).load(d.getSendIcon()).into(sicon);
+        Glide.with(BaseApplication.mcontext).load(d.getGiftPic()).into(gpic);
+        Glide.with(BaseApplication.mcontext).load(d.getSlIcon()).into(ticon);
         sname.setText(d.getSendName());
         tname.setText(d.getSlName());
         num.setText("x"+d.getGiftNums());

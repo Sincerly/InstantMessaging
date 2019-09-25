@@ -31,7 +31,6 @@ import com.ysxsoft.imtalk.chatroom.model.BaseRoomInfo;
 import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo;
 import com.ysxsoft.imtalk.chatroom.model.MicBehaviorType;
 import com.ysxsoft.imtalk.chatroom.model.MicPositionsBean;
-import com.ysxsoft.imtalk.chatroom.model.RoomUserListBean;
 import com.ysxsoft.imtalk.chatroom.net.HttpClient;
 import com.ysxsoft.imtalk.chatroom.net.SealMicRequest;
 import com.ysxsoft.imtalk.chatroom.net.model.CreateRoomResult;
@@ -43,8 +42,6 @@ import com.ysxsoft.imtalk.chatroom.task.role.Linker;
 import com.ysxsoft.imtalk.chatroom.task.role.Listener;
 import com.ysxsoft.imtalk.chatroom.task.role.Owner;
 import com.ysxsoft.imtalk.chatroom.task.role.Role;
-import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
-import com.ysxsoft.imtalk.chatroom.utils.SpUtils;
 import com.ysxsoft.imtalk.chatroom.utils.ToastUtils;
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog;
 import com.ysxsoft.imtalk.impservice.ImpService;
@@ -63,13 +60,11 @@ import cn.rongcloud.rtc.events.RongRTCStatusReportListener;
 import cn.rongcloud.rtc.room.RongRTCRoom;
 import cn.rongcloud.rtc.stream.remote.RongRTCAVInputStream;
 import cn.rongcloud.rtc.user.RongRTCRemoteUser;
-import io.rong.imkit.RongIM;
 import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.UserInfo;
-import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
 import okhttp3.RequestBody;
 import rx.Observer;
@@ -299,8 +294,9 @@ public class RoomManager {
      * 在当前所在聊天室发送消息
      *
      * @param message
+     * @param user_level
      */
-    public void sendChatRoomMessage(String message, String id, String name, String icon) {
+    public void sendChatRoomMessage(String message, String id, String name, String icon, int user_level) {
         synchronized (roomLock) {
             if (currentRoom == null) {
                 return;
@@ -308,6 +304,7 @@ public class RoomManager {
 
             TextMessage textMessage = TextMessage.obtain(message);
             textMessage.setUserInfo(new UserInfo(id, name, Uri.parse(icon)));
+            textMessage.setExtra(String.valueOf(user_level));
             RongIMClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, currentRoom.getRoomInfo().getRoom_id(), textMessage, null, null, new IRongCallback.ISendMessageCallback() {
                 @Override
                 public void onAttached(Message message) {

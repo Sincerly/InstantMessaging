@@ -71,12 +71,12 @@ class MoneyZsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         tv_dzs.setOnClickListener {
             tv_dzs.isSelected = true
             tv_tx.isSelected = false
-//            startActivity(ExchangeZSActivity::class.java)
-            if (bean==null){
-                showToastMessage("无法兑换")
-                return@setOnClickListener
-            }
-            ExchangeZSActivity.starExchangeZSActivity(mContext,bean!!.data.diamond)
+//            if (bean==null){
+//                showToastMessage("无法兑换")
+//                return@setOnClickListener
+//            }
+//            ExchangeZSActivity.starExchangeZSActivity(mContext,bean!!.data.diamond)
+            startActivity(ExchangeZSActivity::class.java)
         }
 
         tv_tx.setOnClickListener {

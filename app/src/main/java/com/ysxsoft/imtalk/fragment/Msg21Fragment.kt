@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.activity_my_family.*
 import kotlinx.android.synthetic.main.fm_msg21.*
 import org.litepal.LitePal
 import org.litepal.extension.findAll
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -138,8 +139,11 @@ class Msg21Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 .fansList(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<FansListBean> {
-                    override fun call(t: FansListBean?) {
+                .subscribe(object :Observer<FansListBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: FansListBean?) {
                         if (t!!.code == 0) {
                             showData(t)
                             for (bean in t.data) {
@@ -162,9 +166,10 @@ class Msg21Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             mRecyclerView.setRefreshing(false)//同时调用LuRecyclerView的setRefreshing方法
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
                 })
-
-
     }
 
     var bean: FansListBean? = null

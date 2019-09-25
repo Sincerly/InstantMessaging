@@ -38,5 +38,18 @@ class TyrantListAdapter(mContext:Context) :ListBaseAdapter<TyrantListBean.DataBe
         holder.getView<TextView>(R.id.tvSize)!!.text = bean.next_user
         // 距离上一名差距
         holder.getView<TextView>(R.id.tvGap)!!.text = "距离上一名差"
+        holder.itemView.setOnClickListener {
+            if (onTyrantListener!=null){
+                onTyrantListener!!.onClick(position+3)
+            }
+        }
+    }
+
+    interface OnTyrantListener{
+       fun  onClick(position: Int)
+    }
+    private var onTyrantListener: OnTyrantListener?=null
+    fun setOnTyrantListener(onTyrantListener: OnTyrantListener){
+        this.onTyrantListener=onTyrantListener
     }
 }

@@ -37,5 +37,19 @@ class SupperStarAdapter(mContext:Context) :ListBaseAdapter<SupperStarBean.DataBe
         holder.getView<TextView>(R.id.tvSize)!!.text = bean.next_user
         // 距离上一名差距
         holder.getView<TextView>(R.id.tvGap)!!.text = "距离上一名"
+        holder.itemView.setOnClickListener {
+            if (onSupperStarListener!=null){
+                onSupperStarListener!!.onClick(position+3)
+            }
+        }
+
+    }
+
+    interface OnSupperStarListener{
+        fun onClick(position: Int);
+    }
+    private var onSupperStarListener: OnSupperStarListener?=null
+    fun setOnSupperStarListener(onSupperStarListener: OnSupperStarListener){
+        this.onSupperStarListener=onSupperStarListener
     }
 }

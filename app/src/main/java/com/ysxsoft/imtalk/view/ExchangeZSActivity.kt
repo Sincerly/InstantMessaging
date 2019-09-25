@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.widget.TextView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DiamondBean
@@ -15,6 +16,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.widget.dialog.BindingPhoneDialog
 import kotlinx.android.synthetic.main.exchange_jb_layout.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -71,8 +73,6 @@ class ExchangeZSActivity : BaseActivity() {
     }
 
     private fun initView() {
-//        tv_current_jb.setText(money)
-//        ed_num
         tv_all_exchange.setOnClickListener {
             if (TextUtils.isEmpty(tv_current_jb.text.toString().trim())) {
                 showToastMessage("当前没有金币")
@@ -93,19 +93,17 @@ class ExchangeZSActivity : BaseActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!TextUtils.isEmpty(s) && !"0".equals(s)) {
-                    val decimal = BigDecimal(s.toString())
-                    val dec = BigDecimal("10")
-                    val divide = decimal.divide(dec)
-                    tv_zs.setText(divide.toString())
+//                    val decimal = BigDecimal(s.toString())
+//                    val dec = BigDecimal("10")
+//                    val divide = decimal.divide(dec)
+//                    tv_zs.setText(divide.toString())
                     tv_ok.isEnabled = true
                 } else {
-                    tv_zs.setText("0")
+//                    tv_zs.setText("0")
                     tv_ok.isEnabled = false
                 }
             }
         })
-//        tv_current_jb.setText()
-//        tv_zs.setText()
         tv_ok.setOnClickListener {
             exchangData()
         }
@@ -127,6 +125,26 @@ class ExchangeZSActivity : BaseActivity() {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
                             finish()
+                        } else {
+                            val bindingPhoneDialog = BindingPhoneDialog(mContext)
+                            val tv_tip = bindingPhoneDialog.findViewById<TextView>(R.id.tv_tip)
+                            val tv_go = bindingPhoneDialog.findViewById<TextView>(R.id.tv_go)
+                            when (t.code) {
+                                2 -> {//绑定手机号
+                                    tv_tip.setText("请先绑定手机号")
+                                    tv_go.setOnClickListener {
+                                       startActivity(BindPhoneActivity::class.java)
+                                    }
+                                    bindingPhoneDialog.show()
+                                }
+                                3 -> {//去实名认证
+                                    tv_tip.setText("请先实名认证")
+                                    tv_go.setOnClickListener {
+                                        startActivity(SmrzActivity::class.java)
+                                    }
+                                    bindingPhoneDialog.show()
+                                }
+                            }
                         }
                     }
                 })
