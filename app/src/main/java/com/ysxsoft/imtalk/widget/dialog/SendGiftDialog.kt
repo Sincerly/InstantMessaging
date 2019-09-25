@@ -117,7 +117,7 @@ class SendGiftDialog : ABSDialog {
         if(isRequested){
             return;
         }
-        isRequested=false;
+        isRequested=true;
 
         val map = HashMap<String, String>()
         map.put("type", giftbage.toString())

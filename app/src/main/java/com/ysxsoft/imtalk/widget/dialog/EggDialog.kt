@@ -76,6 +76,11 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 return@setOnClickListener
             }
 
+
+            if(isRequest){
+                return@setOnClickListener
+            }
+            isRequest=true;
             when (type) {
                 "1" -> {
                     ZdData()
@@ -95,6 +100,8 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         }
     }
 
+    var isRequest=false;
+
     /**
      * 砸蛋的数据请求
      */
@@ -105,6 +112,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<EggBean> {
                     override fun call(t: EggBean?) {
+                        isRequest=false;
                         ToastUtils.showToast(this@EggDialog.context, t!!.msg)
 
                         var map= HashMap<String,ArrayList<EggBean.DataBean>>()
