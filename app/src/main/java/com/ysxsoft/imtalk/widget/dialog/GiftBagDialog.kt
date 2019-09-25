@@ -141,7 +141,7 @@ class GiftBagDialog : ABSDialog {
         if(isRequested){
             return;
         }
-        isRequested=false;
+        isRequested=true;
 
         if (mwJson == null) {
             ToastUtils.showToast(context, "请选择赠送的人")
