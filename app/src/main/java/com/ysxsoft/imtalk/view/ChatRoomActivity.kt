@@ -143,11 +143,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
                 }
 
-            override fun onFail(errorCode: Int) {
+                override fun onFail(errorCode: Int) {
 
-            }
-        })
+                }
+            })
 
+        }
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
@@ -299,7 +300,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     companion object {
-        fun starChatRoomActivity(mContext: Context, room_id: String, nikeName: String, icon: String,identical: String) {
+        fun starChatRoomActivity(mContext: Context, room_id: String, nikeName: String, icon: String, identical: String) {
             val intent = Intent(mContext, ChatRoomActivity::class.java)
             intent.putExtra("room_id", room_id)
             intent.putExtra("nikeName", nikeName)
@@ -429,13 +430,15 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         giftEggManager = NotifyManager(mContext as Activity?)
         giftNotifyManager = GiftNotifyManager(mContext as Activity?)
     }
+
     inner class MyBroadcast : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("RECEIVEMESSAGE".equals(intent!!.action)) {
-                tv_point.visibility=View.VISIBLE
+                tv_point.visibility = View.VISIBLE
             }
         }
     }
+
     private fun initroomManager() {
         roomManager = RoomManager.getInstance()
         detailRoomInfo = roomManager!!.getCurrentRoomInfo()
@@ -714,13 +717,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                 override fun NextSong() {
                     if (playMusicService != null) {
-                       var position = musicbean!!.position
+                        var position = musicbean!!.position
                         playMusicService!!.next()
                         position++
-                        if (position>musicbean!!.list.size){
-                            position==0
+                        if (position > musicbean!!.list.size) {
+                            position == 0
                             tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
-                        }else{
+                        } else {
                             tv_song_name1.setText(musicbean!!.list.get(position).music_name)
                         }
                     }
@@ -753,7 +756,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
             val msg = chatroom_et_chat_input.text.toString().trim()
             if (!TextUtils.isEmpty(msg)) {
-                roomManager!!.sendChatRoomMessage(msg, SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, mydatabean!!.data.icon,mydatabean!!.data.user_level);
+                roomManager!!.sendChatRoomMessage(msg, SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, mydatabean!!.data.icon, mydatabean!!.data.user_level);
             }
             hideInputKeyboard();
             chatroom_et_chat_input.setText("");
@@ -765,25 +768,25 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         chatroom_iv_sound_control.setOnClickListener {
-            tv_point.visibility=View.GONE
+            tv_point.visibility = View.GONE
             startActivity(MsgActivity::class.java)
         }
 
         img_gold_egg.setOnClickListener {
             val eggDialog = EggDialog(mContext)
             eggDialog.setOnEggOpenListener(object : EggDialog.OnEggOpenListener {
-                override fun onEggOpened(data: List<EggBean.DataBean>,map:HashMap<String,ArrayList<EggBean.DataBean>>) {
+                override fun onEggOpened(data: List<EggBean.DataBean>, map: HashMap<String, ArrayList<EggBean.DataBean>>) {
                     //创建消息
                     for (item in data) {
                         val msg = EggChatMessage()
-                        if(map.containsKey(item.gift_id)){
-                            if(map.get(item.gift_id)!=null){
-                                msg.giftName = item.sg_name+"x"+ map.get(item.gift_id)!!.size
-                            }else{
-                                msg.giftName = item.sg_name+"x1"
+                        if (map.containsKey(item.gift_id)) {
+                            if (map.get(item.gift_id) != null) {
+                                msg.giftName = item.sg_name + "x" + map.get(item.gift_id)!!.size
+                            } else {
+                                msg.giftName = item.sg_name + "x1"
                             }
-                        }else{
-                            msg.giftName = item.sg_name+"x1"
+                        } else {
+                            msg.giftName = item.sg_name + "x1"
                         }
                         msg.giftPrice = "0"//TODO: Sincerly 是否需要价格？
                         msg.name = mydatabean!!.data!!.nickname
@@ -807,7 +810,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
                         //显示本地公屏消息
                         android.os.Handler(Looper.getMainLooper()).postDelayed({
-                            if("1".equals(item.is_big_money)){
+                            if ("1".equals(item.is_big_money)) {
                                 //超过大额
                                 onGoldMessage(mydatabean!!.data!!.nickname, item.sg_name, "(" + item.aw_gold + "金币)")
                             }
@@ -924,7 +927,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             giftChatMessage.toName = bean.nickname//接收人
                             giftChatMessage.giftName = gifName//礼物名称
                             giftChatMessage.giftPic = gifPic//礼物图片
-                            giftChatMessage.giftStaticPic=pic//礼物静态图片
+                            giftChatMessage.giftStaticPic = pic//礼物静态图片
                             giftChatMessage.giftNum = gifNum//礼物数量
                             giftChatMessage.fromUid = AuthManager.getInstance().currentUserId.toString()
                             giftChatMessage.toUid = bean.uid.toString()
@@ -953,8 +956,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     chatroom_list_chat.smoothScrollToPosition(chatListAdapter!!.count)
 
                     //创建聊天室礼物通知消息
-                    for (msg in data){
-                        if("1".equals(msg.is_big_money)){
+                    for (msg in data) {
+                        if ("1".equals(msg.is_big_money)) {
                             var messageBean = RoomPublicGiftMessageBean();
                             messageBean.setSendName(msg.send_name);
                             messageBean.setSendIcon(msg.send_icon);
@@ -1100,7 +1103,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","启用房间声音失败==" + errorCode)
+                    Log.d("tag", "启用房间声音失败==" + errorCode)
                 }
             })
         } else {
@@ -1111,7 +1114,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","关闭房间声音失败==" + errorCode)
+                    Log.d("tag", "关闭房间声音失败==" + errorCode)
                 }
             })
         }
@@ -1314,7 +1317,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
         }
 
-        if (TextUtils.equals("identical",identical)){
+        if (TextUtils.equals("identical", identical)) {
             enableVoiceChat(true)  //话筒
         }
 
@@ -1333,7 +1336,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
 
             override fun onFail(errorCode: Int) {
-                showToastMessage("初始化语音失败" + errorCode)
+                Log.d("tag","初始化语音失败" + errorCode)
             }
         })
     }
@@ -1471,11 +1474,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private fun enableRoomChatVoice(enable: Boolean) {
         roomManager!!.enableRoomChatVoice(enable, object : ResultCallback<Boolean> {
             override fun onSuccess(aBoolean: Boolean?) {
-                Log.d("tag","设置启动房间聊天声音成功")
+                Log.d("tag", "设置启动房间聊天声音成功")
             }
 
             override fun onFail(errorCode: Int) {
-                Log.d("tag","设置启动房间聊天声音失败" + errorCode)
+                Log.d("tag", "设置启动房间聊天声音失败" + errorCode)
             }
         })
     }
@@ -1493,7 +1496,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","设置是否开启失败" + errorCode)
+                    Log.d("tag", "设置是否开启失败" + errorCode)
                 }
             })
         } else {
@@ -1503,7 +1506,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","设置是否关闭失败" + errorCode)
+                    Log.d("tag", "设置是否关闭失败" + errorCode)
                 }
             })
         }
@@ -1784,7 +1787,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveZb() {
-                        DressMallActivity.startDressMallActivity(mContext, userId,"",nikeName!!)
+                        DressMallActivity.startDressMallActivity(mContext, userId, "", nikeName!!)
                     }
 
                     override fun clickFoucsOn() {
@@ -1835,7 +1838,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
                         }
                     })
-                }else{
+                } else {
                     if ("0".equals(is_lock_wheat)) {
                         seatMicDialog.findViewById<TextView>(R.id.tv_close_mic).setText("解麦")
                     } else {
@@ -1891,8 +1894,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     tv_setting_manager.visibility = View.GONE
                     tv_move_manager.visibility = View.GONE
-                    zw.visibility=View.INVISIBLE
-                    zw1.visibility=View.INVISIBLE
+                    zw.visibility = View.INVISIBLE
+                    zw1.visibility = View.INVISIBLE
                     if ("0".equals(is_lock_wheat)) {
                         giveDialog.findViewById<TextView>(R.id.tv_scm).setText("解麦")
                     } else {
@@ -2870,7 +2873,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
                         finish()
-                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"")
+                        ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon, "")
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
@@ -2900,8 +2903,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun onKeyboardStateChanged(isShown: Boolean, height: Int) {
         /*
-         * 监听软键盘弹出，当有软键盘时使输入框加入软键盘等高的间距
-         */
+     * 监听软键盘弹出，当有软键盘时使输入框加入软键盘等高的间距
+     */
         val layoutParams = chatroom_ll_input_container.getLayoutParams() as RelativeLayout.LayoutParams
 
         if (isShown) {
@@ -2969,9 +2972,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onResume() {
         super.onResume()
         /*
-       * 当用户切出应用时可能会有其他应用更改音频的输出模式
-       * 所以当应用切回前台时切换音频输出模式
-       */
+   * 当用户切出应用时可能会有其他应用更改音频的输出模式
+   * 所以当应用切回前台时切换音频输出模式
+   */
         changeAudioOutputMode()
 
         roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
@@ -3263,11 +3266,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     //分发动画结束之后 显示特效
                                     var svgaImageView = SVGAImageView(mContext)
-                                    svgaImageView.scaleType=ImageView.ScaleType.FIT_XY
+                                    svgaImageView.scaleType = ImageView.ScaleType.FIT_XY
                                     val parser = SVGAParser(mContext)
                                     //铺满全屏
                                     val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                                    svgaImageView.layoutParams=layoutParams;
+                                    svgaImageView.layoutParams = layoutParams;
                                     f.addView(svgaImageView)
                                     val inputStream = FileInputStream(downloadFile)
                                     parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
@@ -3335,11 +3338,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     Handler(Looper.getMainLooper()).postDelayed({
                         //分发动画结束之后 显示特效
                         var svgaImageView = SVGAImageView(this)
-                        svgaImageView.scaleType=ImageView.ScaleType.FIT_XY
+                        svgaImageView.scaleType = ImageView.ScaleType.FIT_XY
                         val parser = SVGAParser(this)
                         //铺满全屏
                         val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                        svgaImageView.layoutParams=layoutParams;
+                        svgaImageView.layoutParams = layoutParams;
                         f.addView(svgaImageView)
                         val inputStream = FileInputStream(downloadFile)
                         parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
@@ -3721,6 +3724,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     }
 
     var playMusicService: PlayMusicService? = null
+
     var connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
         }
@@ -3731,4 +3735,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             playMusicService!!.setData(musicbean!!.list, musicbean!!.position)
         }
     }
+
+
 }

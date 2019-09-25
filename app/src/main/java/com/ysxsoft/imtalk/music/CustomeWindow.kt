@@ -264,12 +264,12 @@ class CustomeWindow {
                     windowManager!!.updateViewLayout(view, layoutParams)
                 }
 
-                MotionEvent.ACTION_UP -> {
-                    layoutParams!!.x = mWindowWidth
-                    windowManager!!.updateViewLayout(view, layoutParams)
-                }
-                else -> {
-                }
+//                MotionEvent.ACTION_UP -> {
+//                    layoutParams!!.x = mWindowWidth
+//                    windowManager!!.updateViewLayout(view, layoutParams)
+//                }
+//                else -> {
+//                }
             }
             return false
         }
