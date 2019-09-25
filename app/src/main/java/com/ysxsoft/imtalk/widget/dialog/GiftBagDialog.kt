@@ -3,7 +3,6 @@ package com.ysxsoft.imtalk.widget.dialog
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +10,13 @@ import com.bumptech.glide.Glide
 import com.gcssloop.widget.PagerGridLayoutManager
 import com.gcssloop.widget.PagerGridSnapHelper
 import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.GridBageAdpater
 import com.ysxsoft.imtalk.adapter.GridGiftAdpater
 import com.ysxsoft.imtalk.adapter.MicPostionAdapter
 import com.ysxsoft.imtalk.bean.*
-import com.ysxsoft.imtalk.chatroom.model.DetailRoomInfo
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
-import com.ysxsoft.imtalk.chatroom.task.ResultCallback
-import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.JbWithDrawActivity
@@ -47,6 +42,7 @@ class GiftBagDialog : ABSDialog {
     var num = 0
     var giftbage = 1
     private var sectionNum = StringBuffer()
+    var isRequested=false;
 
 
     override fun initView() {
@@ -142,6 +138,11 @@ class GiftBagDialog : ABSDialog {
 
     val uidList = ArrayList<String>()
     private fun sendGift() {
+        if(isRequested){
+            return;
+        }
+        isRequested=false;
+
         if (mwJson == null) {
             ToastUtils.showToast(context, "请选择赠送的人")
             return
@@ -158,11 +159,13 @@ class GiftBagDialog : ABSDialog {
                 .send_gift(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<CommonBean> {
+                .subscribe(object : Observer<GiftSendBean> {
                     override fun onError(e: Throwable?) {
+                        isRequested=false;
                     }
 
-                    override fun onNext(t: CommonBean?) {
+                    override fun onNext(t: GiftSendBean?) {
+                        isRequested=false;
                         if (t!!.code == 0) {
                             dismiss()
                             if (onGiftListener != null) {
@@ -225,8 +228,9 @@ class GiftBagDialog : ABSDialog {
                                         }
                                     }
                                 }
+                                t.data
 
-                                onGiftListener!!.onClck(fromPosition, data, pic!!, micPositons!!, gifurl!!, gifname!!, gift_num!!,targetUserId,targetUserName)
+                                onGiftListener!!.onClck(fromPosition, data, pic!!, micPositons!!, gifurl!!, gifname!!, gift_num!!,targetUserId,targetUserName,t!!.data)
                             }
                         } else {
                             ToastUtils.showToast(this@GiftBagDialog.context, t.msg)
@@ -289,7 +293,6 @@ class GiftBagDialog : ABSDialog {
                     }
                 })
     }
-
 
     /**
      * 获取好友资料以及信息
@@ -476,7 +479,7 @@ class GiftBagDialog : ABSDialog {
     var targetUserName = "";
 
     interface OnGiftListener {
-        fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String,targetUserId:String,targetUserName:String)
+        fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String, targetUserName: String, data: MutableList<GiftSendBean.DataBean>)
         fun needInputed();
     }
 

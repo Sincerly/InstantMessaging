@@ -30,10 +30,18 @@
         android:textColor="@color/btn_color"
         android:textSize="12sp"
         tools:text="李"/>
+
+
+    <com.ysxsoft.imtalk.widget.CircleImageView
+        android:id="@+id/giftPic"
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="24dp"
+        android:layout_marginHorizontal="@dimen/dp_4"
+        android:layout_height="24dp"/>
     <TextView
         android:layout_width="wrap_content"
         android:id="@+id/giftInfo"
-        android:text="名字"
+        android:text=""
         android:textColor="@color/white"
         android:textSize="12sp"
         android:layout_height="wrap_content"/>

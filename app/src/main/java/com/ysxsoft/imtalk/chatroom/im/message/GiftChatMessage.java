@@ -27,6 +27,7 @@ public class GiftChatMessage extends MessageContent {
     private String toName;
     private String giftName;
     private String giftPic;
+    private String giftStaticPic;
     private String giftNum;
     private String fromUid;
     private String toUid;
@@ -43,6 +44,7 @@ public class GiftChatMessage extends MessageContent {
             setToName(jsonObj.optString("toName"));
             setGiftName(jsonObj.optString("giftName"));
             setGiftPic(jsonObj.optString("giftPic"));
+            setGiftStaticPic(jsonObj.optString("giftStaticPic"));
             setGiftNum(jsonObj.optString("giftNum"));
             setFromUid(jsonObj.optString("fromUid"));
             setToUid(jsonObj.optString("toUid"));
@@ -61,6 +63,7 @@ public class GiftChatMessage extends MessageContent {
             jsonObj.put("toName", getToName());
             jsonObj.put("giftName", getGiftName());
             jsonObj.put("giftPic", getGiftPic());
+            jsonObj.put("giftStaticPic", getGiftStaticPic());
             jsonObj.put("giftNum", getGiftNum());
             jsonObj.put("fromUid", getFromUid());
             jsonObj.put("toUid", getToUid());
@@ -86,6 +89,7 @@ public class GiftChatMessage extends MessageContent {
         dest.writeString(this.toName);
         dest.writeString(this.giftName);
         dest.writeString(this.giftPic);
+        dest.writeString(this.giftStaticPic);
         dest.writeString(this.giftNum);
         dest.writeString(this.fromUid);
         dest.writeString(this.toUid);
@@ -96,6 +100,7 @@ public class GiftChatMessage extends MessageContent {
         this.toName = in.readString();
         this.giftName = in.readString();
         this.giftPic = in.readString();
+        this.giftStaticPic = in.readString();
         this.giftNum = in.readString();
         this.fromUid = in.readString();
         this.toUid = in.readString();
@@ -167,5 +172,13 @@ public class GiftChatMessage extends MessageContent {
 
     public void setToUid(String toUid) {
         this.toUid = toUid;
+    }
+
+    public String getGiftStaticPic() {
+        return giftStaticPic == null ? "" : giftStaticPic;
+    }
+
+    public void setGiftStaticPic(String giftStaticPic) {
+        this.giftStaticPic = giftStaticPic;
     }
 }

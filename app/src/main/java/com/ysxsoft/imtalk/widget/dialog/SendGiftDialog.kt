@@ -47,6 +47,7 @@ class SendGiftDialog : ABSDialog {
     var mwJson:String?=""
     var targetUserId = "";
     var targetUserName = "";
+    var isRequested=false;
 
     override fun initView() {
         tv1.isSelected = true
@@ -113,6 +114,11 @@ class SendGiftDialog : ABSDialog {
     }
 
     private fun sendGift() {
+        if(isRequested){
+            return;
+        }
+        isRequested=false;
+
         val map = HashMap<String, String>()
         map.put("type", giftbage.toString())
         map.put("gift_id", giftid.toString())
@@ -125,11 +131,13 @@ class SendGiftDialog : ABSDialog {
                 .send_gift(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<CommonBean> {
+                .subscribe(object : Observer<GiftSendBean> {
                     override fun onError(e: Throwable?) {
+                        isRequested=false;
                     }
 
-                    override fun onNext(t: CommonBean?) {
+                    override fun onNext(t: GiftSendBean?) {
+                        isRequested=false;
                         if (t!!.code == 0) {
                             dismiss()
                             if (onGiftListener != null) {

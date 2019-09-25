@@ -64,7 +64,16 @@ public class BageListBean {
         private String gift_num;
         private String aw_name;
         private String aw_images;
+        private String aw_gold;
         private boolean isSelect;
+
+        public String getAw_gold() {
+            return aw_gold == null ? "" : aw_gold;
+        }
+
+        public void setAw_gold(String aw_gold) {
+            this.aw_gold = aw_gold;
+        }
 
         public boolean isSelect() {
             return isSelect;

@@ -12,10 +12,7 @@ import com.ysxsoft.imtalk.bean.SupperStarBean
 import com.ysxsoft.imtalk.bean.WeekStarBean
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.BaseActivity
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.displayResCyclo
-import com.ysxsoft.imtalk.utils.displayUrlCyclo
+import com.ysxsoft.imtalk.utils.*
 import kotlinx.android.synthetic.main.activity_week_star.*
 import kotlinx.android.synthetic.main.include_crown_bronze.*
 import kotlinx.android.synthetic.main.include_crown_gold.*
@@ -41,6 +38,7 @@ class WeekStarActivity : BaseActivity() {
     private lateinit var mAdapter5: WeekAdapter5 //周星奖励列表
     private lateinit var mAdapter6: WeekAdapter6 //礼物预告列表
 
+    private lateinit var customDialog: CustomDialog
 
     override fun getLayout(): Int {
         return R.layout.activity_week_star
@@ -51,6 +49,7 @@ class WeekStarActivity : BaseActivity() {
         tvTitle.text = "周星榜"
         setSupportActionBar(toolBar)
         toolBar.setNavigationOnClickListener { finish() }
+        customDialog = CustomDialog(mContext, "正在加载....")
 
         initAdapter()
         postData()//获取页面数据
@@ -69,16 +68,17 @@ class WeekStarActivity : BaseActivity() {
         mAdapter6 = WeekAdapter6(mContext)
 
         recyclerViewGift.layoutManager = GridLayoutManager(mContext, 3)
-        recyclerViewGift.adapter = mAdapter1
         recyclerViewLastWeek.layoutManager = GridLayoutManager(mContext, 3)
-        recyclerViewLastWeek.adapter = mAdapter2
         recyclerViewGiftTop.layoutManager = GridLayoutManager(mContext, 3)
-        recyclerViewGiftTop.adapter = mAdapter3
         recyclerViewStarList.layoutManager = LinearLayoutManager(mContext)
-        recyclerViewStarList.adapter = mAdapter4
         recyclerViewWeekStar.layoutManager = LinearLayoutManager(mContext)
-        recyclerViewWeekStar.adapter = mAdapter5
         recyclerViewNextGift.layoutManager = GridLayoutManager(mContext, 3)
+
+        recyclerViewGift.adapter = mAdapter1
+        recyclerViewLastWeek.adapter = mAdapter2
+        recyclerViewGiftTop.adapter = mAdapter3
+        recyclerViewStarList.adapter = mAdapter4
+        recyclerViewWeekStar.adapter = mAdapter5
         recyclerViewNextGift.adapter = mAdapter6
 
         mAdapter3.setListener(object : WeekAdapter3.ItemClickListener {
@@ -87,12 +87,14 @@ class WeekStarActivity : BaseActivity() {
                 postWeekStarData(item.id)
             }
         })
-        //上周明星/本周明星可以点击进入个人信息页面
+        /*上周明星/本周明星可以点击进入个人信息页面*/
+        //上周明星
         mAdapter2.setOnclickListener(object : WeekAdapter2.OnItemClickListener{
             override fun onItemClick(itemView: View, position: Int, item: WeekStarBean.DataBean.LastStarBean) {
                 MyDataActivity.startMyDataActivity(mContext, item.uid.toString(), if (item.uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
             }
         })
+        //本周明星
         mAdapter4.setOnclickListener(object : WeekAdapter4.OnItemClickListener{
             override fun onItemClick(itemView: View, position: Int, item: StarBean.DataBean) {
                 MyDataActivity.startMyDataActivity(mContext, item.uid.toString(), if (item.uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
@@ -104,6 +106,9 @@ class WeekStarActivity : BaseActivity() {
      * 获取页面数据
      */
     private fun postData() {
+        if (!customDialog.isShowing){
+            customDialog.show()
+        }
         NetWork.getService(ImpService::class.java)
                 .weekStarList()
                 .subscribeOn(Schedulers.io())
@@ -121,6 +126,7 @@ class WeekStarActivity : BaseActivity() {
                         }
 
                     }
+                    customDialog.dismiss()
                 }
     }
 
@@ -128,6 +134,9 @@ class WeekStarActivity : BaseActivity() {
      * 获取本周明星数据
      */
     private fun postWeekStarData(gift_zl_id: Int) {
+        if (!customDialog.isShowing){
+            customDialog.show()
+        }
         NetWork.getService(ImpService::class.java)
                 .weekStar(gift_zl_id)
                 .subscribeOn(Schedulers.io())
@@ -140,6 +149,7 @@ class WeekStarActivity : BaseActivity() {
                         setTopThree(ArrayList())
                         mAdapter4.setDataList(ArrayList())
                     }
+                    customDialog.dismiss()
                 }
     }
 
@@ -204,7 +214,7 @@ class WeekStarActivity : BaseActivity() {
                         tvNo3Zuan.text = data[i].now_level.toString()
                         tvNo3Zuan.visibility = View.VISIBLE
                         tvNo3Content.text = "距前一名" + data[i].next_user
-                        tvNo3Content.visibility = View.GONE
+                        tvNo3Content.visibility = View.VISIBLE
                         ivCrownBronze.setOnClickListener {
                             MyDataActivity.startMyDataActivity(mContext, data[i].uid.toString(), if (data[i].uid.toString() == AuthManager.getInstance().currentUserId) "myself" else "")
                         }
@@ -213,4 +223,8 @@ class WeekStarActivity : BaseActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        customDialog.dismiss()
+    }
 }

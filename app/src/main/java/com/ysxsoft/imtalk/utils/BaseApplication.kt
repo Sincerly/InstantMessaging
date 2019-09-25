@@ -11,6 +11,7 @@ import android.util.Log
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash
 import com.umeng.commonsdk.UMConfigure
 import com.umeng.socialize.PlatformConfig
+import com.ysxsoft.imtalk.bean.PalMessageBus
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.net.HttpClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
@@ -18,9 +19,11 @@ import com.ysxsoft.imtalk.chatroom.task.ThreadManager
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication
 import com.ysxsoft.imtalk.chatroom.utils.ToastUtils
 import com.ysxsoft.imtalk.chatroom.utils.log.SLog
+import com.ysxsoft.imtalk.im.message.LobbyTextMessage
 import com.ysxsoft.imtalk.im.message.PrivateCarMessage
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
 import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
+import com.ysxsoft.imtalk.im.provider.LobbyTextMessageProvider
 import com.ysxsoft.imtalk.im.provider.PrivateCarProvider
 import com.ysxsoft.imtalk.im.provider.PrivateGiftProvider
 import com.ysxsoft.imtalk.im.provider.PrivateHeaderProvider
@@ -37,6 +40,7 @@ import io.rong.message.ImageMessage
 import io.rong.message.RichContentMessage
 import io.rong.message.TextMessage
 import io.rong.message.VoiceMessage
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import org.litepal.LitePal
 import org.litepal.extension.find
@@ -109,6 +113,8 @@ class BaseApplication : MyApplication() {
         RongIM.registerMessageTemplate(PrivateCarProvider())
         RongIM.registerMessageType(PrivateHeaderMessage::class.java)
         RongIM.registerMessageTemplate(PrivateHeaderProvider())
+        RongIM.registerMessageType(LobbyTextMessage::class.java)
+        RongIM.registerMessageTemplate(LobbyTextMessageProvider())
     }
 
     fun setMyExtensionModule() {
@@ -147,6 +153,7 @@ class BaseApplication : MyApplication() {
             }
             val intent = Intent("RECEIVEMESSAGE")
             sendBroadcast(intent)
+            EventBus.getDefault().post(PalMessageBus(p0))
             return false
         }
     }

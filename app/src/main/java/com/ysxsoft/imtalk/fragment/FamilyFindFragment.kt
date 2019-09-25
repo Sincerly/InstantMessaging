@@ -1,8 +1,16 @@
 package com.ysxsoft.imtalk.fragment
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.adapter.PalMessageAdapter
+import com.ysxsoft.imtalk.bean.EventBusBean
 import com.ysxsoft.imtalk.bean.GroupIdBean
+import com.ysxsoft.imtalk.bean.PalMessageBus
 import com.ysxsoft.imtalk.bean.SysBean
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
@@ -22,6 +30,9 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import io.rong.imlib.model.RemoteHistoryMsgOption
+import kotlinx.android.synthetic.main.head_wear_fragment_layout.view.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 
 
 /**
@@ -36,6 +47,31 @@ class FamilyFindFragment : BaseFragment() {
     //设置数据
     var list = ArrayList<String>()
 
+    private lateinit var msgAdapter : PalMessageAdapter
+    private var groupId = ""
+    private var palMessages = ArrayList<Message>()
+
+    /**
+     * 收到新消息
+     */
+    @Subscribe
+    @Synchronized fun palMessage( bus : PalMessageBus){
+        val newMessage  = bus.newMessage
+        if (groupId.isEmpty()){
+            palMessages.add(newMessage)
+        }else{
+//            if (msgAdapter.){
+//                msgAdapter.setDataList()
+//            }
+        }
+
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        EventBus.getDefault().register(this)
+    }
+
     override fun onResume() {
         super.onResume()
         initView()
@@ -45,7 +81,7 @@ class FamilyFindFragment : BaseFragment() {
 
     private fun requestGroupData() {
         val map = HashMap<String, String>()
-        map.put("uid", AuthManager.getInstance().currentUserId)
+        map["uid"] = AuthManager.getInstance().currentUserId
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .groupId(body)
@@ -53,21 +89,12 @@ class FamilyFindFragment : BaseFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<GroupIdBean> {
                     override fun onError(e: Throwable?) {
+                        Log.e("onError", "onError")
                     }
 
                     override fun onNext(t: GroupIdBean?) {
                         if (t!!.code == 0) {
-                            RongIMClient.getInstance().getRemoteHistoryMessages(Conversation.ConversationType.GROUP, t.data, RemoteHistoryMsgOption(), object : RongIMClient.ResultCallback<List<Message>> (){
-                                override fun onSuccess(p0: List<Message>?) {
-
-
-                                }
-
-                                override fun onError(p0: RongIMClient.ErrorCode?) {
-
-                                }
-                            })
-
+                            groupId = t.data
                         }
                     }
 
@@ -109,6 +136,10 @@ class FamilyFindFragment : BaseFragment() {
     }
 
     private fun initView() {
+        msgAdapter = PalMessageAdapter(mContext)
+        group_recyclerview.layoutManager = LinearLayoutManager(mContext)
+        group_recyclerview.adapter = msgAdapter
+
         //土豪榜
         tv1.setOnClickListener {
             startActivity(TyrantListActivity::class.java)
@@ -134,7 +165,13 @@ class FamilyFindFragment : BaseFragment() {
         }
         //交友大厅
         tv_look.setOnClickListener {
-            NoticeActivity.starNoticeActivity(mContext, "0")
+            PalLobbyActivity.intentPalLobbyActivity(groupId)
+//            NoticeActivity.starNoticeActivity(mContext, "0")
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
     }
 }

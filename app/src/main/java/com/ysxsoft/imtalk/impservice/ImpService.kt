@@ -591,7 +591,7 @@ interface ImpService {
     fun RoomMusicDel(@Body body: RequestBody): Observable<CommonBean>
 
     @POST("Room/send_gift")
-    fun send_gift(@Body body: RequestBody): Observable<CommonBean>
+    fun send_gift(@Body body: RequestBody): Observable<GiftSendBean>
 
     @POST("Sign/sign_day")
     fun sign_day(@Body body: RequestBody): Observable<SignDayBean>

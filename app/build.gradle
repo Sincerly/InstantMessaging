@@ -144,6 +144,7 @@ dependencies {
     implementation project(':RCSticker')
     //    implementation project(':PushLib')
 //    implementation files('libs/utdid4all-1.1.5.3_proguard.jar')
+
     implementation 'com.github.yyued:SVGAPlayer-Android:2.4.7'
     implementation 'com.zhy:okhttputils:2.6.2'
 

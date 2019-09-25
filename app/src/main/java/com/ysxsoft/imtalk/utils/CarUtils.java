@@ -335,6 +335,26 @@ public class CarUtils {
                                                     public void onResponse(File file, int id) {
                                                     }
                                                 });
+                                    }else{
+                                        long size=item.getSize();
+                                        if(size==downloadFile.length()){
+                                            //数据完整
+                                        }else{
+                                            downloadFile.delete();
+                                            OkHttpUtils.get()
+                                                    .url(url)
+                                                    .build()
+                                                    .execute(new FileCallBack(SDPATH,destFileName) {
+                                                        @Override
+                                                        public void onError(Call call, Exception e, int id) {
+
+                                                        }
+
+                                                        @Override
+                                                        public void onResponse(File file, int id) {
+                                                        }
+                                                    });
+                                        }
                                     }
                                 }
                             }
@@ -387,6 +407,26 @@ public class CarUtils {
                                                     public void onResponse(File file, int id) {
                                                     }
                                                 });
+                                    }else{
+                                        long size=item.getSize();
+                                        if(size==downloadFile.length()){
+                                            //数据完整
+                                        }else{
+                                            downloadFile.delete();
+                                            OkHttpUtils.get()
+                                                    .url(url)
+                                                    .build()
+                                                    .execute(new FileCallBack(SDPATH,destFileName) {
+                                                        @Override
+                                                        public void onError(Call call, Exception e, int id) {
+
+                                                        }
+
+                                                        @Override
+                                                        public void onResponse(File file, int id) {
+                                                        }
+                                                    });
+                                        }
                                     }
                                 }
                             }
