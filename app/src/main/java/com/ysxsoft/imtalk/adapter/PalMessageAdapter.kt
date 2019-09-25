@@ -40,7 +40,7 @@ class PalMessageAdapter(mContext: Context) : ListBaseAdapter<Message>(mContext){
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val item = mDataList[position]
         val tvContent = holder.getView<AutoLinkTextView>(R.id.tvContent)
-        val layoutSticker = holder.getView<FrameLayout>(R.id.layoutSticker)
+//        val layoutSticker = holder.getView<FrameLayout>(R.id.layoutSticker)
 
         val tvMeili = holder.getView<TextView>(R.id.tvMeili)
         val tvZuan = holder.getView<TextView>(R.id.tvZuan)
@@ -49,7 +49,7 @@ class PalMessageAdapter(mContext: Context) : ListBaseAdapter<Message>(mContext){
 
         if (item.content is LobbyTextMessage){
             tvContent?.visibility = View.VISIBLE
-            layoutSticker?.visibility = View.GONE
+//            layoutSticker?.visibility = View.GONE
             val msg = item.content as LobbyTextMessage
             val extra = Gson().fromJson(msg.extra, UserInfoBean.DataBean::class.java)
             holder.getView<ImageView>(R.id.ivAvatar)?.displayUrlCyclo(extra.icon)

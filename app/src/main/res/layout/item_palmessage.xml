@@ -64,19 +64,6 @@
         app:RCMaxWidth="223dp"
         android:background="@drawable/icon_mytextmsg_left"
         />
-    <include
-        android:id="@+id/layoutSticker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        layout="@layout/rc_sticker_messsage_item"
-        app:layout_constraintStart_toEndOf="@+id/ivAvatar"
-        app:layout_constraintTop_toTopOf="@+id/ivAvatar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        />
+
 
 </LinearLayout>
