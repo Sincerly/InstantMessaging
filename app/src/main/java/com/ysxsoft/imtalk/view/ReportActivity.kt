@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import com.luck.picture.lib.PictureSelector
 import com.luck.picture.lib.config.PictureConfig
 import com.luck.picture.lib.config.PictureMimeType
@@ -139,7 +140,7 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
         map.put("be_uid",be_uid!!)
         map.put("uid",AuthManager.getInstance().currentUserId)
         map.put("info_id",info_id)
-        map.put("pic_id",pic_id)
+        map.put("pic_id","["+pic_id+"]")
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .reportUser(body)
@@ -147,6 +148,7 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object :Observer<CommonBean>{
                     override fun onError(e: Throwable?) {
+                        Log.d("tag举报好友",e!!.message.toString())
                     }
 
                     override fun onNext(t: CommonBean?) {
@@ -160,8 +162,6 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                     }
                 })
 
-
-
     }
 
     private fun saveData(info_id: String, pic_id: String) {
@@ -169,12 +169,19 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                 .reportRoom(room_id!!, SpUtils.getSp(mContext, "uid"), info_id, "["+pic_id+"]")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<CommonBean> {
-                    override fun call(t: CommonBean?) {
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                        Log.d("tag举报",e!!.message.toString())
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
                             finish()
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }
@@ -222,7 +229,7 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                             .subscribe(object : Action1<UploadFileBean> {
                                 override fun call(t: UploadFileBean?) {
                                     if (t!!.code == 0) {
-                                        val imgId1 = t.data
+                                        val imgId1 = t.data.id
                                         Ids.add(imgId1.toString())
                                     }
                                 }

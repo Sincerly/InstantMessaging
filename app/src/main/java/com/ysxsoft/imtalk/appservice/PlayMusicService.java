@@ -15,10 +15,16 @@ import android.util.Log;
 
 import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.bean.RoomMusicListBean;
+import com.ysxsoft.imtalk.music.DBUtils;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.FileCallBack;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
 
 /**
  * create by Sincerly on 2019/1/17 0017
@@ -151,4 +157,52 @@ public class PlayMusicService extends Service {
     public void setOnMusicPosition(OnMusicPosition onMusicPosition){
         this.onMusicPosition = onMusicPosition;
     }
+
+//    ///////////////////////////////////////////////////////////////////////////
+//    // 下载音乐
+//    ///////////////////////////////////////////////////////////////////////////
+//    private void downloadMusic(int i,String url,String mid){
+//        String webPath=url;
+//        int index=webPath.lastIndexOf("/");
+//        String destFileName=webPath.substring(index,webPath.length());
+//
+//        OkHttpUtils.get()
+//                .url(url)
+//                .build()
+//                .execute(new FileCallBack(AppConfig.BASE_PATH, destFileName) {
+//                    @Override
+//                    public void onError(Call call, Exception e, int id) {
+//
+//                    }
+//
+//                    @Override
+//                    public void inProgress(float progress, long total, int id) {
+//                    }
+//
+//                    @Override
+//                    public void onResponse(File file, int id) {
+//                        Log.e("tag",""+i);
+//                        //缓存完毕
+////                        MusicCache cache=new MusicCache();
+////                        cache.mid=mid;
+////                        cache.webPath=webPath;
+////                        cache.uid=DBUtils.getUid();
+////                        cache.nativePath=file.getAbsolutePath();
+////                        cache.save();
+//
+//                        DBUtils.updateMusicCachePath(mid,file.getAbsolutePath());
+////                        if(musics!=null){
+////                            MusicCache m=musics.get(i);
+////                            m.nativePath=file.getAbsolutePath();//更新url
+////                        }
+////                        if(DemoHelper.getInstance().isVoiceCalling||DemoHelper.getInstance().isVideoCalling){
+////                            //正在语音通话/视频通话
+////                            return;
+////                        }else{
+////                            //播放路径
+////                            musicPlay(i,file.getAbsolutePath());
+////                        }
+//                    }
+//                });
+//    }
 }

@@ -38,6 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:visibility="gone"
         android:text="家族" />
 
     <com.ysxsoft.imtalk.widget.MyRecyclerView

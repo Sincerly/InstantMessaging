@@ -184,17 +184,33 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                     }
                                     helper.itemView.setOnClickListener {
 //                                        roomLock(item.room_id.toString())
-                                        if (mydatabean!=null) {
-                                            if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
-                                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
-                                                    roomLock(item.room_id.toString())
-                                                } else {
-                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", item.room_id.toString())
-                                                }
-                                            }else{
-                                                roomLock(item.room_id.toString())
-                                            }
-                                        }
+                                        activity!!.sendBroadcast(Intent("WINDOW"))
+                                        NetWork.getService(ImpService::class.java)
+                                                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(object : Observer<UserInfoBean> {
+                                                    override fun onError(e: Throwable?) {
+                                                    }
+
+                                                    override fun onNext(t: UserInfoBean?) {
+                                                        if (t!!.code == 0) {
+                                                            val data = t.data
+                                                            if (!TextUtils.isEmpty(data.now_roomId)) {
+                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+                                                                    roomLock(item.room_id.toString())
+                                                                } else {
+                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1",  data.now_roomId,item.room_id.toString())
+                                                                }
+                                                            } else {
+                                                                roomLock(item.room_id.toString())
+                                                            }
+                                                        }
+                                                    }
+
+                                                    override fun onCompleted() {
+                                                    }
+                                                })
                                     }
                                 }
                             }
@@ -230,17 +246,33 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                     }
                                     helper.itemView.setOnClickListener {
 //                                        roomLock(item.room_id.toString())
-                                        if (mydatabean!=null) {
-                                            if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
-                                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
-                                                    roomLock(item.room_id.toString())
-                                                } else {
-                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", item.room_id.toString())
-                                                }
-                                            }else{
-                                                roomLock(item.room_id.toString())
-                                            }
-                                        }
+                                        activity!!.sendBroadcast(Intent("WINDOW"))
+                                        NetWork.getService(ImpService::class.java)
+                                                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(object : Observer<UserInfoBean> {
+                                                    override fun onError(e: Throwable?) {
+                                                    }
+
+                                                    override fun onNext(t: UserInfoBean?) {
+                                                        if (t!!.code == 0) {
+                                                            val data = t.data
+                                                            if (!TextUtils.isEmpty(data.now_roomId)) {
+                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+                                                                    roomLock(item.room_id.toString())
+                                                                } else {
+                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1",  data.now_roomId,item.room_id.toString())
+                                                                }
+                                                            } else {
+                                                                roomLock(item.room_id.toString())
+                                                            }
+                                                        }
+                                                    }
+
+                                                    override fun onCompleted() {
+                                                    }
+                                                })
                                     }
                                 }
                             }
@@ -258,13 +290,13 @@ class HomeFragment : BaseFragment(), OnBannerListener {
     /**
      * 退出房间
      */
-    private fun quiteRoom(uid: String, kick: String, newRoomId: String) {
+    private fun quiteRoom(uid: String, kick: String, preRoomId: String,newRoomId:String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = uid
         message.targetPosition = -1
         message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
-        val obtain = Message.obtain(mydatabean!!.data.now_roomId, Conversation.ConversationType.CHATROOM, message)
+        val obtain = Message.obtain(preRoomId, Conversation.ConversationType.CHATROOM, message)
 
         RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
             override fun onAttached(p0: Message?) {
@@ -273,7 +305,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
             override fun onSuccess(p0: Message?) {
                 NetWork.getService(ImpService::class.java)
-                        .tCRoom(uid, kick, mydatabean!!.data.now_roomId!!)
+                        .tCRoom(uid, kick, preRoomId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(object : Observer<CommonBean> {
@@ -284,9 +316,9 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                             override fun onNext(t: CommonBean?) {
 //                                showToastMessage(t!!.msg)
                                 if (t!!.code == 0) {
-                                    IMClient.getInstance().quitChatRoom(mydatabean!!.data.now_roomId, null)
-                                    RtcClient.getInstance().quitRtcRoom(mydatabean!!.data.now_roomId, null)
-                                    removeUser(mydatabean!!.data.now_roomId!!, uid,newRoomId)
+                                    IMClient.getInstance().quitChatRoom(preRoomId, null)
+                                    RtcClient.getInstance().quitRtcRoom(preRoomId, null)
+                                    removeUser(preRoomId, uid,newRoomId)
                                 }
                             }
 
@@ -480,9 +512,6 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
     private fun joinChatRoom(roomId: String, isCreate: String) {
         showToastMessage(R.string.toast_joining_room)
-
-        activity!!.sendBroadcast(Intent("WINDOW"))
-
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
                 ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"")

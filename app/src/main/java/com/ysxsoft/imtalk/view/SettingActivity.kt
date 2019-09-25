@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
+import com.ysxsoft.imtalk.bean.UserInfoBean
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
@@ -31,7 +32,7 @@ import rx.schedulers.Schedulers
 class SettingActivity : BaseActivity() {
 
     companion object {
-        fun startSettingActivity(mContext: Context, roomId: String,nikeName:String,icon:String) {
+        fun startSettingActivity(mContext: Context, roomId: String, nikeName: String, icon: String) {
             val intent = Intent(mContext, SettingActivity::class.java)
             intent.putExtra("roomId", roomId)
             intent.putExtra("nikeName", nikeName)
@@ -40,7 +41,7 @@ class SettingActivity : BaseActivity() {
         }
     }
 
-    var roomId: String? = null
+    //    var roomId: String? = null
     var nikeName: String? = null
     var icon: String? = null
     override fun getLayout(): Int {
@@ -49,7 +50,7 @@ class SettingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        roomId = intent.getStringExtra("roomId")
+//        roomId = intent.getStringExtra("roomId")
         nikeName = intent.getStringExtra("nikeName")
         icon = intent.getStringExtra("icon")
         setLightStatusBar(true)
@@ -110,23 +111,39 @@ class SettingActivity : BaseActivity() {
             val outDialog = LoginOutDialog(mContext)
             val tv_ok = outDialog.findViewById<TextView>(R.id.tv_ok)
             tv_ok.setOnClickListener {
-                if (!TextUtils.isEmpty(roomId)){
-                    quiteRoom(AuthManager.getInstance().currentUserId,"1")
-                }else{
-                    var instance = ActivityPageManager.getInstance();
-                    instance!!.finishAllActivity();
-                    SpUtils.deleteSp(mContext)
-                    mContext.startActivity(Intent(mContext, LoginActivity::class.java))
-                }
-
                 sendBroadcast(Intent("WINDOW"))
-                outDialog.dismiss()
+                NetWork.getService(ImpService::class.java)
+                        .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<UserInfoBean> {
+                            override fun onError(e: Throwable?) {
+                            }
+
+                            override fun onNext(t: UserInfoBean?) {
+                                if (t!!.code == 0) {
+                                    val data = t.data
+                                    if (!TextUtils.isEmpty(data.now_roomId)) {
+                                        quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId)
+                                    } else {
+                                        var instance = ActivityPageManager.getInstance();
+                                        instance!!.finishAllActivity();
+                                        SpUtils.deleteSp(mContext)
+                                        mContext.startActivity(Intent(mContext, LoginActivity::class.java))
+                                    }
+                                    outDialog.dismiss()
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
             }
             outDialog.show()
         }
     }
 
-    private fun quiteRoom(uid: String, kick: String) {
+    private fun quiteRoom(uid: String, kick: String, roomId: String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = uid
@@ -153,10 +170,7 @@ class SettingActivity : BaseActivity() {
                                 if (t.code == 0) {
                                     IMClient.getInstance().quitChatRoom(roomId, null)
                                     RtcClient.getInstance().quitRtcRoom(roomId, null)
-                                    removeUser(roomId!!,AuthManager.getInstance().currentUserId)
-//                                    val intent = Intent(mContext, PlayMusicService::class.java)
-//                                    stopService(intent)
-
+                                    removeUser(roomId!!, AuthManager.getInstance().currentUserId)
                                 }
                             }
 
@@ -170,21 +184,22 @@ class SettingActivity : BaseActivity() {
             }
         });
     }
-    fun removeUser(roomId:String,uid:String){
+
+    fun removeUser(roomId: String, uid: String) {
         val map = HashMap<String, String>()
-        map.put("room_id",roomId)
-        map.put("uid",uid)
+        map.put("room_id", roomId)
+        map.put("uid", uid)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .remove_user(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<CommonBean>{
+                .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: CommonBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
                             var instance = ActivityPageManager.getInstance();
                             instance!!.finishAllActivity();
                             SpUtils.deleteSp(mContext)

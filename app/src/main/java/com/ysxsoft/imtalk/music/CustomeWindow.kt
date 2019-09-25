@@ -24,10 +24,12 @@ import com.ysxsoft.imtalk.widget.CircleImageView
 import android.content.Context.WINDOW_SERVICE
 import android.content.IntentFilter
 import android.net.Uri
+import android.text.TextUtils
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
+import android.widget.ImageView
 import com.umeng.socialize.utils.DeviceConfigInternal.context
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
@@ -45,6 +47,7 @@ import com.ysxsoft.imtalk.utils.BaseApplication
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.view.ChatRoomActivity
+import com.ysxsoft.imtalk.view.MyImageView
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
@@ -64,7 +67,7 @@ class CustomeWindow {
     private var displayView: View? = null
     private var mWindowWidth: Int = 0
     private var mWindowHeight: Int = 0
-    private var imageView: CircleImageView? = null
+    private var imageView: MyImageView? = null
     var mydatabean: UserInfoBean? = null
     var isShowing: Boolean = false
     var icon: String? = null
@@ -83,12 +86,12 @@ class CustomeWindow {
     inner class MyBroadCast : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("WINDOW".equals(intent!!.action)) {
-                quiteRoom("1")
-//                dismiss()
+                if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                    quiteRoom("1",mydatabean!!.data.now_roomId)
+                }
             }
         }
     }
-
 
     init {//初始化代码块
         requestMyData()
@@ -142,21 +145,41 @@ class CustomeWindow {
         return isShowing
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     fun show() {
         requestMyData()
         isShowing = true
         val layoutInflater = LayoutInflater.from(BaseApplication.mContext!!)
         displayView = layoutInflater.inflate(R.layout.floatwindow_layout, null)
         imageView = displayView!!.findViewById(R.id.img_head)
+
         displayView!!.setOnTouchListener(FloatingOnTouchListener())
         windowManager!!.addView(displayView, layoutParams)
         val viewById = displayView!!.findViewById<FrameLayout>(R.id.fl)
         viewById.setOnClickListener {
-            if (mydatabean != null) {
-                if (mydatabean!!.data != null) {
-                    quiteRoom("1")
-                }
-            }
+            NetWork.getService(ImpService::class.java)
+                    .GetUserInfo(AuthManager.getInstance().currentUserId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Observer<UserInfoBean> {
+                        override fun onError(e: Throwable?) {
+                        }
+
+                        override fun onNext(t: UserInfoBean?) {
+                            if (t!!.code == 0) {
+                                mydatabean = t
+                                if (mydatabean!!.data != null) {
+                                    if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
+                                        quiteRoom("1",mydatabean!!.data.now_roomId)
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun onCompleted() {
+                        }
+                    })
+
         }
 
         Glide.with(BaseApplication.mContext!!).load(icon).into(imageView!!)
@@ -172,13 +195,13 @@ class CustomeWindow {
 
     }
 
-    private fun quiteRoom(kick: String) {
+    private fun quiteRoom(kick: String,newRoomId:String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = AuthManager.getInstance().currentUserId
         message.targetPosition = -1
         message.userInfo = io.rong.imlib.model.UserInfo(AuthManager.getInstance().currentUserId, mydatabean!!.data.nickname, Uri.parse(icon))
-        val obtain = Message.obtain(mydatabean!!.data.now_roomId, Conversation.ConversationType.CHATROOM, message)
+        val obtain = Message.obtain(newRoomId, Conversation.ConversationType.CHATROOM, message)
 
         RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
             override fun onAttached(p0: Message?) {
@@ -187,7 +210,7 @@ class CustomeWindow {
 
             override fun onSuccess(p0: Message?) {
                 NetWork.getService(ImpService::class.java)
-                        .tCRoom(AuthManager.getInstance().currentUserId, kick, mydatabean!!.data.now_roomId)
+                        .tCRoom(AuthManager.getInstance().currentUserId, kick, newRoomId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(object : Observer<CommonBean> {
@@ -195,9 +218,9 @@ class CustomeWindow {
                             }
 
                             override fun onNext(t: CommonBean?) {
-                                ToastUtils.showToast(t!!.msg)
-                                if (t.code == 0) {
-                                    removeUser(AuthManager.getInstance().currentUserId, mydatabean!!.data.now_roomId)
+//                                ToastUtils.showToast(t!!.msg)
+                                if (t!!.code == 0) {
+                                    removeUser(newRoomId,AuthManager.getInstance().currentUserId)
                                 }
                             }
 
@@ -208,12 +231,11 @@ class CustomeWindow {
 
             override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
                 Log.d("tag", p0!!.content.toString())//23409
-                dismiss()
-                removeUser(AuthManager.getInstance().currentUserId, mydatabean!!.data.now_roomId)
+//                dismiss()
+//                removeUser(AuthManager.getInstance().currentUserId, mydatabean!!.data.now_roomId)
             }
         });
     }
-
 
     fun removeUser(roomId: String, uid: String) {
         val map = HashMap<String, String>()

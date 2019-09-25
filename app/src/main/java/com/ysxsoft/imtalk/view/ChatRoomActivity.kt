@@ -359,7 +359,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var giftNotifyManager: GiftNotifyManager? = null
     var myBroadcast: MyBroadcast? = null
     var amdinType: Int? = -1
-
+    var isStop:Boolean=false
     /**
      * 监听来电状态进行房间的静音和禁麦操作
      */
@@ -594,7 +594,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickSmall() {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (!Settings.canDrawOverlays(mContext)) {
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                         } else {
@@ -661,7 +661,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     if (playMusicService != null) {
                         playMusicService!!.stop()
                     }
-                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (!Settings.canDrawOverlays(mContext)) {
                             startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                         } else {
@@ -691,6 +691,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
         tv_music.setOnClickListener {
             voiceDialog = SongVoiceDialog(mContext)
+            val img_stop = voiceDialog!!.findViewById<ImageView>(R.id.img_stop)
             val tv_song_name1 = voiceDialog!!.findViewById<TextView>(R.id.tv_song_name1)
             if (musicbean != null) {
                 tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
@@ -712,6 +713,12 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 override fun StopSong() {
                     if (playMusicService != null) {
                         playMusicService!!.pause()
+                    }
+                    isStop=!isStop
+                    if (isStop){
+                        img_stop.setImageResource(R.mipmap.img_stop)
+                    }else{
+                        img_stop.setImageResource(R.mipmap.img_stop)
                     }
                 }
 
@@ -2945,7 +2952,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
             @RequiresApi(Build.VERSION_CODES.M)
             override fun clickSmall() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (!Settings.canDrawOverlays(mContext)) {
                         startActivityForResult(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")), 1)
                     } else {

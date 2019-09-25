@@ -68,6 +68,7 @@ class ZsWithDrawActivity : BaseActivity() {
                             tv_add_bank_card.setText("添加银行卡")
                             tv_add_bank_card.visibility = View.VISIBLE
                             tv_withdraw_acount.setHintTextColor(R.color.hint_text_color)
+                            tv_withdraw_acount.setText("")
                         }
                     }
                 }

@@ -88,6 +88,16 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!TextUtils.isEmpty(SpUtils.getPwd(mContext,"phoneNum"))){
+            ed_phone.setText(SpUtils.getPwd(mContext,"phoneNum"))
+        }
+        if (!TextUtils.isEmpty(SpUtils.getPwd(mContext,"pwd"))){
+            ed_pwd.setText(SpUtils.getPwd(mContext,"pwd"))
+        }
+    }
+
     private fun UMQQLoglin(share_media: SHARE_MEDIA?) {
         UMShareAPI.get(mContext).getPlatformInfo(this@LoginActivity, share_media, authListener)
     }
@@ -104,12 +114,12 @@ class LoginActivity : BaseActivity() {
 
         override fun onError(platform: SHARE_MEDIA, action: Int, t: Throwable) {
             SocializeUtils.safeCloseDialog(dialog)
-            showToastMessage("失败：" + t.message)
+//            showToastMessage("失败：" + t.message)
         }
 
         override fun onCancel(platform: SHARE_MEDIA, action: Int) {
             SocializeUtils.safeCloseDialog(dialog)
-            showToastMessage("取消了===" + action)
+//            showToastMessage("取消了===" + action)
         }
 
     }
@@ -219,6 +229,13 @@ class LoginActivity : BaseActivity() {
                     override fun onNext(t: LoginBean?) {
                         showToastMessage(t!!.msg)
                         if (t!!.code == 0) {
+                           if (cb_forget_pwd.isChecked){
+                               SpUtils.savePwd(mContext,"phoneNum",ed_phone.text.toString().trim())
+                               SpUtils.savePwd(mContext,"pwd",ed_pwd.text.toString().trim())
+                           }else{
+                               SpUtils.deletePWD(mContext)
+                           }
+
                             RongIM.connect(t.data.chat_token, object : RongIMClient.ConnectCallback() {
                                 override fun onTokenIncorrect() {
                                     SLog.e(TAG, "RongIMClient onTokenIncorrect")
