@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.fragment
 import android.content.Context
 import android.text.TextUtils
 import android.view.View
+import com.google.gson.Gson
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.GetRealInfoBean
 import com.ysxsoft.imtalk.bean.MFamilyBean
@@ -85,6 +86,8 @@ class MyFragment : BaseFragment() {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             dataBean = t.data
+                            //保存整个个人信息到本地
+                            SharedPreferencesUtils.saveInfo(mContext, Gson().toJson(dataBean))
                             val info = UserInfo()
                             info.uid = t.data.uid
                             info.icon = t.data.icon

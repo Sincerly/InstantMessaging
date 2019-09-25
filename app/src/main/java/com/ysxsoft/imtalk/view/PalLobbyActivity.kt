@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
+import android.view.View
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.adapter.fgpageradapter.FgTableBean
 import com.ysxsoft.imtalk.adapter.fgpageradapter.FgVpAdapter
@@ -46,6 +47,7 @@ class PalLobbyActivity : BaseActivity() {
     }
 
     override fun initUi() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR//黑色
         groupId = intent.extras?.getString(ARG_GROUPID, "")!!
         toolBar.setNavigationOnClickListener { finish() }
         ivHelp.setOnClickListener {
@@ -57,7 +59,7 @@ class PalLobbyActivity : BaseActivity() {
     private fun initAdapter() {
         val informfragments = ArrayList<FgTableBean<Fragment>>()
             tabTop.addTab(titles[0])
-            informfragments.add(FgTableBean(getConverationFragment(Conversation.ConversationType.CHATROOM), titles[0], 0))
+            informfragments.add(FgTableBean(getConverationFragment(Conversation.ConversationType.GROUP), titles[0], 0))
             tabTop.addTab(titles[1])
             informfragments.add(FgTableBean(Notice2Fragment(), titles[1], 1))
         val fgVpAdapter = FgVpAdapter(supportFragmentManager, informfragments)

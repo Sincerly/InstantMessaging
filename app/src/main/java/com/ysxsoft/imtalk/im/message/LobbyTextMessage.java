@@ -25,6 +25,7 @@ import io.rong.message.TextMessage;
         value = "SM:LobbyTxtMsg",
         flag = MessageTag.ISCOUNTED
 )
+@DestructionTag
 public class LobbyTextMessage extends MessageContent {
     private static final String TAG = "LobbyTextMessage";
     private String content;
