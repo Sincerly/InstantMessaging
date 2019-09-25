@@ -17,6 +17,7 @@ import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.bean.UserInfoBean;
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
 import com.ysxsoft.imtalk.im.message.LobbyTextMessage;
+import com.ysxsoft.imtalk.utils.GradeIconUtils;
 
 import io.rong.imkit.RongContext;
 import io.rong.imkit.RongIM;
@@ -97,8 +98,18 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
             holder.message.setTextColor(ContextCompat.getColor(MyApplication.mcontext, R.color.colorAccent));
             UserInfoBean.DataBean bean = new Gson().fromJson(textMessage.getExtra(), UserInfoBean.DataBean.class);
             holder.tvNick.setText(bean.getNickname());
-            holder.tvZuan.setText("0");
-            holder.tvMeili.setText("0");
+
+            int[] array = GradeIconUtils.Companion.charmIcon(bean.getCharm_level());
+//            holder.tvMeili.setCompoundDrawables(ContextCompat.getDrawable(MyApplication.mcontext, array[0]), null, null, null);
+            holder.tvMeili.setCompoundDrawablesWithIntrinsicBounds(array[0], 0, 0, 0);
+            holder.tvMeili.setTextColor(ContextCompat.getColor(MyApplication.mcontext, array[1]));
+            holder.tvMeili.setText(String.valueOf(bean.getCharm_level()));
+
+            int[] grade = GradeIconUtils.Companion.gradeIcon(bean.getCharm_level());
+//            holder.tvZuan.setCompoundDrawables(ContextCompat.getDrawable(MyApplication.mcontext, grade[0]), null, null, null);
+            holder.tvZuan.setCompoundDrawablesWithIntrinsicBounds(grade[0], 0, 0, 0);
+            holder.tvZuan.setTextColor(ContextCompat.getColor(MyApplication.mcontext, grade[1]));
+            holder.tvZuan.setText(String.valueOf(bean.getUser_level()));
         }
 
 
