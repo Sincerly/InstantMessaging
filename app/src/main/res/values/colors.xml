@@ -36,4 +36,34 @@
     <color name="textColor28">#282828</color>
     <color name="colorSilver">#B2B5CA</color>
     <color name="colorAF3600">#40AF3600</color>
+
+    <!--魅力色值-->
+    <color name="colorM_1_9">#CCCCCC</color>
+    <color name="colorM_10_19">#FF5E84</color>
+    <color name="colorM_20_29">#FF8FE1</color>
+    <color name="colorM_30_39">#5796FF</color>
+    <color name="colorM_40_49">#433AFC</color>
+    <color name="colorM_50_59">#FF0D96</color>
+    <color name="colorM_60_69">#FF290D</color>
+    <color name="colorM_70_79">#FF7B2B</color>
+    <color name="colorM_80_89">#974A36</color>
+    <color name="colorM_90_100">#C63EFF</color>
+    <!--等级色值-->
+    <color name="color_1_9">#CCCCCC</color>
+    <color name="color_10_19">#64D974</color>
+    <color name="color_20_29">#089A2B</color>
+    <color name="color_30_39">#38A1FA</color>
+    <color name="color_40_49">#4F68FF</color>
+    <color name="color_50_59">#0C36BD</color>
+    <color name="color_60_69">#FFD200</color>
+    <color name="color_70_79">#FEF17F</color>
+    <color name="color_80_89">#E9A936</color>
+    <color name="color_90_99">#FF860F</color>
+    <color name="color_100_149">#FF0000</color>
+    <color name="color_150_199">#B12258</color>
+    <color name="color_200_249">#BA0404</color>
+    <color name="color_250_299">#A3826C</color>
+    <color name="color_300_399">#974A36</color>
+    <color name="color_400_500">#C63EFF</color>
+
 </resources>

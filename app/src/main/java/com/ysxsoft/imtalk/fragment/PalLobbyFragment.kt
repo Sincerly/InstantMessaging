@@ -20,6 +20,7 @@ import com.ysxsoft.imtalk.chatroom.utils.MyApplication
 import com.ysxsoft.imtalk.im.message.LobbyTextMessage
 import com.ysxsoft.imtalk.utils.AppUtil
 import com.ysxsoft.imtalk.utils.SharedPreferencesUtils
+import com.ysxsoft.imtalk.utils.ToastUtils
 import io.rong.common.rlog.RLog
 import io.rong.imkit.InputBar
 import io.rong.imkit.RongExtension
@@ -100,6 +101,10 @@ class PalLobbyFragment : ConversationFragment() {
 //    使用自定义消息LobbyTextMessage同时使用自定义消息模板LobbyTextMessageProvider，
 //    因为uimessage的问题表情只能自动使用android表情，需要在provider内部自己转换，不知道会不会存在弊端
     override fun onSendToggleClick(v: View, text: String) {
+        if(info.user_level <= 2){
+            context?.let { ToastUtils.showToast(it, "你当前等级不够，无发言权限！！") }
+            return
+        }
         if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(text.trim { it <= ' ' })) {
             val textMessage = LobbyTextMessage.obtain(text)
             val mentionedInfo = RongMentionManager.getInstance().onSendButtonClick()
