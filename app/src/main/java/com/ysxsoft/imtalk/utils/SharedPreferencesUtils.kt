@@ -40,5 +40,13 @@ object SharedPreferencesUtils {
         return get(context).getString("carPic", "")
     }
 
+    fun saveInfo(context: Context, value: String) {
+        save(context, "userInfo", value)
+    }
+
+    fun getInfo(context: Context): String {
+        return get(context).getString("userInfo", "")
+    }
+
 
 }

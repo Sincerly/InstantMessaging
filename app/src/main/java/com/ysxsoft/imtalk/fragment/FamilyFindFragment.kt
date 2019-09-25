@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.support.annotation.MainThread
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import com.ysxsoft.imtalk.R
@@ -47,7 +50,7 @@ class FamilyFindFragment : BaseFragment() {
     //设置数据
     var list = ArrayList<String>()
 
-    private lateinit var msgAdapter : PalMessageAdapter
+    private lateinit var msgAdapter: PalMessageAdapter
     private var groupId = ""
     private var palMessages = ArrayList<Message>()
 
@@ -55,16 +58,17 @@ class FamilyFindFragment : BaseFragment() {
      * 收到新消息
      */
     @Subscribe
-    @Synchronized fun palMessage( bus : PalMessageBus){
-        val newMessage  = bus.newMessage
-        if (groupId.isEmpty()){
-            palMessages.add(newMessage)
-        }else{
-//            if (msgAdapter.){
-//                msgAdapter.setDataList()
-//            }
+    @MainThread
+    fun palMessage(bus: PalMessageBus) {
+        val newMessage = bus.newMessage
+        if (groupId.isNotEmpty()) {
+            if (newMessage.targetId == groupId) {
+                Handler(Looper.getMainLooper()).post {
+                    msgAdapter.addData(newMessage)
+                    (group_recyclerview.layoutManager as LinearLayoutManager ).scrollToPositionWithOffset(if (msgAdapter.dataList.isNotEmpty()) msgAdapter.dataList.size - 1 else msgAdapter.dataList.size, 0)
+                }
+            }
         }
-
     }
 
     override fun onAttach(context: Context?) {
@@ -72,13 +76,21 @@ class FamilyFindFragment : BaseFragment() {
         EventBus.getDefault().register(this)
     }
 
+    override fun initUi() {
+        msgAdapter = PalMessageAdapter(mContext)
+        group_recyclerview.layoutManager = LinearLayoutManager(mContext)
+        group_recyclerview.adapter = msgAdapter
+        requestGroupData()
+    }
     override fun onResume() {
         super.onResume()
         initView()
         requestData()
-        requestGroupData()
     }
 
+    /**
+     * 获取群id
+     */
     private fun requestGroupData() {
         val map = HashMap<String, String>()
         map["uid"] = AuthManager.getInstance().currentUserId
@@ -136,10 +148,6 @@ class FamilyFindFragment : BaseFragment() {
     }
 
     private fun initView() {
-        msgAdapter = PalMessageAdapter(mContext)
-        group_recyclerview.layoutManager = LinearLayoutManager(mContext)
-        group_recyclerview.adapter = msgAdapter
-
         //土豪榜
         tv1.setOnClickListener {
             startActivity(TyrantListActivity::class.java)
@@ -165,8 +173,21 @@ class FamilyFindFragment : BaseFragment() {
         }
         //交友大厅
         tv_look.setOnClickListener {
-            PalLobbyActivity.intentPalLobbyActivity(groupId)
+            intoPalLobby()
 //            NoticeActivity.starNoticeActivity(mContext, "0")
+        }
+    }
+
+    /**
+     * 进入交友大厅
+     */
+    private fun intoPalLobby(){
+        if (groupId.isNotEmpty()){
+            PalLobbyActivity.intentPalLobbyActivity(groupId)
+        }else{
+            Handler().postDelayed({
+                intoPalLobby()
+            }, 1000)
         }
     }
 

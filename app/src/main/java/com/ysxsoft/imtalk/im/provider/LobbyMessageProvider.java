@@ -12,9 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.ysxsoft.imtalk.R;
-import com.ysxsoft.imtalk.bean.UserInfoBean;
 import com.ysxsoft.imtalk.chatroom.utils.MyApplication;
 import com.ysxsoft.imtalk.im.message.LobbyTextMessage;
 
@@ -27,18 +25,21 @@ import io.rong.imkit.widget.AutoLinkTextView;
 import io.rong.imkit.widget.LinkTextViewMovementMethod;
 import io.rong.imkit.widget.provider.IContainerItemProvider;
 import io.rong.imlib.model.Message;
+import io.rong.message.TextMessage;
 
 @ProviderTag(
-        messageContent = LobbyTextMessage.class,
+        messageContent = TextMessage.class,
         showSummaryWithName = false,
         showReadState = true
 )
-public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProvider<LobbyTextMessage>{
+//ToDo 如果启用这个模板，需要处理正常消息与大厅消息的ui显示差异，这里只有大厅消息的ui
+public class LobbyMessageProvider extends IContainerItemProvider.MessageProvider<TextMessage>{
 
     private static final String TAG = "LobbyTextMessageProvider";
 
-    public LobbyTextMessageProvider() {
+    public LobbyMessageProvider() {
     }
+
 
     @Override
     public View newView(Context context, ViewGroup viewGroup) {
@@ -53,12 +54,12 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
     }
 
     @Override
-    public Spannable getContentSummary(LobbyTextMessage data) {
+    public Spannable getContentSummary(TextMessage data) {
         return null;
     }
 
     @Override
-    public Spannable getContentSummary(Context context, LobbyTextMessage data) {
+    public Spannable getContentSummary(Context context, TextMessage data) {
         if (data == null) {
             return null;
         } else {
@@ -76,13 +77,13 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
     }
 
     @Override
-    public void onItemClick(View view, int i, LobbyTextMessage lobbyTextMessage, UIMessage uiMessage) {
+    public void onItemClick(View view, int i, TextMessage lobbyTextMessage, UIMessage uiMessage) {
 
     }
 
     @Override
-    public void bindView(View v, int i, LobbyTextMessage textMessage, UIMessage data) {
-        LobbyTextMessageProvider.ViewHolder holder = (LobbyTextMessageProvider.ViewHolder)v.getTag();
+    public void bindView(View v, int i, TextMessage textMessage, UIMessage data) {
+        LobbyMessageProvider.ViewHolder holder = (LobbyMessageProvider.ViewHolder)v.getTag();
         if (data.getMessageDirection() == Message.MessageDirection.SEND) {
             holder.message.setBackgroundResource(R.drawable.icon_mytextmsg_right);
             holder.tvMeili.setVisibility(View.GONE);
@@ -95,26 +96,17 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
             holder.tvZuan.setVisibility(View.VISIBLE);
             holder.tvNick.setVisibility(View.VISIBLE);
             holder.message.setTextColor(ContextCompat.getColor(MyApplication.mcontext, R.color.colorAccent));
-            UserInfoBean.DataBean bean = new Gson().fromJson(textMessage.getExtra(), UserInfoBean.DataBean.class);
-            holder.tvNick.setText(bean.getNickname());
-            holder.tvZuan.setText("0");
-            holder.tvMeili.setText("0");
         }
-
 
         final AutoLinkTextView textView = holder.message;
-        if (textMessage.getContent() != null) {
-            SpannableStringBuilder spannable = new SpannableStringBuilder(textMessage.getContent());
-            SpannableStringBuilder spannable1 = AndroidEmoji.replaceEmojiWithText(spannable);
-            AndroidEmoji.ensure(spannable1);
-            int len = textMessage.getContent().length();
+        if (data.getTextMessageContent() != null) {
+            int len = data.getTextMessageContent().length();
             if (v.getHandler() != null && len > 500) {
-                v.getHandler().postDelayed(() -> textView.setText(spannable1), 50L);
+                v.getHandler().postDelayed(() -> textView.setText(data.getTextMessageContent()), 50L);
             } else {
-                textView.setText(spannable1);
+                textView.setText(data.getTextMessageContent());
             }
         }
-
         holder.message.setMovementMethod(new LinkTextViewMovementMethod(link -> {
             RongIM.ConversationBehaviorListener listener = RongContext.getInstance().getConversationBehaviorListener();
             RongIM.ConversationClickListener clickListener = RongContext.getInstance().getConversationClickListener();

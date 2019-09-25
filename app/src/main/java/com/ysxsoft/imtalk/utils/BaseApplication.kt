@@ -23,10 +23,7 @@ import com.ysxsoft.imtalk.im.message.LobbyTextMessage
 import com.ysxsoft.imtalk.im.message.PrivateCarMessage
 import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
 import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
-import com.ysxsoft.imtalk.im.provider.LobbyTextMessageProvider
-import com.ysxsoft.imtalk.im.provider.PrivateCarProvider
-import com.ysxsoft.imtalk.im.provider.PrivateGiftProvider
-import com.ysxsoft.imtalk.im.provider.PrivateHeaderProvider
+import com.ysxsoft.imtalk.im.provider.*
 import com.ysxsoft.imtalk.rong.MyExtensionModule
 import com.ysxsoft.imtalk.widget.dialog.OnLineDialog
 import io.rong.imkit.DefaultExtensionModule
@@ -34,6 +31,7 @@ import io.rong.imkit.IExtensionModule
 import io.rong.imkit.RongExtensionManager
 import io.rong.imkit.RongIM
 import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Group
 import io.rong.imlib.model.Message
 import io.rong.imlib.model.UserInfo
 import io.rong.message.ImageMessage
@@ -92,7 +90,7 @@ class BaseApplication : MyApplication() {
         RongIM.getInstance().setSendMessageListener(MySendMessageListener())
         setMyExtensionModule()
 
-        RongIM.setUserInfoProvider({ userId ->
+        RongIM.setUserInfoProvider({ userId ->//个人信息消息提供者
             //   //根据 userId 去你的用户系统里查询对应的用户信息返回给融云 SDK。
             val beans = LitePal.where("uid=?", userId).find<com.ysxsoft.imtalk.bean.UserInfo>()
             if (beans!!.size > 0) {
@@ -102,6 +100,17 @@ class BaseApplication : MyApplication() {
                 UserInfo(userId, "", Uri.parse(""))
             }
         }, true)
+
+        //设置群消息提供者(不缓存)
+        RongIM.setGroupInfoProvider({ s ->
+            val beans = LitePal.where("uid=?", s).find<com.ysxsoft.imtalk.bean.UserInfo>()
+            if (beans.isNotEmpty()) {
+                val bean = beans[0]
+                Group(bean.uid, bean.nikeName, Uri.parse(bean.icon))
+            } else {
+                Group(s, "", Uri.parse(""))
+            }
+        }, false)
 
         initMessageAndTemplate();
     }
@@ -113,8 +122,12 @@ class BaseApplication : MyApplication() {
         RongIM.registerMessageTemplate(PrivateCarProvider())
         RongIM.registerMessageType(PrivateHeaderMessage::class.java)
         RongIM.registerMessageTemplate(PrivateHeaderProvider())
+        //根据PalLobbyFragment注释看需求
         RongIM.registerMessageType(LobbyTextMessage::class.java)
         RongIM.registerMessageTemplate(LobbyTextMessageProvider())
+////        为TextMessage注册自定义模板,根据PalLobbyFragment注释选择需求
+//        RongIM.registerMessageTemplate(LobbyMessageProvider())
+
     }
 
     fun setMyExtensionModule() {
