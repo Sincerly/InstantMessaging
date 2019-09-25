@@ -711,14 +711,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             })
             voiceDialog!!.setSongVoiceListener(object : SongVoiceDialog.SongVoiceListener {
                 override fun StopSong() {
-                    if (playMusicService != null) {
-                        playMusicService!!.pause()
-                    }
                     isStop=!isStop
                     if (isStop){
+                        if (playMusicService != null) {
+                            playMusicService!!.stop()
+                        }
                         img_stop.setImageResource(R.mipmap.img_stop)
                     }else{
-                        img_stop.setImageResource(R.mipmap.img_stop)
+                        img_stop.setImageResource(R.mipmap.img_pause)
+                        if (playMusicService != null) {
+                            playMusicService!!.pause()
+                        }
                     }
                 }
 

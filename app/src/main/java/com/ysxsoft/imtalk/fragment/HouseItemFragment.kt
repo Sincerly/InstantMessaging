@@ -49,6 +49,7 @@ private const val ARG_POSITION = "position"
  */
 class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.OnRefreshListener {
     var customDialog: CustomDialog? = null
+    var loadingDialog: LoadingDialog? = null
     override fun onRefresh() {
         initUi()
     }
@@ -183,6 +184,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<ImageView>(R.id.img_w_lock)!!.visibility = View.GONE
                     }
                     helper.itemView.setOnClickListener {
+                        loadingDialog!!.show()
                         activity!!.sendBroadcast(Intent("WINDOW"))
                         NetWork.getService(ImpService::class.java)
                                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -196,11 +198,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                                         if (t!!.code == 0) {
                                             val data = t.data
                                             if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
-                                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
-                                                    roomLock(item.room_id.toString())
-                                                } else {
+//                                                if (TextUtils.equals(mydatabean!!.data.now_roomId, item.room_id.toString())) {
+//                                                    roomLock(item.room_id.toString())
+//                                                } else {
                                                     quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId,item.room_id.toString())
-                                                }
+//                                                }
                                             } else {
                                                 roomLock(item.room_id.toString())
                                             }
@@ -236,6 +238,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                     }
                     helper.itemView.setOnClickListener {
+                        loadingDialog!!.show()
                         activity!!.sendBroadcast(Intent("WINDOW"))
                         NetWork.getService(ImpService::class.java)
                                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -249,11 +252,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                                         if (t!!.code == 0) {
                                             val data = t.data
                                             if (!TextUtils.isEmpty(data.now_roomId)) {
-                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
-                                                    roomLock(item.room_id.toString())
-                                                } else {
+//                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+//                                                    roomLock(item.room_id.toString())
+//                                                } else {
                                                     quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId,item.room_id.toString())
-                                                }
+//                                                }
                                             } else {
                                                 roomLock(item.room_id.toString())
                                             }
@@ -286,6 +289,8 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     }
 
                     helper.itemView.setOnClickListener {
+                        loadingDialog!!.show()
+                        activity!!.sendBroadcast(Intent("WINDOW"))
                         NetWork.getService(ImpService::class.java)
                                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
                                 .subscribeOn(Schedulers.io())
@@ -298,11 +303,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                                         if (t!!.code == 0) {
                                             val data = t.data
                                             if (!TextUtils.isEmpty(data.now_roomId)) {
-                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
-                                                    roomLock(item.room_id.toString())
-                                                } else {
+//                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+//                                                    roomLock(item.room_id.toString())
+//                                                } else {
                                                     quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId,item.room_id.toString())
-                                                }
+//                                                }
                                             } else {
                                                 roomLock(item.room_id.toString())
                                             }
@@ -364,6 +369,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
 
     override fun initUi() {
         customDialog = CustomDialog(mContext, "正在加载....")
+        loadingDialog = LoadingDialog(mContext, "Loading....")
         customDialog!!.show()
         requestMyData()
         banner.visibility = if (0 == position) View.VISIBLE else View.GONE
@@ -396,6 +402,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                 }
 
                 helper.itemView.setOnClickListener {
+                    loadingDialog!!.show()
                     activity!!.sendBroadcast(Intent("WINDOW"))
                     NetWork.getService(ImpService::class.java)
                             .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -409,11 +416,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                                     if (t!!.code == 0) {
                                         val data = t.data
                                         if (!TextUtils.isEmpty(data.now_roomId)) {
-                                            if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
-                                                roomLock(item.room_id.toString())
-                                            } else {
+//                                            if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+//                                                roomLock(item.room_id.toString())
+//                                            } else {
                                                 quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId,item.room_id.toString())
-                                            }
+//                                            }
                                         } else {
                                             roomLock(item.room_id.toString())
                                         }
@@ -452,6 +459,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                     helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                 }
                 helper.itemView.setOnClickListener {
+                    loadingDialog!!.show()
                     activity!!.sendBroadcast(Intent("WINDOW"))
                     NetWork.getService(ImpService::class.java)
                             .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -465,11 +473,11 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                                     if (t!!.code == 0) {
                                         val data = t.data
                                         if (!TextUtils.isEmpty(data.now_roomId)) {
-                                            if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
-                                                roomLock(item.room_id.toString())
-                                            } else {
+//                                            if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+//                                                roomLock(item.room_id.toString())
+//                                            } else {
                                                 quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId,item.room_id.toString())
-                                            }
+//                                            }
                                         } else {
                                             roomLock(item.room_id.toString())
                                         }
@@ -523,6 +531,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         } else {
                             ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon, "")
                         }
+                        loadingDialog!!.dismiss()
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
@@ -611,8 +620,8 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                             }
 
                             override fun onNext(t: CommonBean?) {
-                                showToastMessage(t!!.msg)
-                                if (t.code == 0) {
+//                                showToastMessage(t!!.msg)
+                                if (t!!.code == 0) {
                                     IMClient.getInstance().quitChatRoom(preRoomId, null)
                                     RtcClient.getInstance().quitRtcRoom(preRoomId, null)
                                     removeUser(preRoomId, uid, newRoomId)

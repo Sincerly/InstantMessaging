@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.fragment
 
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.utils.BaseFragment
@@ -56,6 +57,7 @@ class HouseFragment : BaseFragment() {
             topView.layoutParams = params
         }
         img_right.setOnClickListener {
+            activity!!.sendBroadcast(Intent("WINDOW"))
             getRealName()
         }
         requestTable()

@@ -24,6 +24,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.youth.banner.listener.OnBannerListener
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.id.tvtitle
 import com.ysxsoft.imtalk.adapter.BannerAdapter
 import com.ysxsoft.imtalk.appservice.FloatingDisplayService
 import com.ysxsoft.imtalk.bean.*
@@ -71,13 +72,14 @@ class HomeFragment : BaseFragment(), OnBannerListener {
     lateinit var adapter1: BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>
     lateinit var adapter2: BaseQuickAdapter<HomeRoomListBean.DataBean.RoomListBean, BaseViewHolder>
     var mydatabean: UserInfoBean? = null
-
+    var loadingDialog: LoadingDialog? = null
     override fun getLayoutResId(): Int {
         return R.layout.fm_home
     }
 
 
     override fun initUi() {
+        loadingDialog = LoadingDialog(mContext, "Loading....")
         relTitle.post {
             val params = relTitle.layoutParams as RelativeLayout.LayoutParams
             params.setMargins(0, getStateBar(), 0, 0)
@@ -152,12 +154,12 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                         if (t!!.code == 0) {
                             tv1.setText(t.data.get(0).cname)
                             tv2.setText(t.data.get(1).cname)
-                            if (t.data.size>0){
-                                when(t.data.size){
-                                    1->{
+                            if (t.data.size > 0) {
+                                when (t.data.size) {
+                                    1 -> {
                                         roomLists0 = t.data.get(0).roomList
                                     }
-                                    2->{
+                                    2 -> {
                                         roomLists0 = t.data.get(0).roomList
                                         roomLists1 = t.data.get(1).roomList
                                     }
@@ -177,13 +179,13 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                     } else {
                                         helper.getView<TextView>(R.id.tvContent).setText(item.label_name + "  " + item.room_name)
                                     }
-                                    if (!"0".equals(item.is_lock)){
-                                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.VISIBLE
-                                    }else{
-                                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility=View.GONE
+                                    if (!"0".equals(item.is_lock)) {
+                                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility = View.VISIBLE
+                                    } else {
+                                        helper.getView<ImageView>(R.id.img_w_lock)!!.visibility = View.GONE
                                     }
                                     helper.itemView.setOnClickListener {
-//                                        roomLock(item.room_id.toString())
+                                        loadingDialog!!.show()
                                         activity!!.sendBroadcast(Intent("WINDOW"))
                                         NetWork.getService(ImpService::class.java)
                                                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -197,11 +199,11 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                                         if (t!!.code == 0) {
                                                             val data = t.data
                                                             if (!TextUtils.isEmpty(data.now_roomId)) {
-                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
-                                                                    roomLock(item.room_id.toString())
-                                                                } else {
-                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1",  data.now_roomId,item.room_id.toString())
-                                                                }
+//                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+//                                                                    roomLock(item.room_id.toString())
+//                                                                } else {
+                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId, item.room_id.toString())
+//                                                                }
                                                             } else {
                                                                 roomLock(item.room_id.toString())
                                                             }
@@ -237,7 +239,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                     if (TextUtils.isEmpty(item.label_name)) {
                                         helper.getView<TextView>(R.id.tv_Tag).text = "暂无"
                                     } else {
-                                        helper.getView<TextView>(R.id.tv_Tag).text =  item.label_name
+                                        helper.getView<TextView>(R.id.tv_Tag).text = item.label_name
                                     }
                                     if (TextUtils.isEmpty(item.memCount)) {
                                         helper.getView<TextView>(R.id.tv_Online).text = "0" + "人在线"
@@ -245,7 +247,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                         helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                                     }
                                     helper.itemView.setOnClickListener {
-//                                        roomLock(item.room_id.toString())
+                                        loadingDialog!!.show()
                                         activity!!.sendBroadcast(Intent("WINDOW"))
                                         NetWork.getService(ImpService::class.java)
                                                 .GetUserInfo(SpUtils.getSp(mContext, "uid"))
@@ -259,11 +261,11 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                                         if (t!!.code == 0) {
                                                             val data = t.data
                                                             if (!TextUtils.isEmpty(data.now_roomId)) {
-                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
-                                                                    roomLock(item.room_id.toString())
-                                                                } else {
-                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1",  data.now_roomId,item.room_id.toString())
-                                                                }
+//                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
+//                                                                    roomLock(item.room_id.toString())
+//                                                                } else {
+                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId, item.room_id.toString())
+//                                                                }
                                                             } else {
                                                                 roomLock(item.room_id.toString())
                                                             }
@@ -287,10 +289,11 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                 })
 
     }
+
     /**
      * 退出房间
      */
-    private fun quiteRoom(uid: String, kick: String, preRoomId: String,newRoomId:String) {
+    private fun quiteRoom(uid: String, kick: String, preRoomId: String, newRoomId: String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = uid
@@ -318,7 +321,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                                 if (t!!.code == 0) {
                                     IMClient.getInstance().quitChatRoom(preRoomId, null)
                                     RtcClient.getInstance().quitRtcRoom(preRoomId, null)
-                                    removeUser(preRoomId, uid,newRoomId)
+                                    removeUser(preRoomId, uid, newRoomId)
                                 }
                             }
 
@@ -452,6 +455,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
             startActivity(QDActivity::class.java)
         }    //新建房间
         ivRoom.setOnClickListener {
+            activity!!.sendBroadcast(Intent("WINDOW"))
             getRealName()
         }
         //搜索
@@ -460,7 +464,6 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         }
         //嗨爆聊天
         cardView.setOnClickListener {
-
             joinChatRoom(room_id!!, "")
         }
     }
@@ -514,7 +517,8 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         showToastMessage(R.string.toast_joining_room)
         RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"")
+                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon, "")
+                loadingDialog!!.dismiss()
             }
 
             override fun onFail(errorCode: Int) {

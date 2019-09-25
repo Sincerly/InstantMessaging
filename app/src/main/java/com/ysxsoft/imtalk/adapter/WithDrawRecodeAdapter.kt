@@ -10,6 +10,7 @@ import com.ysxsoft.imtalk.R.id.tv_type
 import com.ysxsoft.imtalk.bean.RefundListBean
 import com.ysxsoft.imtalk.com.ListBaseAdapter
 import com.ysxsoft.imtalk.com.SuperViewHolder
+import com.ysxsoft.imtalk.widget.dialog.WithDrawDescDialog
 
 /**
  *Create By 胡
@@ -24,6 +25,13 @@ class WithDrawRecodeAdapter(mContext: Context) : ListBaseAdapter<RefundListBean.
         val bean = mDataList.get(position)
         holder.getView<TextView>(R.id.tv_time)!!.setText(bean.add_time)
         when (bean.tx_status) {//状态：0 申请中；1 提现成功（通过）；2 提现失败（驳回）
+            0 -> {
+                holder.getView<TextView>(R.id.tv_sucess)!!.setText("审核中")
+                holder.getView<TextView>(R.id.tv_sucess)!!.setTextColor(R.color.btn_color)
+                holder.getView<TextView>(R.id.tv_money)!!.setTextColor(R.color.btn_color)
+                holder.getView<TextView>(R.id.tv_money)!!.setText("-"+bean.money)
+                holder.getView<ImageView>(R.id.img_bh)!!.visibility=View.GONE
+            }
             1 -> {
                 holder.getView<TextView>(R.id.tv_sucess)!!.setText("提现成功")
                 holder.getView<TextView>(R.id.tv_sucess)!!.setTextColor(R.color.btn_color)
@@ -46,7 +54,9 @@ class WithDrawRecodeAdapter(mContext: Context) : ListBaseAdapter<RefundListBean.
             2 -> {
                 holder.getView<TextView>(R.id.tv_type)!!.setText("银行卡提现")
             }
-
+        }
+        holder.getView<ImageView>(R.id.img_bh)!!.setOnClickListener {
+            WithDrawDescDialog(mContext,bean.desc).show()
         }
     }
 }
