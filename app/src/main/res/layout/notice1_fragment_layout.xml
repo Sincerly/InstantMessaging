@@ -11,13 +11,13 @@
         android:orientation="vertical"
         android:layout_margin="15dp">
 
-        <TextView
-            android:id="@+id/tv_look"
-            style="@style/text_2_next"
-            android:layout_height="40dp"
-            android:text="交友大厅"/>
+        <!--<TextView-->
+            <!--android:id="@+id/tv_look"-->
+            <!--style="@style/text_2_next"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:text="交友大厅"/>-->
 
-        <View style="@style/gray_line_style"/>
+        <!--<View style="@style/gray_line_style"/>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 聊天列表 -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:scrollbarThumbVertical="@android:color/transparent"
+        tools:listitem="@layout/item_palmessage"
+        />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="49dp">
+        <EditText
+            android:id="@+id/editContent"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/ivXiaolian"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/shape_stroke_colorcc_oval"
+            android:textSize="14sp"
+            />
+
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="70dp"
+            android:layout_height="34dp"
+            android:background="@drawable/shape_gradient_oval"
+            android:textColor="@color/white"
+            android:text="发送"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp"
+            />
+        <ImageView
+            android:id="@+id/ivAita"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnSend"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:src="@mipmap/icon_aita"
+            android:background="?attr/actionBarItemBackground"
+            />
+        <ImageView
+            android:id="@+id/ivXiaolian"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/ivAita"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:src="@mipmap/icon_xiaolian"
+            android:background="?attr/actionBarItemBackground"
+            />
+
+
+    </android.support.constraint.ConstraintLayout>
+    
+</LinearLayout>
