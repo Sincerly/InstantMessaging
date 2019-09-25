@@ -98,87 +98,103 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     override fun setManager(uid: String?, cmd: String?) {
         Log.d("》》》》", "设置管理员成功=====" + uid)
-        AdminData()
-        updateRoomInfo()
+        if (!supportFragmentManager.isDestroyed) {
+            AdminData()
+            updateRoomInfo()
+        }
     }
 
     override fun onGoldMessage(nickname: String?, giftName: String?, goldNum: String?) {
-        if (giftEggManager!! != null) {
-            val d = NotifyManager.Data()
-            d.nickName = nickname;
-            d.giftName = giftName;
-            d.goldNum = goldNum;
-            giftEggManager!!.addData(d)
-            giftEggManager!!.start()
+
+        if (!supportFragmentManager.isDestroyed) {
+            if (giftEggManager!! != null) {
+                val d = NotifyManager.Data()
+                d.nickName = nickname;
+                d.giftName = giftName;
+                d.goldNum = goldNum;
+                giftEggManager!!.addData(d)
+                giftEggManager!!.start()
+            }
         }
     }
 
     override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
         //送礼物超过一定公屏消息
-        if (giftNotifyManager!! != null) {
-            giftNotifyManager!!.addData(roomPublicGiftMessageBean)
-            giftNotifyManager!!.start()
+        if (!supportFragmentManager.isDestroyed) {
+            if (giftNotifyManager!! != null) {
+                giftNotifyManager!!.addData(roomPublicGiftMessageBean)
+                giftNotifyManager!!.start()
+            }
+            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                override fun onSuccess(result: DetailRoomInfo?) {
+                    if (result != null) {
+                        if ("0".equals(result.roomInfo.room_gift_tx)) {
+                            UpdataTips(result.micPositions!!, false)
+                        } else {
+                            tv_room_manager.setText(result.roomInfo.gifts)
+                            UpdataTips(result.micPositions!!, true)
+                        }
+                    }
+                }
+
+                override fun onFail(errorCode: Int) {
+
+                }
+            })
         }
-        roomManager!!.getRoomDetailInfo1(room_id,object :ResultCallback<DetailRoomInfo>{
-            override fun onSuccess(result: DetailRoomInfo?) {
-               if (result!=null){
-                   if ("0".equals(result.roomInfo.room_gift_tx)){
-                       UpdataTips(result.micPositions!!, false)
-                   }else{
-                       tv_room_manager.setText(result.roomInfo.gifts)
-                       UpdataTips(result.micPositions!!, true)
-                   }
-               }
-            }
-
-            override fun onFail(errorCode: Int) {
-
-            }
-        })
-
     }
 
     override fun onIsLock(isLock: String?, isFair: String?, isPure: String?) {
         fair = isFair
         //房间是否加锁  是否纯净模式  是否开启公屏
-        isLockFair(isLock, isFair, isPure)
+        if (!supportFragmentManager.isDestroyed)
+            isLockFair(isLock, isFair, isPure)
     }
 
     override fun onGiftValue(cmd: Int, micPositionInfoList: MutableList<MicPositionsBean>?, houseOwnerValue: String?) {
-        //礼物值
-        if (cmd == 0) {//关闭
-            tv_room_manager.visibility = View.GONE
-            UpdataTips(micPositionInfoList!!, false)
-        } else {
-            tv_room_manager.visibility = View.VISIBLE
-            tv_room_manager.setText(houseOwnerValue)
-            UpdataTips(micPositionInfoList!!, true)
+        if (!supportFragmentManager.isDestroyed) {
+            //礼物值
+            if (cmd == 0) {//关闭
+                tv_room_manager.visibility = View.GONE
+                UpdataTips(micPositionInfoList!!, false)
+            } else {
+                tv_room_manager.visibility = View.VISIBLE
+                tv_room_manager.setText(houseOwnerValue)
+                UpdataTips(micPositionInfoList!!, true)
+            }
         }
     }
 
     override fun onRoomName(room_name: String?) {
         //房间名称
-        updataTitle(room_name)
+        if (!supportFragmentManager.isDestroyed)
+            updataTitle(room_name)
     }
 
     override fun onRoomLable(room_lable: String?) {
         // 房间标签
-        updatRoomLable(room_lable)
+        if (!supportFragmentManager.isDestroyed)
+            updatRoomLable(room_lable)
     }
 
     override fun onRoomNotice(room_desc: String?) {
         //房间通知的title
-        updataRoomTalk(room_desc)
+        if (!supportFragmentManager.isDestroyed)
+            updataRoomTalk(room_desc)
     }
 
     override fun onRoomEmj(p: Int, url: String) {
-        //房间表情
-        showPositionEmj(p, url)
+        //房间表情 使用try catch也可以避免
+        if (!supportFragmentManager.isDestroyed) {
+            showPositionEmj(p, url)
+        }
     }
 
     override fun onRoomGift(p: Int, toP: List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
-        showPositionGift(p, toP, giftUrl, staticUrl)
+        if (!supportFragmentManager.isDestroyed) {
+            showPositionGift(p, toP, giftUrl, staticUrl)
+        }
     }
 
     /**
@@ -662,13 +678,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                 override fun NextSong() {
                     if (playMusicService != null) {
-                       var position = musicbean!!.position
+                        var position = musicbean!!.position
                         playMusicService!!.next()
                         position++
-                        if (position>musicbean!!.list.size){
-                            position==0
+                        if (position > musicbean!!.list.size) {
+                            position == 0
                             tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
-                        }else{
+                        } else {
                             tv_song_name1.setText(musicbean!!.list.get(position).music_name)
                         }
                     }
@@ -1043,7 +1059,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","启用房间声音失败==" + errorCode)
+                    Log.d("tag", "启用房间声音失败==" + errorCode)
                 }
             })
         } else {
@@ -1054,7 +1070,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","关闭房间声音失败==" + errorCode)
+                    Log.d("tag", "关闭房间声音失败==" + errorCode)
                 }
             })
         }
@@ -1191,7 +1207,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveZb() {
-                        DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid,"",detailRoomInfo!!.roomInfo.nickname)
+                        DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid, "", detailRoomInfo!!.roomInfo.nickname)
                     }
 
                     override fun clickFoucsOn() {
@@ -1332,7 +1348,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickGiveZb() {
-                    DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid,"",micNickname!!)
+                    DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid, "", micNickname!!)
                 }
 
                 override fun clickFoucsOn() {
@@ -1409,11 +1425,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private fun enableRoomChatVoice(enable: Boolean) {
         roomManager!!.enableRoomChatVoice(enable, object : ResultCallback<Boolean> {
             override fun onSuccess(aBoolean: Boolean?) {
-                Log.d("tag","设置启动房间聊天声音成功")
+                Log.d("tag", "设置启动房间聊天声音成功")
             }
 
             override fun onFail(errorCode: Int) {
-                Log.d("tag","设置启动房间聊天声音失败" + errorCode)
+                Log.d("tag", "设置启动房间聊天声音失败" + errorCode)
             }
         })
     }
@@ -1431,7 +1447,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","设置是否开启失败" + errorCode)
+                    Log.d("tag", "设置是否开启失败" + errorCode)
                 }
             })
         } else {
@@ -1441,7 +1457,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun onFail(errorCode: Int) {
-                    Log.d("tag","设置是否关闭失败" + errorCode)
+                    Log.d("tag", "设置是否关闭失败" + errorCode)
                 }
             })
         }
@@ -1722,7 +1738,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     }
 
                     override fun clickGiveZb() {
-                        DressMallActivity.startDressMallActivity(mContext, userId,"",nikeName!!)
+                        DressMallActivity.startDressMallActivity(mContext, userId, "", nikeName!!)
                     }
 
                     override fun clickFoucsOn() {
@@ -1817,7 +1833,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         }
 
                         override fun clickGiveZb() {
-                            DressMallActivity.startDressMallActivity(mContext, userId,"",micNickname!!)
+                            DressMallActivity.startDressMallActivity(mContext, userId, "", micNickname!!)
                         }
 
                         override fun clickFoucsOn() {

@@ -10,10 +10,7 @@ import com.ysxsoft.imtalk.bean.SignRuleBean
 import com.ysxsoft.imtalk.bean.SupperStarBean
 import com.ysxsoft.imtalk.bean.TyrantListBean
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.BaseActivity
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.displayResCyclo
-import com.ysxsoft.imtalk.utils.displayUrlCyclo
+import com.ysxsoft.imtalk.utils.*
 import kotlinx.android.synthetic.main.activity_supper_star.recyclerView
 import kotlinx.android.synthetic.main.activity_supper_star.tabLayout
 import kotlinx.android.synthetic.main.activity_supper_star.viewTop
@@ -37,6 +34,7 @@ class SupperStarActivity : BaseActivity() {
 
 
     private lateinit var mAdapter: SupperStarAdapter
+    private lateinit var customDialog: CustomDialog
 
     override fun getLayout(): Int {
         return R.layout.activity_supper_star
@@ -49,6 +47,7 @@ class SupperStarActivity : BaseActivity() {
         tvTitle.text = "巨星榜"
         setSupportActionBar(toolBar)
         toolBar.setNavigationOnClickListener { finish() }
+        customDialog = CustomDialog(mContext, "正在加载....")
 
         initTabLayout()
         initAdapter()
@@ -90,6 +89,7 @@ class SupperStarActivity : BaseActivity() {
      * 获取数据
      */
     private fun postData(type: Int) {
+        customDialog.show()
         NetWork.getService(ImpService::class.java)
                 .supperStarList(type)
                 .subscribeOn(Schedulers.io())
@@ -102,6 +102,7 @@ class SupperStarActivity : BaseActivity() {
                         setTopThree(ArrayList())
                         mAdapter.clear()
                     }
+                    customDialog.dismiss()
                 }
     }
 
@@ -144,6 +145,8 @@ class SupperStarActivity : BaseActivity() {
                         tvNo1Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvNo1ID.text = ttid
+                        tvNo1Zuan.visibility = View.VISIBLE
+                        tvNo1Content.visibility = View.VISIBLE
                         tvNo1Zuan.text = data[i].now_level.toString()
                     }
                 1 ->
@@ -152,6 +155,8 @@ class SupperStarActivity : BaseActivity() {
                         tvNo2Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvNo2ID.text = ttid
+                        tvNo2Zuan.visibility = View.VISIBLE
+                        tvNo2Content.visibility = View.VISIBLE
                         tvNo2Zuan.text = data[i].now_level.toString()
                         tvNo2Content.text = "距前一名"+ data[i].next_user
                     }
@@ -161,10 +166,18 @@ class SupperStarActivity : BaseActivity() {
                         tvNo3Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvNo3ID.text = ttid
+                        tvNo3Zuan.visibility = View.VISIBLE
+                        tvNo3Content.visibility = View.VISIBLE
                         tvNo3Zuan.text = data[i].now_level.toString()
                         tvNo3Content.text = "距前一名"+ data[i].next_user
                     }
             }
         }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        customDialog.dismiss()
     }
 }
