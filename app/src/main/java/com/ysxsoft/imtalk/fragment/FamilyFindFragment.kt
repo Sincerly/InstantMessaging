@@ -22,6 +22,9 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseApplication
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.NetWork
+import com.ysxsoft.imtalk.utils.PalLobbyGrade
+import com.ysxsoft.imtalk.utils.PalLobbyGrade.groupId
+import com.ysxsoft.imtalk.utils.pallobby.PalLobbyGradeListener
 import com.ysxsoft.imtalk.view.*
 import io.rong.imkit.RongIM
 import kotlinx.android.synthetic.main.fm_family_find.*
@@ -51,8 +54,6 @@ class FamilyFindFragment : BaseFragment() {
     var list = ArrayList<String>()
 
     private lateinit var msgAdapter: PalMessageAdapter
-    private var groupId = ""
-    private var palMessages = ArrayList<Message>()
 
     /**
      * 收到新消息
@@ -80,39 +81,11 @@ class FamilyFindFragment : BaseFragment() {
         msgAdapter = PalMessageAdapter(mContext)
         group_recyclerview.layoutManager = LinearLayoutManager(mContext)
         group_recyclerview.adapter = msgAdapter
-        requestGroupData()
     }
     override fun onResume() {
         super.onResume()
         initView()
         requestData()
-    }
-
-    /**
-     * 获取群id
-     */
-    private fun requestGroupData() {
-        val map = HashMap<String, String>()
-        map["uid"] = AuthManager.getInstance().currentUserId
-        val body = RetrofitUtil.createJsonRequest(map)
-        NetWork.getService(ImpService::class.java)
-                .groupId(body)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<GroupIdBean> {
-                    override fun onError(e: Throwable?) {
-                        Log.e("onError", "onError")
-                    }
-
-                    override fun onNext(t: GroupIdBean?) {
-                        if (t!!.code == 0) {
-                            groupId = t.data
-                        }
-                    }
-
-                    override fun onCompleted() {
-                    }
-                })
     }
 
     private fun requestData() {
@@ -182,13 +155,11 @@ class FamilyFindFragment : BaseFragment() {
      * 进入交友大厅
      */
     private fun intoPalLobby(){
-        if (groupId.isNotEmpty()){
-            PalLobbyActivity.intentPalLobbyActivity(groupId)
-        }else{
-            Handler().postDelayed({
-                intoPalLobby()
-            }, 1000)
-        }
+        PalLobbyGrade.getGroupId(object : PalLobbyGradeListener{
+            override fun getGroupId(groupId: String) {
+                PalLobbyActivity.intentPalLobbyActivity(PalLobbyGrade.groupId)
+            }
+        })
     }
 
     override fun onDestroy() {

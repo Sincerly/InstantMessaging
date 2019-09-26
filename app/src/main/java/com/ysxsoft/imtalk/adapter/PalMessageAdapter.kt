@@ -44,16 +44,12 @@ class PalMessageAdapter(mContext: Context) : ListBaseAdapter<Message>(mContext){
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         val item = mDataList[position]
         val tvContent = holder.getView<AutoLinkTextView>(R.id.tvContent)
-//        val layoutSticker = holder.getView<FrameLayout>(R.id.layoutSticker)
-
         val tvMeili = holder.getView<TextView>(R.id.tvMeili)
         val tvZuan = holder.getView<TextView>(R.id.tvZuan)
         val tvNick = holder.getView<TextView>(R.id.tvNick)
 
-
         if (item.content is LobbyTextMessage){
             tvContent?.visibility = View.VISIBLE
-//            layoutSticker?.visibility = View.GONE
             val msg = item.content as LobbyTextMessage
             val extra = Gson().fromJson(msg.extra, UserInfoBean.DataBean::class.java)
             val ivAvatar = holder.getView<ImageView>(R.id.ivAvatar)
@@ -67,13 +63,11 @@ class PalMessageAdapter(mContext: Context) : ListBaseAdapter<Message>(mContext){
             AndroidEmoji.ensure(spannable1)
             tvContent?.text = spannable1
             val array = GradeIconUtils.charmIcon(extra.charm_level)
-//            tvMeili?.setCompoundDrawables(ContextCompat.getDrawable(mContext, array[0]), null, null, null)
             tvMeili?.setCompoundDrawablesRelativeWithIntrinsicBounds( array[0], 0, 0, 0)
             tvMeili?.setTextColor(ContextCompat.getColor(mContext, array[1]))
             tvMeili?.text = extra.charm_level.toString()
 
             val grade = GradeIconUtils.gradeIcon(extra.user_level)
-//            tvZuan?.setCompoundDrawables(ContextCompat.getDrawable(mContext, grade[0]), null, null, null)
             tvZuan?.setCompoundDrawablesRelativeWithIntrinsicBounds( grade[0], 0, 0, 0)
             tvZuan?.setTextColor(ContextCompat.getColor(mContext, grade[1]))
             tvZuan?.text = extra.user_level.toString()

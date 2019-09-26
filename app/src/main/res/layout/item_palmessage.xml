@@ -13,7 +13,7 @@
         android:layout_marginStart="8dp"
         >
         <TextView
-            android:id="@+id/tvMeili"
+            android:id="@+id/tvZuan"
             android:layout_width="wrap_content"
             android:layout_height="16dp"
             android:background="@drawable/shape_solid_colorff_oval"
@@ -26,7 +26,7 @@
             android:gravity="center_vertical"
             />
         <TextView
-            android:id="@+id/tvZuan"
+            android:id="@+id/tvMeili"
             android:layout_width="wrap_content"
             android:layout_height="16dp"
             android:layout_marginStart="5dp"
