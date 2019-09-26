@@ -25,6 +25,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import cn.rongcloud.rtc.stream.local.RongRTCAVOutputStream
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -420,7 +421,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         initAudioOutputMode()
         bgChangBroadCast = BgChangBroadCast()
         val intentFilter = IntentFilter("BGCHANG")
-        val intentFilter1 = IntentFilter("RECEIVEMESSAGE")
+        val intentFilter1 = IntentFilter("TEXTMESSAGE")
         registerReceiver(bgChangBroadCast, intentFilter)
         if (myBroadcast == null) {
             myBroadcast = MyBroadcast()
@@ -714,7 +715,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     isStop=!isStop
                     if (isStop){
                         if (playMusicService != null) {
-                            playMusicService!!.stop()
+                            playMusicService!!.start()
                         }
                         img_stop.setImageResource(R.mipmap.img_stop)
                     }else{
@@ -3745,6 +3746,5 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             playMusicService!!.setData(musicbean!!.list, musicbean!!.position)
         }
     }
-
 
 }

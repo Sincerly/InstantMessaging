@@ -168,7 +168,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="11dp"
                             android:layout_marginStart="11dp"
-                            android:text="聊天嗨爆"
+                            tools:text="聊天嗨爆"
                             android:textColor="@color/textColor28"
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"

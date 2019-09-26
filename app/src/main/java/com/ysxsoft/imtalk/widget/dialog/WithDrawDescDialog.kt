@@ -9,9 +9,8 @@ import kotlinx.android.synthetic.main.with_draw_dialog.*
  *Create By 胡
  *on 2019/9/25 0025
  */
-class WithDrawDescDialog(mContext: Context,var desc:String):ABSDialog(mContext){
+class WithDrawDescDialog(mContext: Context):ABSDialog(mContext){
     override fun initView() {
-        tv_desc.setText(desc)
         tv_ok.setOnClickListener {
             dismiss()
         }

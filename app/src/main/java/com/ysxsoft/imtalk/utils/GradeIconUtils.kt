@@ -9,7 +9,7 @@ class GradeIconUtils {
         fun charmIcon( grade : Int) : IntArray{
             val array = intArrayOf(0,0)
             when(grade){
-                in 1..9 ->{
+                in 0..9 ->{
                     array[0] = R.mipmap.icon_m_1_9
                     array[1] = R.color.colorM_1_9
                 }
@@ -55,7 +55,7 @@ class GradeIconUtils {
         fun gradeIcon(grade : Int) : IntArray{
             val array = intArrayOf(0,0)
             when(grade){
-                in 1..9 ->{
+                in 0..9 ->{
                     array[0] = R.mipmap.icon_1_9
                     array[1] = R.color.color_1_9
                 }

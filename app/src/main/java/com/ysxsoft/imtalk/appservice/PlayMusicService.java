@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -16,6 +17,7 @@ import android.util.Log;
 import com.ysxsoft.imtalk.R;
 import com.ysxsoft.imtalk.bean.RoomMusicListBean;
 import com.ysxsoft.imtalk.music.DBUtils;
+import com.ysxsoft.imtalk.utils.AppUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
@@ -41,7 +43,7 @@ public class PlayMusicService extends Service {
         return new MyBind();
     }
 
-    public class MyBind extends Binder{
+    public class MyBind extends Binder {
         public PlayMusicService getService() {
             return PlayMusicService.this;
         }
@@ -52,7 +54,7 @@ public class PlayMusicService extends Service {
         super.onCreate();
     }
 
-    public void musicPlay(String url) {
+    public void musicPlay(int position,String url) {
         isRunning = true;
         try {
             if (mediaPlayer != null) {
@@ -105,7 +107,7 @@ public class PlayMusicService extends Service {
         musics.clear();
         musics.addAll(m);
         if (musics != null && musics.size() > 0) {
-            musicPlay(musics.get(position).getMusic_url());
+            musicPlay(position,musics.get(position).getMusic_url());
         }
 
     }
@@ -114,10 +116,10 @@ public class PlayMusicService extends Service {
         isRunning = true;
         position++;
         if (musics.size() > position) {
-            musicPlay(musics.get(position).getMusic_url());
+            musicPlay(position,musics.get(position).getMusic_url());
         } else {
             position = 0;
-            musicPlay(musics.get(position).getMusic_url());
+            musicPlay(position,musics.get(position).getMusic_url());
         }
 
     }
@@ -141,6 +143,7 @@ public class PlayMusicService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -149,60 +152,48 @@ public class PlayMusicService extends Service {
             stop();
         }
     }
-    public interface OnMusicPosition{
+
+    public interface OnMusicPosition {
         void postion(int position);
     }
 
     public OnMusicPosition onMusicPosition;
-    public void setOnMusicPosition(OnMusicPosition onMusicPosition){
+
+    public void setOnMusicPosition(OnMusicPosition onMusicPosition) {
         this.onMusicPosition = onMusicPosition;
     }
 
-//    ///////////////////////////////////////////////////////////////////////////
-//    // 下载音乐
-//    ///////////////////////////////////////////////////////////////////////////
-//    private void downloadMusic(int i,String url,String mid){
-//        String webPath=url;
-//        int index=webPath.lastIndexOf("/");
-//        String destFileName=webPath.substring(index,webPath.length());
-//
-//        OkHttpUtils.get()
-//                .url(url)
-//                .build()
-//                .execute(new FileCallBack(AppConfig.BASE_PATH, destFileName) {
-//                    @Override
-//                    public void onError(Call call, Exception e, int id) {
-//
-//                    }
-//
-//                    @Override
-//                    public void inProgress(float progress, long total, int id) {
-//                    }
-//
-//                    @Override
-//                    public void onResponse(File file, int id) {
-//                        Log.e("tag",""+i);
-//                        //缓存完毕
-////                        MusicCache cache=new MusicCache();
-////                        cache.mid=mid;
-////                        cache.webPath=webPath;
-////                        cache.uid=DBUtils.getUid();
-////                        cache.nativePath=file.getAbsolutePath();
-////                        cache.save();
-//
-//                        DBUtils.updateMusicCachePath(mid,file.getAbsolutePath());
-////                        if(musics!=null){
-////                            MusicCache m=musics.get(i);
-////                            m.nativePath=file.getAbsolutePath();//更新url
-////                        }
-////                        if(DemoHelper.getInstance().isVoiceCalling||DemoHelper.getInstance().isVideoCalling){
-////                            //正在语音通话/视频通话
-////                            return;
-////                        }else{
-////                            //播放路径
-////                            musicPlay(i,file.getAbsolutePath());
-////                        }
-//                    }
-//                });
-//    }
+    ///////////////////////////////////////////////////////////////////////////
+    /// // 下载音乐
+    ///////////////////////////////////////////////////////////////////////////
+    private void downloadMusic(int i, String url, String mid) {
+        String SDPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + AppUtil.INSTANCE.getCurrentPageName(this) + "/music/";
+        int index = url.lastIndexOf("/");
+        String destFileName = url.substring(index, url.length());
+//        File downloadFile = new File(SDPATH + destFileName);
+//        if (!downloadFile.exists()) {
+//            downloadFile.mkdirs();
+//        }
+        OkHttpUtils.get()
+                .url(url)
+                .build()
+                .execute(new FileCallBack(SDPATH, destFileName) {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+
+                    }
+
+                    @Override
+                    public void inProgress(float progress, long total, int id) {
+                    }
+
+                    @Override
+                    public void onResponse(File file, int id) {
+                        Log.e("tag", "" + i);
+                        //播放路径
+                        musicPlay(i, file.getAbsolutePath());
+
+                    }
+                });
+    }
 }

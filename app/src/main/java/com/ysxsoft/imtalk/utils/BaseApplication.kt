@@ -178,6 +178,8 @@ class BaseApplication : MyApplication() {
         var userInfo: JSONObject? = null
         val messageContent = message!!.getContent()
         if (messageContent is TextMessage) {//文本消息
+            val intent = Intent("TEXTMESSAGE")
+            sendBroadcast(intent)
             val textMessage = messageContent as TextMessage
             userInfo = JSONObject(textMessage!!.extra)
         } else if (messageContent is ImageMessage) {//图片消息

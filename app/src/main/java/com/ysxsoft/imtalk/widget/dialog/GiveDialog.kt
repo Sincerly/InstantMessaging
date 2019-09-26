@@ -7,6 +7,7 @@ import com.ysxsoft.imtalk.bean.RoomMwUserBean
 import com.ysxsoft.imtalk.bean.UserInfo
 import com.ysxsoft.imtalk.chatroom.task.RoomManager
 import com.ysxsoft.imtalk.impservice.ImpService
+import com.ysxsoft.imtalk.utils.GradeIconUtils
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.view.MyDataActivity
@@ -45,9 +46,15 @@ class GiveDialog : ABSDialog {
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID：" + t.data.tt_id)
                             tv_familly.setText("所在家族：" + t.data.fmy_name)
-                            tv_tuhao.setText("豪 " + t.data.user_level)
-                            tv_mei.setText("魅 " + t.data.ml_level)
+//                            tv_tuhao.setText("豪 " + t.data.user_level)
+                            val charmIcon = GradeIconUtils.charmIcon(t.data.ml_level.toInt())
+                            img_mei.setImageResource(charmIcon[0])
+                            tv_mei.setText(t.data.ml_level)
+                            tv_mei.setTextColor(charmIcon[1])
+                            val ints = GradeIconUtils.gradeIcon(t.data.user_level.toInt())
                             tv_zs.setText(t.data.user_level)
+                            tv_zs.setTextColor(ints[1])
+                            img_zs.setImageResource(ints[0])
                             when (t.data.sex) {
                                 "1" -> {
                                     img_sex.setImageResource(R.mipmap.img_boy)

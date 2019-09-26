@@ -56,7 +56,10 @@ class WithDrawRecodeAdapter(mContext: Context) : ListBaseAdapter<RefundListBean.
             }
         }
         holder.getView<ImageView>(R.id.img_bh)!!.setOnClickListener {
-            WithDrawDescDialog(mContext,bean.desc).show()
+            val withDrawDescDialog = WithDrawDescDialog(mContext)
+            val tv_desc = withDrawDescDialog.findViewById<TextView>(R.id.tv_desc)
+            tv_desc.setText(bean.desc)
+            withDrawDescDialog .show()
         }
     }
 }

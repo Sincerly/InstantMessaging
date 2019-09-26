@@ -16,6 +16,8 @@ import com.ysxsoft.imtalk.chatroom.im.message.GiftChatMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage;
 import com.ysxsoft.imtalk.chatroom.utils.ResourceUtils;
+import com.ysxsoft.imtalk.utils.GradeIconUtils;
+import com.ysxsoft.imtalk.utils.ImageLoadUtil;
 import com.ysxsoft.imtalk.widget.CircleImageView;
 
 import java.util.List;
@@ -78,6 +80,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.nickNameTv = contentView.findViewById(R.id.chatroom_item_chatlist_tv_nickname);
             viewHolder.messageTv = contentView.findViewById(R.id.chatroom_item_chatlit_tv_message);
             viewHolder.zsvalue = contentView.findViewById(R.id.tv_zs_num);
+            viewHolder.img_zs = contentView.findViewById(R.id.img_zs);
             contentView.setTag(viewHolder);
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             LayoutInflater inflater = LayoutInflater.from(context);
@@ -121,6 +124,9 @@ public class RoomChatListAdapter extends BaseAdapter {
             }
             viewHolder.messageTv.setText(textMessage.getContent());
             viewHolder.zsvalue.setText(textMessage.getExtra());
+            int[] ints = GradeIconUtils.Companion.gradeIcon(Integer.valueOf(textMessage.getExtra()));
+            viewHolder.img_zs.setImageResource(ints[0]);
+            viewHolder.zsvalue.setTextColor(ints[1]);
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
@@ -190,6 +196,7 @@ public class RoomChatListAdapter extends BaseAdapter {
         TextView nickNameTv;
         TextView messageTv;
         TextView zsvalue;
+        ImageView img_zs;
         //礼物start
         TextView giftFromName;
         TextView giftToName;

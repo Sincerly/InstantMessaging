@@ -47,6 +47,7 @@
                 style="@style/text_my"
                 android:drawableLeft="@mipmap/my_jz"
                 android:drawableRight="@mipmap/right_gray"
+                android:visibility="gone"
                 android:text="我的家族" />
 
             <TextView

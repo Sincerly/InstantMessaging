@@ -120,16 +120,16 @@ class HouseFragment : BaseFragment() {
             }
 
             override fun onFail(errorCode: Int) {
-
+                Log.d("tag=errorCode=>>", errorCode.toString())
             }
         })
     }
 
     private fun joinChatRoom(roomId: String, isCreate: String) {
         showToastMessage(R.string.toast_joining_room)
-        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate,object : ResultCallback<DetailRoomInfo> {
+        RoomManager.getInstance().joinRoom(SpUtils.getSp(mContext, "uid"), roomId, isCreate, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(result: DetailRoomInfo?) {
-                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon,"")
+                ChatRoomActivity.starChatRoomActivity(mContext, roomId, mydatabean!!.data.nickname, mydatabean!!.data.icon, "")
             }
 
             override fun onFail(errorCode: Int) {
@@ -143,9 +143,9 @@ class HouseFragment : BaseFragment() {
                 .homeTable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<HomeTableBean>{
+                .subscribe(object : Observer<HomeTableBean> {
                     override fun onError(e: Throwable?) {
-                        Log.d("HouseFragment",e!!.message.toString())
+                        Log.d("HouseFragment", e!!.message.toString())
                     }
 
                     override fun onNext(t: HomeTableBean?) {
@@ -165,13 +165,14 @@ class HouseFragment : BaseFragment() {
         val informfragments = ArrayList<FgTableBean<HouseItemFragment>>()
         for (i in 0 until titles!!.size) {
             tabLayoutHouse.addTab(titles!!.get(i).pname)
-            informfragments.add(FgTableBean(HouseItemFragment.newInstance(i,titles!!.get(i).pids.toString()), titles!!.get(i).pids.toString(), i))
+            informfragments.add(FgTableBean(HouseItemFragment.newInstance(i, titles!!.get(i).pids.toString()), titles!!.get(i).pids.toString(), i))
         }
         val fgVpAdapter = FgVpAdapter(childFragmentManager, informfragments)
         viewPagerHouse.adapter = fgVpAdapter
         viewPagerHouse.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayoutHouse.getTabLayout()))
         tabLayoutHouse.setupWithViewPager(viewPagerHouse)
     }
+
     /**
      * 校验语音聊天的权限
      */

@@ -3,6 +3,7 @@
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center"
     android:background="@drawable/w_gk_shape"
     android:orientation="vertical">
@@ -70,41 +71,76 @@
             android:background="@drawable/cccccc_shape"
             android:gravity="center"
             android:text="豪 12"
+            android:visibility="gone"
             android:textColor="@color/white"
             android:textSize="10sp"
             app:layout_constraintLeft_toRightOf="@id/img_head"
             app:layout_constraintTop_toBottomOf="@id/tv_familly" />
 
-        <TextView
-            android:id="@+id/tv_mei"
-            android:layout_width="40dp"
-            android:layout_height="16dp"
-            android:layout_marginLeft="10dp"
+        <LinearLayout
+            android:id="@+id/ll_mei"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/cccccc_shape"
             android:gravity="center"
-            android:text="魅 12"
-            android:textColor="@color/white"
-            android:textSize="10sp"
+            android:orientation="horizontal"
             app:layout_constraintLeft_toRightOf="@id/tv_tuhao"
-            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+            app:layout_constraintTop_toBottomOf="@id/tv_familly">
 
+            <ImageView
+                android:id="@+id/img_mei"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:src="@mipmap/img_w_masonry" />
 
-        <TextView
-            android:id="@+id/tv_zs"
-            android:layout_width="40dp"
-            android:layout_height="16dp"
+            <TextView
+                android:id="@+id/tv_mei"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                tools:text="12" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_zs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/cccccc_shape"
-            android:drawableLeft="@mipmap/img_w_masonry"
             android:gravity="center"
-            android:paddingLeft="5dp"
-            android:text="12"
-            android:textColor="@color/white"
-            android:textSize="10sp"
-            app:layout_constraintLeft_toRightOf="@id/tv_mei"
-            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toRightOf="@id/ll_mei"
+            app:layout_constraintTop_toBottomOf="@id/tv_familly">
+
+            <ImageView
+                android:id="@+id/img_zs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:src="@mipmap/img_w_masonry" />
+
+            <TextView
+                android:id="@+id/tv_zs"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                tools:text="12" />
+
+        </LinearLayout>
 
 
         <ImageView

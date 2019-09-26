@@ -388,7 +388,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<HomeHLBean> {
                     override fun onError(e: Throwable?) {
-                        showToastMessage("嗨聊==" + e!!.message.toString())
+//                        showToastMessage("嗨聊==" + e!!.message.toString())
                     }
 
                     override fun onNext(t: HomeHLBean?) {

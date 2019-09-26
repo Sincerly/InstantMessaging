@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center"
     android:background="@drawable/w_gk_shape"
     android:orientation="vertical">
@@ -25,9 +25,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            tools:text="额头上"
             android:textColor="@color/white"
-            app:layout_constraintLeft_toRightOf="@id/img_head" />
+            app:layout_constraintLeft_toRightOf="@id/img_head"
+            tools:text="额头上" />
 
         <ImageView
             android:id="@+id/img_sex"
@@ -43,11 +43,11 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
-            tools:text="ID:1324654654"
             android:textColor="@color/white"
             android:textSize="12sp"
             app:layout_constraintLeft_toRightOf="@id/img_head"
-            app:layout_constraintTop_toBottomOf="@id/tv_nikeName" />
+            app:layout_constraintTop_toBottomOf="@id/tv_nikeName"
+            tools:text="ID:1324654654" />
 
         <TextView
             android:id="@+id/tv_familly"
@@ -55,12 +55,12 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
-            tools:text="所在家族：顶级娱乐"
-            android:visibility="gone"
             android:textColor="@color/white"
             android:textSize="12sp"
+            android:visibility="gone"
             app:layout_constraintLeft_toRightOf="@id/img_head"
-            app:layout_constraintTop_toBottomOf="@id/tv_id" />
+            app:layout_constraintTop_toBottomOf="@id/tv_id"
+            tools:text="所在家族：顶级娱乐" />
 
 
         <TextView
@@ -70,43 +70,77 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/cccccc_shape"
             android:gravity="center"
-            tools:text="豪 12"
             android:textColor="@color/white"
             android:textSize="10sp"
+            android:visibility="gone"
             app:layout_constraintLeft_toRightOf="@id/img_head"
-            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+            app:layout_constraintTop_toBottomOf="@id/tv_familly"
+            tools:text="豪 12" />
 
-        <TextView
-            android:id="@+id/tv_mei"
-            android:layout_width="40dp"
-            android:layout_height="16dp"
-            android:layout_marginLeft="10dp"
+        <LinearLayout
+            android:id="@+id/ll_mei"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/cccccc_shape"
             android:gravity="center"
-            tools:text="魅 12"
-            android:textColor="@color/white"
-            android:textSize="10sp"
+            android:orientation="horizontal"
             app:layout_constraintLeft_toRightOf="@id/tv_tuhao"
-            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+            app:layout_constraintTop_toBottomOf="@id/tv_familly">
 
+            <ImageView
+                android:id="@+id/img_mei"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:src="@mipmap/img_w_masonry" />
 
-        <TextView
-            android:id="@+id/tv_zs"
-            android:layout_width="40dp"
-            android:layout_height="16dp"
+            <TextView
+                android:id="@+id/tv_mei"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                tools:text="12" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_zs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/cccccc_shape"
-            android:drawableLeft="@mipmap/img_w_masonry"
             android:gravity="center"
-            android:paddingLeft="5dp"
-            tools:text="12"
-            android:textColor="@color/white"
-            android:textSize="10sp"
-            app:layout_constraintLeft_toRightOf="@id/tv_mei"
-            app:layout_constraintTop_toBottomOf="@id/tv_familly" />
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toRightOf="@id/ll_mei"
+            app:layout_constraintTop_toBottomOf="@id/tv_familly">
 
+            <ImageView
+                android:id="@+id/img_zs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:src="@mipmap/img_w_masonry" />
+
+            <TextView
+                android:id="@+id/tv_zs"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:paddingLeft="5dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                tools:text="12" />
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/img_cancle"
@@ -225,6 +259,7 @@
             android:gravity="center"
             android:textSize="11sp"
             android:visibility="gone" />
+
         <TextView
             android:id="@+id/zw1"
             android:layout_width="0dp"

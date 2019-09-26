@@ -103,7 +103,7 @@ public class MicSeatView extends FrameLayout {
         if ((TextUtils.equals("0", micUserId)) && (!"0".equals(state)) && "0".equals(micInfo.getIs_wheat())) {
             setMicSeatEmpty();
             // 麦位是否被锁定
-        } else if ("0".equals(state)) {
+        } else if ("0".equals(state)&&"0".equals(micUserId)) {
             lockMicSeat();
             // 麦位有用户
         } else if (!TextUtils.isEmpty(micUserId) && !TextUtils.equals("0", micUserId)) {
