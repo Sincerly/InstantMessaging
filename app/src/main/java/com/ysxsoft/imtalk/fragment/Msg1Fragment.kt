@@ -13,10 +13,7 @@ import com.ysxsoft.imtalk.adapter.MsgChatListAdapter
 import com.ysxsoft.imtalk.bean.SysMessageBean
 import com.ysxsoft.imtalk.bean.UserInfo
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.BaseFragment
-import com.ysxsoft.imtalk.utils.ImageLoadUtil
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.SysCustomerBanner
 import io.rong.imkit.RongIM
 import io.rong.imlib.RongIMClient
@@ -36,6 +33,7 @@ import rx.schedulers.Schedulers
  */
 @ConversationProviderTag
 class Msg1Fragment : BaseFragment() {
+
     override fun getLayoutResId(): Int {
         return R.layout.fm_msg1
     }
@@ -76,6 +74,13 @@ class Msg1Fragment : BaseFragment() {
             override fun onSuccess(datas: MutableList<Conversation>?) {
                 Log.e("---->", "" + datas?.size)
                 if (datas != null) {
+                    for (i in datas.indices){
+                        when(datas[i].targetId){
+                            PalLobbyGrade.groupId->{
+                                datas.removeAt(i)
+                            }
+                        }
+                    }
                     mAdapter!!.setDataList(datas)
                     mAdapter!!.notifyDataSetChanged()
                 }

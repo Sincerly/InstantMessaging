@@ -40,19 +40,8 @@
         tools:replace="android:appComponentFactory">
         <activity
             android:name=".view.PalLobbyActivity"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data
-                    android:host="com.ysxsoft.imtalk"
-                    android:pathPrefix="/conversation/group"
-                    android:scheme="rong" />
-            </intent-filter>
         </activity>
         <activity android:name=".view.WeekStarActivity" />
         <activity android:name=".view.SupperStarActivity" />

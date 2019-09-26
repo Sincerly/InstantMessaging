@@ -91,28 +91,18 @@ class BaseApplication : MyApplication() {
         setMyExtensionModule()
 
         RongIM.setUserInfoProvider({ userId ->//个人信息消息提供者
+            Log.e("provider", "chat")
             //   //根据 userId 去你的用户系统里查询对应的用户信息返回给融云 SDK。
             val beans = LitePal.where("uid=?", userId).find<com.ysxsoft.imtalk.bean.UserInfo>()
-            if (beans!!.size > 0) {
-                val bean = beans.get(0)
-                UserInfo(bean!!.uid, bean.nikeName, Uri.parse(bean.icon))
+            if (beans.isNotEmpty()) {
+                val bean = beans[0]
+                UserInfo(bean.uid, bean.nikeName, Uri.parse(bean.icon))
             } else {
                 UserInfo(userId, "", Uri.parse(""))
             }
         }, true)
 
-        //设置群消息提供者(不缓存)
-        RongIM.setGroupInfoProvider({ s ->
-            val beans = LitePal.where("uid=?", s).find<com.ysxsoft.imtalk.bean.UserInfo>()
-            if (beans.isNotEmpty()) {
-                val bean = beans[0]
-                Group(bean.uid, bean.nikeName, Uri.parse(bean.icon))
-            } else {
-                Group(s, "", Uri.parse(""))
-            }
-        }, false)
-
-        initMessageAndTemplate();
+        initMessageAndTemplate()
     }
 
     fun initMessageAndTemplate() {
@@ -189,18 +179,23 @@ class BaseApplication : MyApplication() {
         } else if (messageContent is RichContentMessage) {//图文消息
             val richMessage = messageContent as RichContentMessage
             userInfo = JSONObject(richMessage!!.extra)
-        } else {
+        } else if (messageContent is LobbyTextMessage){//交友大厅消息
+            val richMessage = messageContent as LobbyTextMessage
+            userInfo = JSONObject(richMessage.extra)
+        }else{
             Log.d("tag", "onSent-其他消息，自己来判断处理")
         }
         //从扩展字段获取用户信息
         if (userInfo != null) {
             var tempUser = com.ysxsoft.imtalk.bean.UserInfo()
-            tempUser.uid = userInfo.getString("uid")              //UID
-            tempUser.nikeName = userInfo.getString("nikeName")   //昵称
-            tempUser.icon = userInfo.getString("icon")          //头像
-            tempUser.sex = userInfo.getString("sex")            //性别
-            tempUser.zsl = userInfo.getString("zsl")            //钻数量
+            tempUser.uid = userInfo.optString("uid")              //UID
+            tempUser.nikeName = userInfo.optString("nikeName")   //昵称
+            tempUser.icon = userInfo.optString("icon")          //头像
+            tempUser.sex = userInfo.optString("sex")            //性别
+            tempUser.zsl = userInfo.optString("zsl")            //钻数量
             tempUser.save()
+            //刷新用户缓存数据(否则聊天内部头像不更新)
+            RongIM.getInstance().refreshUserInfoCache(UserInfo(tempUser.uid, tempUser.nikeName, Uri.parse(tempUser.icon)))
         }
     }
 
