@@ -226,7 +226,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 //砸蛋100次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     //跳转到列表
-                                    WiningRecordDialog(mContext).show()
+//                                    WiningRecordDialog(mContext).show()
+                                    for (bean in showPics) {
+                                        showAnim(bean!!.sg_pic)
+                                    }
                                 }, 3000)
                             }
                         }
