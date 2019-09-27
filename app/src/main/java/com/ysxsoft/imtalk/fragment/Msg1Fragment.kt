@@ -69,18 +69,18 @@ class Msg1Fragment : BaseFragment() {
     }
 
     var userInfo: UserInfo? = null
+    var posittion: Conversation ?= null
     private fun conversionList() {
         RongIMClient.getInstance().getConversationList(object : RongIMClient.ResultCallback<MutableList<Conversation>>() {
             override fun onSuccess(datas: MutableList<Conversation>?) {
                 Log.e("---->", "" + datas?.size)
                 if (datas != null) {
-                    for (i in datas.indices){
-                        when(datas[i].targetId){
-                            PalLobbyGrade.groupId->{
-                                datas.removeAt(i)
-                            }
+                    for (bean in datas){
+                        if (bean.targetId.equals(PalLobbyGrade.groupId)){
+                            posittion=bean
                         }
                     }
+                    datas.remove(posittion)
                     mAdapter!!.setDataList(datas)
                     mAdapter!!.notifyDataSetChanged()
                 }

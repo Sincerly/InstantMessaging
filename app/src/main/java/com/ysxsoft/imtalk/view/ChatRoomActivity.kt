@@ -20,12 +20,10 @@ import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import cn.rongcloud.rtc.stream.local.RongRTCAVOutputStream
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -64,12 +62,10 @@ import com.ysxsoft.imtalk.chatroom.utils.DisplayUtils
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetPlugReceiver
 import com.ysxsoft.imtalk.chatroom.utils.HeadsetUtils
 import com.ysxsoft.imtalk.chatroom.widget.MicSeatView
-import com.ysxsoft.imtalk.fragment.Msg1Fragment
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.music.AudioUtils
 import com.ysxsoft.imtalk.music.CustomeWindow
 import com.ysxsoft.imtalk.utils.*
-import com.ysxsoft.imtalk.widget.CircleImageView
 import com.ysxsoft.imtalk.widget.dialog.*
 import com.zhy.http.okhttp.OkHttpUtils
 import com.zhy.http.okhttp.callback.FileCallBack
@@ -79,12 +75,10 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_chatroom.*
-import kotlinx.android.synthetic.main.view_input_num.*
 import okhttp3.Call
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.w3c.dom.Text
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -93,7 +87,6 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.lang.reflect.InvocationTargetException
 import kotlin.collections.HashMap
-import java.net.URL
 import java.util.ArrayList
 
 /**
@@ -214,6 +207,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             RtcClient.getInstance().quitRtcRoom(room_id, null)
             sendBroadcast(Intent("WINDOW"))
             showToastMessage("你已被踢出房间")
+            if (playMusicService != null) {
+                playMusicService!!.stop()
+                unbindService(connection)
+            }
 //            finish()
             removeUser(room_id!!, uid)
         }
@@ -360,7 +357,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var giftNotifyManager: GiftNotifyManager? = null
     var myBroadcast: MyBroadcast? = null
     var amdinType: Int? = -1
-    var isStop:Boolean=false
+    var isStop: Boolean = false
+
     /**
      * 监听来电状态进行房间的静音和禁麦操作
      */
@@ -434,7 +432,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     inner class MyBroadcast : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if ("RECEIVEMESSAGE".equals(intent!!.action)) {
+            if ("TEXTMESSAGE".equals(intent!!.action)) {
                 tv_point.visibility = View.VISIBLE
             }
         }
@@ -486,7 +484,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     override fun onNext(t: IsAdminBean?) {
                         if (t!!.code == 0) {
-                            amdinType = t.data
+                            amdinType = t.data.is_admin.toInt()
                             initRoom(room_id!!)
                         }
                     }
@@ -591,6 +589,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickExit() {
+                    if (playMusicService != null) {
+//                        playMusicService!!.stop()
+                        unbindService(connection)
+                    }
                     quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
                 }
 
@@ -655,12 +657,16 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 }
 
                 override fun clickExit() {
+                    if (playMusicService != null) {
+//                        playMusicService!!.stop()
+                        unbindService(connection)
+                    }
                     quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
                 }
 
                 override fun clickSmall() {
                     if (playMusicService != null) {
-                        playMusicService!!.stop()
+//                        playMusicService!!.stop()
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (!Settings.canDrawOverlays(mContext)) {
@@ -697,6 +703,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             if (musicbean != null) {
                 tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
             }
+            if (playMusicService != null) {
+                if (playMusicService!!.isRunning){
+                    img_stop.setImageResource(R.mipmap.img_stop)
+                }
+            }
             val seekBar = voiceDialog!!.findViewById<AppCompatSeekBar>(R.id.seekBar)
             seekBar.progress = AudioUtils.getCurrentAudioVolume(mContext)
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -712,13 +723,13 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             })
             voiceDialog!!.setSongVoiceListener(object : SongVoiceDialog.SongVoiceListener {
                 override fun StopSong() {
-                    isStop=!isStop
-                    if (isStop){
+                    isStop = !isStop
+                    if (isStop) {
                         if (playMusicService != null) {
                             playMusicService!!.start()
                         }
                         img_stop.setImageResource(R.mipmap.img_stop)
-                    }else{
+                    } else {
                         img_stop.setImageResource(R.mipmap.img_pause)
                         if (playMusicService != null) {
                             playMusicService!!.pause()
@@ -899,8 +910,30 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         chatroom_list_chat.setAdapter(chatListAdapter)
         chatListAdapter!!.setOnGiftEggItemClickListener(object : RoomChatListAdapter.OnGiftEggItemClickListener {
             override fun onClickUser(userId: String?) {
-                showMessageUserInfoDialog(userId.toString(), room_id!!)
+                if (userId.equals(AuthManager.getInstance().currentUserId)) {
+                    return
+                }
+                val map = HashMap<String, String>()
+                map.put("room_id", room_id!!)
+                map.put("uid", userId.toString())
+                val body = RetrofitUtil.createJsonRequest(map)
+                NetWork.getService(ImpService::class.java)
+                        .isAdmin(body)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<IsAdminBean> {
+                            override fun onError(e: Throwable?) {
+                            }
 
+                            override fun onNext(t: IsAdminBean?) {
+                                if (t!!.code == 0) {
+                                    showMessageUserInfoDialog(userId.toString(), room_id!!, t.data)
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
             }
         })
         //麦位
@@ -1090,7 +1123,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onNext(t: HomeHLBean?) {
                         if (t!!.code == 0) {
                             if (playMusicService != null) {
-                                playMusicService!!.stop()
+//                                playMusicService!!.stop()
+                                unbindService(connection)
                             }
                             RandomQuiteRoom(SpUtils.getSp(mContext, "uid"), "1", t.data.room_id.toString())
                         }
@@ -1226,7 +1260,29 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     if (TextUtils.isEmpty(userid)) {
                         return
                     }
-                    showMessageUserInfoDialog(userid, room_id)
+
+                    val map = HashMap<String, String>()
+                    map.put("room_id", room_id)
+                    map.put("uid", userid)
+                    val body = RetrofitUtil.createJsonRequest(map)
+                    NetWork.getService(ImpService::class.java)
+                            .isAdmin(body)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(object : Observer<IsAdminBean> {
+                                override fun onError(e: Throwable?) {
+                                    Log.d("", e!!.message.toString())
+                                }
+
+                                override fun onNext(t: IsAdminBean?) {
+                                    if (t!!.code == 0) {
+                                        showMessageUserInfoDialog(userid, room_id, t.data)
+                                    }
+                                }
+
+                                override fun onCompleted() {
+                                }
+                            })
                 }
             }
         })
@@ -1347,92 +1403,390 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
 
             override fun onFail(errorCode: Int) {
-                Log.d("tag","初始化语音失败" + errorCode)
+                Log.d("tag", "初始化语音失败" + errorCode)
             }
         })
     }
 
-    private fun showMessageUserInfoDialog(userid: String, room_id: String) {
-        val msgListDialog = MsgListDialog(mContext, userid, room_id)
-        msgListDialog.setOnMsgListDialog(object : MsgListDialog.OnMsgListDialogListener {
-            override fun bMClick() {//闭麦
+    private fun showMessageUserInfoDialog(userid: String, room_id: String, data: IsAdminBean.DataBean) {
+        if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid)) {//自己是房主
+            val giveDialog = GiveDialog(mContext, userid, room_id!!)
+            val tv_setting_manager = giveDialog.findViewById<TextView>(R.id.tv_setting_manager)
+            val tv_move_manager = giveDialog.findViewById<TextView>(R.id.tv_move_manager)
+            val zw = giveDialog.findViewById<TextView>(R.id.zw)
+            val tv_btxm = giveDialog.findViewById<TextView>(R.id.tv_btxm)
+            val tv_bm = giveDialog.findViewById<TextView>(R.id.tv_bm)
+            val tv_scm = giveDialog.findViewById<TextView>(R.id.tv_scm)
 
+            if (TextUtils.isEmpty(data.is_lock_wheat)) {
+                giveDialog.findViewById<TextView>(R.id.tv_scm).setText("解麦")
+            } else {
+                giveDialog.findViewById<TextView>(R.id.tv_scm).setText("锁麦")
             }
-
-            override fun xMClick() {//下麦旁听
-
+            if (TextUtils.isEmpty(data.is_oc_wheat) || "0".equals(data.is_oc_wheat)) {
+                giveDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+            } else {
+                giveDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
             }
-
-            override fun jMClick() {//解锁
-
+            if (data.is_admin == 1) {
+                tv_setting_manager.visibility = View.GONE
+                tv_move_manager.visibility = View.VISIBLE
+                zw.visibility = View.INVISIBLE
+            } else {
+                tv_setting_manager.visibility = View.VISIBLE
+                tv_move_manager.visibility = View.GONE
+                zw.visibility = View.INVISIBLE
             }
-
-            override fun bTMClick() {//报Ta上麦
-                val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
-                upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
-                    override fun onClickWheat(position: Int) {
-                        JoinMic(userid, position)
-                    }
-                })
-                upperWheatDialog.show()
+            if (TextUtils.isEmpty(data.is_wheat)) {
+                tv_btxm.setText("抱TA上麦")
+                tv_bm.visibility = View.INVISIBLE
+                tv_scm.visibility = View.INVISIBLE
+            } else {
+                tv_btxm.setText("抱TA下麦")
             }
-        })
-
-        if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid) || amdinType == 1) {
-            msgListDialog.show()
-        } else {
-            val giveDialog = GiveDialog(mContext, userid, room_id)
-            val tv_nikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
-            giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
-            giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
             giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
-                override fun BmClick() {
-
+                override fun BmClick() {//闭麦
+                    if ("0".equals(data.is_oc_wheat)) {
+                        OcWheat(room_id, data.sort_id.toInt(), "2", userid)
+                    } else {
+                        OcWheat(room_id, data.sort_id.toInt(), "1", userid)
+                    }
                 }
 
-                override fun BtxmClick() {
-
+                override fun BtxmClick() {//抱TA下麦
+                    if (TextUtils.isEmpty(data.is_wheat)) {
+                        val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
+                        upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
+                            override fun onClickWheat(position: Int) {
+                                JoinMic(userid, position)
+                            }
+                        })
+                        upperWheatDialog.show()
+                    } else {
+                        ExitMic(userid, data.sort_id.toInt())
+                    }
                 }
 
-                override fun ScmClick() {
+                override fun ScmClick() {//锁麦
+                    if (!TextUtils.equals("0", userid)) {
+                        showToastMessage("麦位有人")
+                        return
+                    }
 
-                }
-
-                override fun clickGiveGift(uid: String, nickname: String) {
-                    showGiftBagDialog(uid, nickname)
-                    //GiftBagDialog(mContext, room_id).show()
-                }
-
-                override fun clickPrivateChat() {
-                    RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, tv_nikeName.text.toString());
-                }
-
-                override fun clickGiveZb() {
-                    DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid, "", micNickname!!)
-                }
-
-                override fun clickFoucsOn() {
-                    FocusOnData(SpUtils.getSp(mContext, "uid"), detailRoomInfo!!.roomInfo.uid, "1")
-                }
-
-                override fun setManager() {
-
+                    if (TextUtils.isEmpty(data.is_lock_wheat)) {
+                        LockWheat(room_id, data.sort_id.toInt(), "2", userid)//	是否锁麦：1 锁麦； 2 已解麦
+                    } else {
+                        LockWheat(room_id, data.sort_id.toInt(), "1", userid)//	是否锁麦：1 锁麦； 2 已解麦
+                    }
                 }
 
                 override fun removeManager() {
+                    RemoveManager(userid, room_id!!, "2")
+                }
 
+                override fun setManager() {
+                    BlackManager(userid, room_id!!, "2", "", "")
                 }
 
                 override fun setExit() {
-
+                    ExitCurrentRoom(userid, "2", room_id, data.nickname, data.icon)
                 }
 
                 override fun blackList() {
+                    BlackManager(userid, room_id!!, "1", data.nickname, data.icon)
+                    ExitCurrentRoom(userid, "2", room_id!!, data.nickname, data.icon)
+                }
 
+                override fun clickGiveGift(uid: String, nikeName: String) {
+                    showGiftBagDialog(uid, nikeName)
+                }
+
+                override fun clickPrivateChat() {
+                    RongIM.getInstance().startPrivateChat(mContext, userid, data.nickname);
+                }
+
+                override fun clickGiveZb() {
+                    DressMallActivity.startDressMallActivity(mContext, userid, "", data.nickname)
+                }
+
+                override fun clickFoucsOn() {
+                    FocusOnData(SpUtils.getSp(mContext, "uid"), userid, "1")
                 }
             })
             giveDialog.show()
+        } else if (amdinType == 1) {//自己是管理员
+            val giveDialog = GiveDialog(mContext, userid, room_id!!)
+            val tv_setting_manager = giveDialog.findViewById<TextView>(R.id.tv_setting_manager)
+            val tv_move_manager = giveDialog.findViewById<TextView>(R.id.tv_move_manager)
+            val tv_black_list = giveDialog.findViewById<TextView>(R.id.tv_black_list)
+            val zw = giveDialog.findViewById<TextView>(R.id.zw)
+            val tv_btxm = giveDialog.findViewById<TextView>(R.id.tv_btxm)
+            val tv_bm = giveDialog.findViewById<TextView>(R.id.tv_bm)
+            val tv_scm = giveDialog.findViewById<TextView>(R.id.tv_scm)
+            if (TextUtils.isEmpty(data.is_lock_wheat)) {
+                giveDialog.findViewById<TextView>(R.id.tv_scm).setText("解麦")
+            } else {
+                giveDialog.findViewById<TextView>(R.id.tv_scm).setText("锁麦")
+            }
+            if (TextUtils.isEmpty(data.is_oc_wheat) || "0".equals(data.is_oc_wheat)) {
+                giveDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+            } else {
+                giveDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+            }
+            if (data.is_admin == 1 || data.is_admin == 3) {
+                tv_setting_manager.visibility = View.GONE
+                tv_move_manager.visibility = View.GONE
+                tv_black_list.visibility = View.GONE
+                zw.visibility = View.INVISIBLE
+            }
+            if (TextUtils.isEmpty(data.is_wheat)) {
+                tv_btxm.setText("抱TA上麦")
+                tv_bm.visibility = View.INVISIBLE
+                tv_scm.visibility = View.INVISIBLE
+            } else {
+                tv_btxm.setText("抱TA下麦")
+            }
+            giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                override fun BmClick() {//闭麦
+                    if (TextUtils.isEmpty(data.is_oc_wheat)) {
+                        OcWheat(room_id, data.sort_id.toInt().toInt(), "2", userid)
+                    } else {
+                        OcWheat(room_id, data.sort_id.toInt(), "1", userid)
+                    }
+                }
+
+                override fun BtxmClick() {//抱TA下麦
+                    if (TextUtils.isEmpty(data.is_wheat)) {
+                        val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
+                        upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
+                            override fun onClickWheat(position: Int) {
+                                JoinMic(userid, position)
+                            }
+                        })
+                        upperWheatDialog.show()
+                    } else {
+                        ExitMic(userid, data.sort_id.toInt())
+                    }
+                }
+
+                override fun ScmClick() {//锁麦
+                    if (!TextUtils.equals("0", userid)) {
+                        showToastMessage("麦位有人")
+                        return
+                    }
+                    if (TextUtils.isEmpty(data.is_lock_wheat)) {
+                        LockWheat(room_id, data.sort_id.toInt(), "2", userid)//	是否锁麦：1 锁麦； 2 已解麦
+                    } else {
+                        LockWheat(room_id, data.sort_id.toInt(), "1", userid)//	是否锁麦：1 锁麦； 2 已解麦
+                    }
+                }
+
+                override fun removeManager() {
+                    RemoveManager(userid, room_id, "2")
+                }
+
+                override fun setManager() {
+                    BlackManager(userid, room_id, "2", "", "")
+                }
+
+                override fun setExit() {
+                    ExitCurrentRoom(userid, "2", room_id, data.nickname, data.icon)
+                }
+
+                override fun blackList() {
+                    BlackManager(userid, room_id, "1", data.nickname, data.icon)
+                    ExitCurrentRoom(userid, "2", room_id, data.nickname, data.icon)
+                }
+
+                override fun clickGiveGift(uid: String, nikeName: String) {
+                    showGiftBagDialog(uid, nikeName)
+                }
+
+                override fun clickPrivateChat() {
+                    RongIM.getInstance().startPrivateChat(mContext, userid, data.nickname);
+                }
+
+                override fun clickGiveZb() {
+                    DressMallActivity.startDressMallActivity(mContext, userid, "", data.nickname)
+                }
+
+                override fun clickFoucsOn() {
+                    FocusOnData(SpUtils.getSp(mContext, "uid"), userid, "1")
+                }
+            })
+            giveDialog.show()
+        } else {//其他
+            val giveDialog = GiveDialog(mContext, userid, room_id)
+            val tv_setting_manager = giveDialog.findViewById<TextView>(R.id.tv_setting_manager)
+            val tv_move_manager = giveDialog.findViewById<TextView>(R.id.tv_move_manager)
+            val zw = giveDialog.findViewById<TextView>(R.id.zw)
+            val tv_btxm = giveDialog.findViewById<TextView>(R.id.tv_btxm)
+            val ll_bbs = giveDialog.findViewById<TextView>(R.id.ll_bbs)
+            val ll_isShow = giveDialog.findViewById<TextView>(R.id.ll_isShow)
+            ll_bbs.visibility = View.GONE
+            ll_isShow.visibility = View.GONE
+            if (TextUtils.isEmpty(data.is_lock_wheat)) {
+                giveDialog.findViewById<TextView>(R.id.tv_scm).setText("解麦")
+            } else {
+                giveDialog.findViewById<TextView>(R.id.tv_scm).setText("锁麦")
+            }
+            if (TextUtils.isEmpty(data.is_oc_wheat)) {
+                giveDialog.findViewById<TextView>(R.id.tv_bm).setText("闭麦")
+            } else {
+                giveDialog.findViewById<TextView>(R.id.tv_bm).setText("开麦")
+            }
+            giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                override fun BmClick() {//闭麦
+                    if (TextUtils.isEmpty(data.is_oc_wheat)) {
+                        OcWheat(room_id, data.sort_id.toInt(), "2", userid)
+                    } else {
+                        OcWheat(room_id, data.sort_id.toInt(), "1", userid)
+                    }
+                }
+
+                override fun BtxmClick() {//抱TA下麦
+                    if (TextUtils.isEmpty(data.is_wheat)) {
+                        val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
+                        upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
+                            override fun onClickWheat(position: Int) {
+                                JoinMic(userid, position)
+                            }
+                        })
+                        upperWheatDialog.show()
+                    } else {
+                        ExitMic(userid, data.sort_id.toInt())
+                    }
+                }
+
+                override fun ScmClick() {//锁麦
+                    if (!TextUtils.equals("0", userid)) {
+                        showToastMessage("麦位有人")
+                        return
+                    }
+
+                    if (TextUtils.isEmpty(data.is_lock_wheat)) {
+                        LockWheat(room_id, data.sort_id.toInt(), "2", userid)//	是否锁麦：1 锁麦； 2 已解麦
+                    } else {
+                        LockWheat(room_id, data.sort_id.toInt(), "1", userid)//	是否锁麦：1 锁麦； 2 已解麦
+                    }
+                }
+
+                override fun removeManager() {
+                    RemoveManager(userid, room_id, "2")
+                }
+
+                override fun setManager() {
+                    BlackManager(userid, room_id, "2", "", "")
+                }
+
+                override fun setExit() {
+                    ExitCurrentRoom(userid, "2", room_id, data.nickname, data.icon)
+                }
+
+                override fun blackList() {
+                    BlackManager(userid, room_id, "1", data.nickname, data.icon)
+                    ExitCurrentRoom(userid, "2", room_id, data.nickname, data.icon)
+                }
+
+                override fun clickGiveGift(uid: String, nikeName: String) {
+                    showGiftBagDialog(uid, nikeName)
+                }
+
+                override fun clickPrivateChat() {
+                    RongIM.getInstance().startPrivateChat(mContext, userid, data.nickname);
+                }
+
+                override fun clickGiveZb() {
+                    DressMallActivity.startDressMallActivity(mContext, userid, "", data.nickname)
+                }
+
+                override fun clickFoucsOn() {
+                    FocusOnData(SpUtils.getSp(mContext, "uid"), userid, "1")
+                }
+            })
+            giveDialog.show()
+
         }
+
+        /*    val msgListDialog = MsgListDialog(mContext, userid, room_id)
+            msgListDialog.setOnMsgListDialog(object : MsgListDialog.OnMsgListDialogListener {
+                override fun bMClick() {//闭麦
+
+                }
+
+                override fun xMClick() {//下麦旁听
+
+                }
+
+                override fun jMClick() {//解锁
+
+                }
+
+                override fun bTMClick() {//报Ta上麦
+                    val upperWheatDialog = UpperWheatDialog(mContext, userid, room_id)
+                    upperWheatDialog.setOnWheatClickListener(object : UpperWheatDialog.OnWheatClickListener {
+                        override fun onClickWheat(position: Int) {
+                            JoinMic(userid, position)
+                        }
+                    })
+                    upperWheatDialog.show()
+                }
+            })
+            if (SpUtils.getSp(mContext, "uid").equals(detailRoomInfo!!.roomInfo.uid) || amdinType == 1) {
+                msgListDialog.show()
+            } else {
+                val giveDialog = GiveDialog(mContext, userid, room_id)
+                val tv_nikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
+                giveDialog.findViewById<LinearLayout>(R.id.ll_isShow).visibility = View.GONE
+                giveDialog.findViewById<LinearLayout>(R.id.ll_bbs).visibility = View.GONE
+                giveDialog.setGiveClickListener(object : GiveDialog.GiveClickListener {
+                    override fun BmClick() {
+
+                    }
+
+                    override fun BtxmClick() {
+
+                    }
+
+                    override fun ScmClick() {
+
+                    }
+
+                    override fun clickGiveGift(uid: String, nickname: String) {
+                        showGiftBagDialog(uid, nickname)
+                        //GiftBagDialog(mContext, room_id).show()
+                    }
+
+                    override fun clickPrivateChat() {
+                        RongIM.getInstance().startPrivateChat(mContext, detailRoomInfo!!.roomInfo.uid, tv_nikeName.text.toString());
+                    }
+
+                    override fun clickGiveZb() {
+                        DressMallActivity.startDressMallActivity(mContext, detailRoomInfo!!.roomInfo.uid, "", micNickname!!)
+                    }
+
+                    override fun clickFoucsOn() {
+                        FocusOnData(SpUtils.getSp(mContext, "uid"), detailRoomInfo!!.roomInfo.uid, "1")
+                    }
+
+                    override fun setManager() {
+
+                    }
+
+                    override fun removeManager() {
+
+                    }
+
+                    override fun setExit() {
+
+                    }
+
+                    override fun blackList() {
+
+                    }
+                })
+                giveDialog.show()
+            }*/
     }
 
     private fun UpdateOwner(detailRoomInfo: DetailRoomInfo) {
@@ -1889,11 +2243,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     })
                 }
                 seatMicDialog.show()
-//                if (currentRole is Listener) {
-//                    JoinMic(AuthManager.getInstance().currentUserId, micPosition)
-//                } else if ((currentRole is Linker) && (preMicPosition != -1)) {
-//                    JumpMic(AuthManager.getInstance().currentUserId, preMicPosition, micPosition)
-//                }
             } else {//有人
                 if ("0".equals(is_admin)) {//不是管理员
                     val giveDialog = GiveDialog(mContext, userId, room_id!!)
@@ -2078,6 +2427,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
         } else { //非房主  点击控麦位
             if ("0".equals(userId)) {
+                if ("0".equals(is_lock_wheat)) {
+                    showToastMessage("该麦位已上锁，请选择其他麦位")
+                    return
+                }
                 val currentRole = roomManager!!.currentRole
 
                 if (currentRole is Listener) {
@@ -2148,7 +2501,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
 
                             override fun clickGiveZb() {
-                                showToastMessage("送装扮")
+                                DressMallActivity.startDressMallActivity(mContext, userId, "", micNickname!!)
                             }
 
                             override fun clickFoucsOn() {
@@ -2532,6 +2885,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                                 if (roomDetailInfo != null) {
                                                     updateMicSeatState(roomDetailInfo.micPositions)
                                                     detailRoomInfo = roomDetailInfo
+                                                    if ("1".equals(roomDetailInfo.roomInfo.room_gift_tx)) {
+                                                        tv_room_manager.visibility = View.VISIBLE
+                                                        tv_room_manager.setText(roomDetailInfo.roomInfo.gifts)
+                                                        UpdataTips(roomDetailInfo.getMicPositions(), true)
+                                                    } else {
+                                                        tv_room_manager.visibility = View.GONE
+                                                        UpdataTips(roomDetailInfo.getMicPositions(), false)
+                                                    }
                                                 }
                                             }
 
@@ -2951,6 +3312,10 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
 
             override fun clickExit() {
+                if (playMusicService != null) {
+//                    playMusicService!!.stop()
+                    unbindService(connection)
+                }
                 quiteRoom(SpUtils.getSp(mContext, "uid"), "1")
             }
 
@@ -3044,7 +3409,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             telephonyManager!!.listen(roomPhoneStateListener, TelephonyManager.PHONE_TYPE_NONE)
         }
         if (playMusicService != null) {
-            playMusicService!!.stop()
+//            playMusicService!!.stop()
+            val intent = Intent(mContext, PlayMusicService::class.java)
+            stopService(intent)
         }
     }
 

@@ -42,7 +42,7 @@ object PalLobbyGrade {
 
                     override fun onNext(t: GroupIdBean?) {
                         if (t!!.code == 0) {
-                            groupId = t.data
+                            groupId = t.data.groupId
                             listener?.getGroupId(groupId)
                         }
                     }

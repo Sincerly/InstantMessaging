@@ -19,6 +19,7 @@ import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
+import com.ysxsoft.imtalk.view.MyDressActivity
 import io.rong.imkit.RongIM
 import kotlinx.android.synthetic.main.mydata_car_fragment_layout.*
 import rx.Observer
@@ -166,6 +167,11 @@ class MyDataCarFragment : BaseFragment() {
                                         }
                                         2 -> {
                                             helper.getView<TextView>(R.id.tv_day)!!.setText("已过期")
+                                        }
+                                    }
+                                    if ("myself".equals(myself)) {
+                                        helper.itemView.setOnClickListener {
+                                            startActivity(MyDressActivity::class.java)
                                         }
                                     }
                                 }

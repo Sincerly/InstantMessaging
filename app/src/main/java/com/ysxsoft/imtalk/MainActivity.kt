@@ -59,26 +59,9 @@ class MainActivity : BaseActivity() {
                 Manifest.permission.SYSTEM_ALERT_WINDOW,
                 Manifest.permission.GET_ACCOUNTS,
                 Manifest.permission.WRITE_APN_SETTINGS,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                .subscribe(object : Consumer<Boolean> {
-                    override fun accept(t: Boolean?) {
-                        if (t!!) {
-                            //申请的权限全部允许
-
-                        } else {
-                            //只要有一个权限被拒绝，就会执行
-//                            showToastMessage("未授权权限，部分功能不能使用")
-                        }
-                    }
-                })
-        setLightStatusBar(true)
-        initView()
-        requestData()
-        requestMyData()
-
-        RxPermissions(this).request(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 .subscribe(object : Consumer<Boolean> {
                     override fun accept(t: Boolean?) {
                         if (t!!) {
@@ -90,6 +73,25 @@ class MainActivity : BaseActivity() {
                         }
                     }
                 })
+        setLightStatusBar(true)
+        initView()
+        requestData()
+        requestMyData()
+//
+//        RxPermissions(this).request(
+//                Manifest.permission.READ_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                .subscribe(object : Consumer<Boolean> {
+//                    override fun accept(t: Boolean?) {
+//                        if (t!!) {
+//                            //申请的权限全部允许
+//                            CarUtils.downloadAll(mContext as Activity?)
+//                        } else {
+//                            //只要有一个权限被拒绝，就会执行
+////                            showToastMessage("未授权权限，部分功能不能使用")
+//                        }
+//                    }
+//                })
     }
 
     var dataBean: UserInfoBean.DataBean? = null

@@ -67,11 +67,8 @@ class MoneyJbFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         tv_djb.setOnClickListener {
             tv_djb.isSelected = true
             tv_cz.isSelected = false
-            if (bean==null){
-                showToastMessage("无法兑换")
-                return@setOnClickListener
-            }
-            ExchangeJBActivity.starExchangeJBActivity(mContext,bean!!.data.moneys)
+//            ExchangeJBActivity.starExchangeJBActivity(mContext,bean!!.data.moneys)
+            startActivity(ExchangeJBActivity::class.java)
         }
 
         tv_cz.setOnClickListener {

@@ -9,10 +9,19 @@
 
     <com.ysxsoft.imtalk.view.MyImageView
         android:id="@+id/img_head"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_gravity="center"
         android:layout_marginBottom="2dp"
         android:src="@mipmap/img_normal_head" />
+
+    <ImageView
+        android:id="@+id/img_close"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="7dp"
+        android:layout_marginTop="5dp"
+        android:src="@mipmap/img_close"/>
 
 </FrameLayout>

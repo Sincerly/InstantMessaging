@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -81,6 +82,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             viewHolder.messageTv = contentView.findViewById(R.id.chatroom_item_chatlit_tv_message);
             viewHolder.zsvalue = contentView.findViewById(R.id.tv_zs_num);
             viewHolder.img_zs = contentView.findViewById(R.id.img_zs);
+            viewHolder.fl_zs_num = contentView.findViewById(R.id.fl_zs_num);
             contentView.setTag(viewHolder);
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             LayoutInflater inflater = LayoutInflater.from(context);
@@ -124,9 +126,13 @@ public class RoomChatListAdapter extends BaseAdapter {
             }
             viewHolder.messageTv.setText(textMessage.getContent());
             viewHolder.zsvalue.setText(textMessage.getExtra());
-            int[] ints = GradeIconUtils.Companion.gradeIcon(Integer.valueOf(textMessage.getExtra()));
-            viewHolder.img_zs.setImageResource(ints[0]);
-            viewHolder.zsvalue.setTextColor(ints[1]);
+            if (!TextUtils.isEmpty(textMessage.getExtra())){
+                int[] ints = GradeIconUtils.Companion.gradeIcon(Integer.valueOf(textMessage.getExtra()));
+                viewHolder.img_zs.setImageResource(ints[0]);
+                viewHolder.zsvalue.setTextColor(ints[1]);
+            }else {
+                viewHolder.fl_zs_num.setVisibility(View.GONE);
+            }
             // 房间人员变动消息
         } else if (viewType == VIEW_TYPE_USER_CHANGED_INFO) {
             RoomMemberChangedMessage memberMessage = (RoomMemberChangedMessage) message.getContent();
@@ -197,6 +203,7 @@ public class RoomChatListAdapter extends BaseAdapter {
         TextView messageTv;
         TextView zsvalue;
         ImageView img_zs;
+        LinearLayout fl_zs_num;
         //礼物start
         TextView giftFromName;
         TextView giftToName;

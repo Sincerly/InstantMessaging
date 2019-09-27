@@ -14,6 +14,7 @@ import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.BaseApplication.Companion.mContext
 import com.ysxsoft.imtalk.utils.NetWork
 import kotlinx.android.synthetic.main.community_norms_layout.*
+import org.jsoup.Jsoup
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -60,7 +61,7 @@ class WebHelpActivity : BaseActivity() {
                 .subscribe(object :Action1<CommunityBean>{
                     override fun call(t: CommunityBean?) {
                         if (t!!.code==0) {
-                            web_content.loadDataWithBaseURL(null, t.data, "text/html", "utf-8", null)
+                            web_content.loadDataWithBaseURL(null,getNewContent(t.data), "text/html", "utf-8", null)
                         }
                     }
                 })
@@ -75,4 +76,12 @@ class WebHelpActivity : BaseActivity() {
         }
     }
 
+    fun getNewContent(htmltext: String): String {
+        var doc = Jsoup.parse(htmltext);
+        val elements = doc.getElementsByTag("img");
+        for (element in elements) {
+            element.attr("width", "100%").attr("height", "auto");
+        }
+        return doc.toString();
+    }
 }

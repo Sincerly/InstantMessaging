@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -28,6 +29,7 @@ class DressMallAdapter(mContext: Context) : ListBaseAdapter<DressMallBean.DataBe
         val bean = mDataList.get(position)
         ImageLoadUtil.GlideGoodsImageLoad(mContext, bean.pic, holder.getView<ImageView>(R.id.img_tupian)!!)
         holder.getView<TextView>(R.id.tv_name)!!.setText(bean.name)
+        holder.getView<TextView>(R.id.tv_money)!!.visibility= View.VISIBLE
         holder.getView<TextView>(R.id.tv_money)!!.setText(bean.gold + "金币")
         holder.getView<TextView>(R.id.tv_day)!!.setText("/" + bean.days.toString() + "天")
         if (click == position) {

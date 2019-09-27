@@ -55,7 +55,7 @@ class BaseApplication : MyApplication() {
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
-        CustomActivityOnCrash.install(this);
+//        CustomActivityOnCrash.install(this);
         UMConfigure.init(this, "5d650e274ca3578df70008cb", "umeng", UMConfigure.DEVICE_TYPE_PHONE, "");//58edcfeb310c93091c000be2 5965ee00734be40b580001a0
 
         LitePal.initialize(this)//初始化LitePal数据库
@@ -90,7 +90,8 @@ class BaseApplication : MyApplication() {
         RongIM.getInstance().setSendMessageListener(MySendMessageListener())
         setMyExtensionModule()
 
-        RongIM.setUserInfoProvider({ userId ->//个人信息消息提供者
+        RongIM.setUserInfoProvider({ userId ->
+            //个人信息消息提供者
             Log.e("provider", "chat")
             //   //根据 userId 去你的用户系统里查询对应的用户信息返回给融云 SDK。
             val beans = LitePal.where("uid=?", userId).find<com.ysxsoft.imtalk.bean.UserInfo>()
@@ -173,18 +174,24 @@ class BaseApplication : MyApplication() {
             val textMessage = messageContent as TextMessage
             userInfo = JSONObject(textMessage!!.extra)
         } else if (messageContent is ImageMessage) {//图片消息
+            val intent = Intent("TEXTMESSAGE")
+            sendBroadcast(intent)
             val imageMessage = messageContent as ImageMessage
             userInfo = JSONObject(imageMessage!!.extra)
         } else if (messageContent is VoiceMessage) {//语音消息
+            val intent = Intent("TEXTMESSAGE")
+            sendBroadcast(intent)
             val voiceMessage = messageContent as VoiceMessage
             userInfo = JSONObject(voiceMessage!!.extra)
         } else if (messageContent is RichContentMessage) {//图文消息
+            val intent = Intent("TEXTMESSAGE")
+            sendBroadcast(intent)
             val richMessage = messageContent as RichContentMessage
             userInfo = JSONObject(richMessage!!.extra)
-        } else if (messageContent is LobbyTextMessage){//交友大厅消息
+        } else if (messageContent is LobbyTextMessage) {//交友大厅消息
             val richMessage = messageContent as LobbyTextMessage
             userInfo = JSONObject(richMessage.extra)
-        }else{
+        } else {
             Log.d("tag", "onSent-其他消息，自己来判断处理")
         }
         //从扩展字段获取用户信息
