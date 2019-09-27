@@ -1,7 +1,9 @@
 package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
+import android.os.Handler
 import android.os.Looper
+import android.os.Message
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPropertyAnimatorListener
 import android.support.v7.widget.LinearLayoutManager
@@ -51,6 +53,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         gifDrawable!!.stop()
         img_close.setOnClickListener {
             isClick = false
+            handler.removeCallbacksAndMessages(null)
             dismiss()
         }
         tv_winning_record.setOnClickListener {
@@ -77,10 +80,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
             }
 
 
-            if(isRequest){
+            if (isRequest) {
                 return@setOnClickListener
             }
-            isRequest=true;
+            isRequest = true;
             when (type) {
                 "1" -> {
                     ZdData()
@@ -100,7 +103,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         }
     }
 
-    var isRequest=false;
+    var isRequest = false;
 
     /**
      * 砸蛋的数据请求
@@ -112,41 +115,41 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<EggBean> {
                     override fun call(t: EggBean?) {
-                        isRequest=false;
+                        isRequest = false;
                         ToastUtils.showToast(this@EggDialog.context, t!!.msg)
 
-                        var map= HashMap<String,ArrayList<EggBean.DataBean>>()
-                        var showPics= ArrayList<EggBean.DataBean>()
-                        for (item in t.data){
-                            if(item.gift_id!=null&&!"".equals(item.gift_id)){
-                                if("".equals(item.aw_name)){
-                                }else{
-                                    item.sg_name=item.aw_name
+                        var map = HashMap<String, ArrayList<EggBean.DataBean>>()
+                        var showPics = ArrayList<EggBean.DataBean>()
+                        for (item in t.data) {
+                            if (item.gift_id != null && !"".equals(item.gift_id)) {
+                                if ("".equals(item.aw_name)) {
+                                } else {
+                                    item.sg_name = item.aw_name
                                 }
 
-                                if(map.containsKey(item.gift_id)){
-                                    var list=map.get(item.gift_id)
-                                    if(list!=null){
+                                if (map.containsKey(item.gift_id)) {
+                                    var list = map.get(item.gift_id)
+                                    if (list != null) {
                                         list.add(item)
-                                    }else{
-                                        var list=ArrayList<EggBean.DataBean>();
+                                    } else {
+                                        var list = ArrayList<EggBean.DataBean>();
                                         list.add(item)
-                                        map!!.put(item.gift_id,list)
+                                        map!!.put(item.gift_id, list)
                                     }
-                                }else{
-                                    var list=ArrayList<EggBean.DataBean>();
+                                } else {
+                                    var list = ArrayList<EggBean.DataBean>();
                                     list.add(item)
-                                    map!!.put(item.gift_id,list)
+                                    map!!.put(item.gift_id, list)
                                     showPics!!.add(item)
                                 }
-                            }else{
+                            } else {
                                 //1次时候不返回
-                                if("".equals(item.aw_name)){
-                                }else{
-                                    item.sg_name=item.aw_name
+                                if ("".equals(item.aw_name)) {
+                                } else {
+                                    item.sg_name = item.aw_name
                                 }
-                                item.sg_pic=item.aw_pic
-                                item.aw_gold=item.sg_gold
+                                item.sg_pic = item.aw_pic
+                                item.aw_gold = item.sg_gold
                                 showPics!!.add(item)
                             }
                         }
@@ -159,42 +162,46 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                     gifDrawable!!.start(); //开始播放
                                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                     gifDrawable!!.reset()
-                                    Thread(object:Runnable{
+                                    Thread(object : Runnable {
                                         override fun run() {
-                                            if(onEggOpenListener!=null){
-                                                onEggOpenListener!!.onEggOpened(showPics,map)
+                                            if (onEggOpenListener != null) {
+                                                onEggOpenListener!!.onEggOpened(showPics, map)
                                             }
                                         }
                                     }).start()
-                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
-                                        showAnim(t!!.data[0].aw_pic)
-                                        ZdData()
-                                    }, 3000)
+//                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+//                                        showAnim(t!!.data[0].aw_pic)
+//                                        ZdData()
+//                                    }, 3000)
+                                    val msg = handler.obtainMessage()
+                                    msg.obj = t!!.data[0].aw_pic
+                                    msg.what = 0x01
+                                    handler.sendMessageDelayed(msg, 3000)
                                 }
-                            } else if("1".equals(type)) {
+                            } else if ("1".equals(type)) {
                                 boxViewLayout.removeAllViews()
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
-                                Thread(object:Runnable{
+                                Thread(object : Runnable {
                                     override fun run() {
-                                        if(onEggOpenListener!=null){
-                                            onEggOpenListener!!.onEggOpened(showPics,map)
+                                        if (onEggOpenListener != null) {
+                                            onEggOpenListener!!.onEggOpened(showPics, map)
                                         }
                                     }
                                 }).start()                             //砸1次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     showAnim(t!!.data[0].aw_pic)
                                 }, 3000)
-                            }else if("2".equals(type)) {
+                            } else if ("2".equals(type)) {
                                 boxViewLayout.removeAllViews()
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
-                                Thread(object:Runnable{
+                                Thread(object : Runnable {
                                     override fun run() {
-                                        if(onEggOpenListener!=null){
-                                            onEggOpenListener!!.onEggOpened(showPics,map)
+                                        if (onEggOpenListener != null) {
+                                            onEggOpenListener!!.onEggOpened(showPics, map)
                                         }
                                     }
                                 }).start()
@@ -204,15 +211,15 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                         showAnim(bean!!.sg_pic)
                                     }
                                 }, 3000)
-                            }else{
+                            } else {
                                 boxViewLayout.removeAllViews()
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
-                                Thread(object:Runnable{
+                                Thread(object : Runnable {
                                     override fun run() {
-                                        if(onEggOpenListener!=null){
-                                            onEggOpenListener!!.onEggOpened(showPics,map)
+                                        if (onEggOpenListener != null) {
+                                            onEggOpenListener!!.onEggOpened(showPics, map)
                                         }
                                     }
                                 }).start()
@@ -225,6 +232,19 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                         }
                     }
                 })
+    }
+
+    var handler: Handler = object : Handler() {
+        override fun dispatchMessage(msg: Message) {
+            super.dispatchMessage(msg)
+            when (msg.what) {
+                0x01 -> {
+                    val a = msg.obj as String
+                    showAnim(a)
+                    ZdData()
+                }
+            }
+        }
     }
 
 //    private fun showGif(picUrl:String){
@@ -294,6 +314,13 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                             adapter.addAll(t.data.zjd_times)
                             adapter.setOnItemClickListener(object : TimesAdapter.OnItemClickListener {
                                 override fun onClick(position: Int) {
+                                    if("4".equals(adapter.dataList.get(position).type)){
+                                        handler.removeCallbacksAndMessages(null)
+                                    }else{
+                                        handler.removeCallbacksAndMessages(null)
+                                    }
+                                    gifDrawable!!.stop()
+                                    gifDrawable!!.seekTo(0)
                                     type = adapter.dataList.get(position).type
                                     adapter.setSelect(position)
                                 }
@@ -336,30 +363,30 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
         val v = View.inflate(mContext, R.layout.view_box, null)
         val boxView = v.findViewById<ImageView>(R.id.boxView)
         val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        layoutParams.gravity=Gravity.CENTER;
+        layoutParams.gravity = Gravity.CENTER;
         v.layoutParams = layoutParams
         v.alpha = 0f
         v.translationX = 0f
         v.translationY = 0f
         Glide.with(context).load(picUrl).into(boxView)
         //var width = boxLayout.width /2- DisplayUtils.dp2px(context!!, 22)
-        var width = boxLayout.width /2
+        var width = boxLayout.width / 2
         var height = boxLayout.height / 2//边界检测
 
-        val x = floatArrayOf(0.1f, 0.2f, 0.3f,0.5f,0.6f,1.0f,1.1f,1.2f,1.3f,1.5f,1.6f)
+        val x = floatArrayOf(0.1f, 0.2f, 0.3f, 0.5f, 0.6f, 1.0f, 1.1f, 1.2f, 1.3f, 1.5f, 1.6f)
         val xv = (Math.random() * x.size).toInt()
         var offsetX = (x[xv] * width).toInt()
         //var offsetY = -(Math.random() * height).toInt()
-        val f = floatArrayOf(0.3f,0.4f,0.5f,0.6f, 0.72f, 0.73f)
+        val f = floatArrayOf(0.3f, 0.4f, 0.5f, 0.6f, 0.72f, 0.73f)
         val yv = (Math.random() * f.size).toInt()
         var offsetY = -(f[yv] * height).toInt() + DisplayUtils.dp2px(context!!, 5)//偏移的高度
         if (offsetX < (boxLayout.width / 2)) {
             offsetX = -offsetX;
-        }else{
-            offsetX=offsetX-boxLayout.width/2;
+        } else {
+            offsetX = offsetX - boxLayout.width / 2;
         }
         boxViewLayout.addView(v)
-        ViewCompat.animate(v).alpha(1f).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).setListener(object:ViewPropertyAnimatorListener{
+        ViewCompat.animate(v).alpha(1f).translationXBy(offsetX.toFloat()).translationYBy(offsetY.toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).setListener(object : ViewPropertyAnimatorListener {
             override fun onAnimationCancel(p0: View?) {
             }
 
@@ -375,7 +402,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
     }
 
     interface OnEggOpenListener {
-        fun onEggOpened(data:List<EggBean.DataBean>,map:HashMap<String,ArrayList<EggBean.DataBean>>)
+        fun onEggOpened(data: List<EggBean.DataBean>, map: HashMap<String, ArrayList<EggBean.DataBean>>)
     }
 
     private var onEggOpenListener: OnEggOpenListener? = null
