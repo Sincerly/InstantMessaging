@@ -1,12 +1,20 @@
-package com.ysxsoft.imtalk.widget.dialog
+package com.ysxsoft.imtalk.widget
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.graphics.PixelFormat
 import android.net.Uri
+import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.id.imageView
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
 import com.ysxsoft.imtalk.chatroom.im.IMClient
@@ -17,27 +25,28 @@ import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.LoginActivity
-import com.ysxsoft.imtalk.widget.ABSDialog
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
-import kotlinx.android.synthetic.main.online_dialog_layout.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
 /**
  *Create By 胡
- *on 2019/9/21 0021
+ *on 2019/9/27 0027
  */
-class OnLineDialog(var mContext: Context) : ABSDialog(mContext) {
+class SinglePointLogin {
+    private var windowManager: WindowManager? = null
+    private var layoutParams: WindowManager.LayoutParams? = null
+    private var displayView: View? = null
+    private var mWindowWidth: Int = 0
+    private var mWindowHeight: Int = 0
     var dataBean: UserInfoBean.DataBean? = null
 
-    override fun initView() {
-        this.setCanceledOnTouchOutside(false)
-        this.setCancelable(false)
-        this.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
+    constructor() : super() {
+        initView()
         NetWork.getService(ImpService::class.java)
                 .GetUserInfo(AuthManager.getInstance().currentUserId)
                 .subscribeOn(Schedulers.io())
@@ -58,16 +67,33 @@ class OnLineDialog(var mContext: Context) : ABSDialog(mContext) {
                     override fun onCompleted() {
                     }
                 })
+    }
 
+    private fun initView() {
+        windowManager = BaseApplication.mContext!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        layoutParams = WindowManager.LayoutParams()
+        layoutParams!!.type = WindowManager.LayoutParams.TYPE_TOAST
+        layoutParams!!.format = PixelFormat.RGBA_8888
+        layoutParams!!.gravity = Gravity.CENTER
+        layoutParams!!.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+        layoutParams!!.width = WindowManager.LayoutParams.WRAP_CONTENT
+        layoutParams!!.height = WindowManager.LayoutParams.WRAP_CONTENT
+    }
+
+    fun show() {
+        val layoutInflater = LayoutInflater.from(BaseApplication.mContext!!)
+        displayView = layoutInflater.inflate(R.layout.online_dialog_layout, null)
+        val tv_ok = displayView!!.findViewById<TextView>(R.id.tv_ok)
         tv_ok.setOnClickListener {
             var instance = ActivityPageManager.getInstance();
             instance!!.finishAllActivity();
-            SpUtils.deleteSp(mContext)
-            val intent = Intent(mContext, LoginActivity::class.java)
+            SpUtils.deleteSp(BaseApplication.mContext!!)
+            val intent = Intent(BaseApplication.mContext!!, LoginActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            mContext.startActivity(intent)
+            BaseApplication.mContext!!.startActivity(intent)
             dismiss()
         }
+        windowManager!!.addView(displayView, layoutParams)
     }
 
     private fun quiteRoom(uid: String, kick: String) {
@@ -94,8 +120,7 @@ class OnLineDialog(var mContext: Context) : ABSDialog(mContext) {
                             }
 
                             override fun onNext(t: CommonBean?) {
-                                ToastUtils.showToast(this@OnLineDialog.mContext, t!!.msg)
-                                if (t.code == 0) {
+                                if (t!!.code == 0) {
                                     IMClient.getInstance().quitChatRoom(dataBean!!.now_roomId, null)
                                     RtcClient.getInstance().quitRtcRoom(dataBean!!.now_roomId, null)
                                     removeUser(dataBean!!.now_roomId!!, AuthManager.getInstance().currentUserId)
@@ -129,10 +154,7 @@ class OnLineDialog(var mContext: Context) : ABSDialog(mContext) {
                     override fun onNext(t: CommonBean?) {
                         Log.d("tag=====", "移除成功")
                         if (t!!.code == 0) {
-//                            var instance = ActivityPageManager.getInstance();
-//                            instance!!.finishAllActivity();
-                            SpUtils.deleteSp(mContext)
-//                            mContext.startActivity(Intent(mContext, LoginActivity::class.java))
+                            SpUtils.deleteSp(BaseApplication.mContext!!)
                         }
                     }
 
@@ -141,7 +163,10 @@ class OnLineDialog(var mContext: Context) : ABSDialog(mContext) {
                 })
     }
 
-    override fun getLayoutResId(): Int {
-        return R.layout.online_dialog_layout
+
+    fun dismiss() {
+        if (windowManager != null && displayView != null) {
+            windowManager!!.removeView(displayView)
+        }
     }
 }

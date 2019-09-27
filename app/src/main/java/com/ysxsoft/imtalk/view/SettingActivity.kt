@@ -180,6 +180,7 @@ class SettingActivity : BaseActivity() {
                         if ("0".equals(t!!.code)) {
                             val versionName = AppUtil.getVersionName(mContext)
                             val i = VersionUtils.compareVersion(versionName, t.data.version)
+                            // 0代表相等，1代表version1大于version2，-1代表version1小于version2
                             if (i == -1) {
                                 dialog = UpdataDialog(mContext)
                                 val tv_update = dialog!!.findViewById<TextView>(R.id.tv_update)

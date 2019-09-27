@@ -299,14 +299,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 SLog.e(TAG, "RongIMClient connect onError:" + errorCode.value + "-" + errorCode.message)
             }
         })
-        //单点登录
-        RongIM.setConnectionStatusListener(object : RongIMClient.ConnectionStatusListener {
-            override fun onChanged(p0: RongIMClient.ConnectionStatusListener.ConnectionStatus?) {
-                if (p0!!.value==3) {
-                    OnLineDialog(mContext).show()
-                }
-            }
-        })
     }
 
 

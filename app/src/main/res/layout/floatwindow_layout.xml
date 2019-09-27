@@ -2,15 +2,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fl"
-    android:layout_width="100dp"
-    android:layout_height="100dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:background="@mipmap/img_room_float">
 
     <com.ysxsoft.imtalk.view.MyImageView
         android:id="@+id/img_head"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_gravity="center"
         android:layout_marginBottom="2dp"
         android:src="@mipmap/img_normal_head" />

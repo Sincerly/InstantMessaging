@@ -25,6 +25,7 @@ import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
 import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
 import com.ysxsoft.imtalk.im.provider.*
 import com.ysxsoft.imtalk.rong.MyExtensionModule
+import com.ysxsoft.imtalk.widget.SinglePointLogin
 import com.ysxsoft.imtalk.widget.dialog.OnLineDialog
 import io.rong.imkit.DefaultExtensionModule
 import io.rong.imkit.IExtensionModule
@@ -55,7 +56,7 @@ class BaseApplication : MyApplication() {
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
-//        CustomActivityOnCrash.install(this);
+        CustomActivityOnCrash.install(this);
         UMConfigure.init(this, "5d650e274ca3578df70008cb", "umeng", UMConfigure.DEVICE_TYPE_PHONE, "");//58edcfeb310c93091c000be2 5965ee00734be40b580001a0
 
         LitePal.initialize(this)//初始化LitePal数据库
@@ -102,7 +103,15 @@ class BaseApplication : MyApplication() {
                 UserInfo(userId, "", Uri.parse(""))
             }
         }, true)
-
+        //单点登录
+        RongIM.setConnectionStatusListener(object : RongIMClient.ConnectionStatusListener {
+            override fun onChanged(p0: RongIMClient.ConnectionStatusListener.ConnectionStatus?) {
+                if (p0!!.value==3) {
+                    OnLineDialog(BaseApplication.mContext!!).show()
+//                    SinglePointLogin().show()
+                }
+            }
+        })
         initMessageAndTemplate()
     }
 

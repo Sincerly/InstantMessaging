@@ -202,7 +202,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 //                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
 //                                                                    roomLock(item.room_id.toString())
 //                                                                } else {
-                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId, item.room_id.toString())
+                                                                quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId, item.room_id.toString())
 //                                                                }
                                                             } else {
                                                                 roomLock(item.room_id.toString())
@@ -264,7 +264,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 //                                                                if (TextUtils.equals(data.now_roomId, item.room_id.toString())) {
 //                                                                    roomLock(item.room_id.toString())
 //                                                                } else {
-                                                                    quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId, item.room_id.toString())
+                                                                quiteRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId, item.room_id.toString())
 //                                                                }
                                                             } else {
                                                                 roomLock(item.room_id.toString())
@@ -464,8 +464,97 @@ class HomeFragment : BaseFragment(), OnBannerListener {
         }
         //嗨爆聊天
         cardView.setOnClickListener {
-            joinChatRoom(room_id!!, "")
+            activity!!.sendBroadcast(Intent("WINDOW"))
+            NetWork.getService(ImpService::class.java)
+                    .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Observer<UserInfoBean> {
+                        override fun onError(e: Throwable?) {
+                            Log.d("", "===" + e!!.message.toString())
+                        }
+
+                        override fun onNext(t: UserInfoBean?) {
+                            if (t!!.code == 0) {
+                                val data = t.data
+                                if (!TextUtils.isEmpty(data.now_roomId)) {
+                                    ExitRoom(AuthManager.getInstance().currentUserId, "1", data.now_roomId)
+                                } else {
+                                    joinChatRoom(room_id!!, "")
+                                }
+                            }
+                        }
+
+                        override fun onCompleted() {
+                        }
+                    })
+
         }
+    }
+
+    private fun ExitRoom(uid: String?, kick: String, now_roomId: String?) {
+        val message = RoomMemberChangedMessage()
+        message.setCmd(2)//离开房间
+        message.targetUserId = uid
+        message.targetPosition = -1
+        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), mydatabean!!.data.nickname, Uri.parse(mydatabean!!.data.icon))
+        val obtain = Message.obtain(now_roomId, Conversation.ConversationType.CHATROOM, message)
+
+        RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
+            override fun onAttached(p0: Message?) {
+                Log.d("tag", p0!!.content.toString())
+            }
+
+            override fun onSuccess(p0: Message?) {
+                NetWork.getService(ImpService::class.java)
+                        .tCRoom(uid!!, kick, now_roomId!!)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<CommonBean> {
+                            override fun onError(e: Throwable?) {
+                                showToastMessage(e!!.message.toString())
+                            }
+
+                            override fun onNext(t: CommonBean?) {
+                                if (t!!.code == 0) {
+                                    IMClient.getInstance().quitChatRoom(now_roomId, null)
+                                    RtcClient.getInstance().quitRtcRoom(now_roomId, null)
+//                                    removeUser(now_roomId, uid)
+                                    val map = HashMap<String, String>()
+                                    map.put("room_id", now_roomId)
+                                    map.put("uid", uid)
+                                    val body = RetrofitUtil.createJsonRequest(map)
+                                    NetWork.getService(ImpService::class.java)
+                                            .remove_user(body)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(object : Observer<CommonBean> {
+                                                override fun onError(e: Throwable?) {
+                                                }
+
+                                                override fun onNext(t: CommonBean?) {
+                                                    if (t!!.code == 0) {
+                                                        joinChatRoom(room_id!!, "")
+                                                    }
+                                                }
+
+                                                override fun onCompleted() {
+                                                }
+                                            })
+                                }
+                            }
+
+                            override fun onCompleted() {
+                            }
+                        })
+            }
+
+            override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
+                Log.d("tag", p0!!.content.toString())//23409
+            }
+        });
+
+
     }
 
     private fun getRealName() {

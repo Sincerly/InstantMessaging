@@ -377,9 +377,15 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             when (state) {
                 TelephonyManager.CALL_STATE_RINGING // 响铃
                 -> {
+                    if (playMusicService != null) {
+                        playMusicService!!.pause()
+                    }
                 }
                 TelephonyManager.CALL_STATE_OFFHOOK // 接听
                 -> {
+                    if (playMusicService != null) {
+                        playMusicService!!.pause()
+                    }
                     // 记录接听电话前静音和房间声音的状态
                     preMuteMicState = isMuteMic
                     preRoomVoiceState = roomManager!!.isCurrentRoomVoiceEnable()
@@ -740,13 +746,17 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 override fun NextSong() {
                     if (playMusicService != null) {
                         var position = musicbean!!.position
-                        playMusicService!!.next()
+                        if (position <musicbean!!.list.size){
+                            playMusicService!!.next()
+                        }
                         position++
                         if (position > musicbean!!.list.size) {
                             position == 0
                             tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
                         } else {
-                            tv_song_name1.setText(musicbean!!.list.get(position).music_name)
+                            if (position <musicbean!!.list.size) {
+                                tv_song_name1.setText(musicbean!!.list.get(position).music_name)
+                            }
                         }
                     }
                 }
@@ -2957,7 +2967,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         message.setCmd(2)//离开房间
         message.targetUserId = uid
         message.targetPosition = -1
-        message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), nikeName, Uri.parse(icon))
+        if (!TextUtils.isEmpty(AuthManager.getInstance().currentUserId)){
+            message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), nikeName, Uri.parse(icon))
+        }
         val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
 
         RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
