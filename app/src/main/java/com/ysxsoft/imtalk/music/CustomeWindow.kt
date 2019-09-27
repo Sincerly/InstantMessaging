@@ -68,6 +68,8 @@ class CustomeWindow {
     private var mWindowWidth: Int = 0
     private var mWindowHeight: Int = 0
     private var imageView: MyImageView? = null
+    private var img_close: ImageView? = null
+    private var viewById: FrameLayout? = null
     var mydatabean: UserInfoBean? = null
     var isShowing: Boolean = false
     var icon: String? = null
@@ -87,7 +89,7 @@ class CustomeWindow {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("WINDOW".equals(intent!!.action)) {
                 if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
-                    quiteRoom("1",mydatabean!!.data.now_roomId)
+                    quiteRoom("1", mydatabean!!.data.now_roomId)
                 }
             }
         }
@@ -109,7 +111,7 @@ class CustomeWindow {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             mydatabean = t
-                            imageView!!.setOnClickListener {
+                            viewById!!.setOnClickListener {
                                 joinChatRoom(mydatabean!!.data.now_roomId)
                             }
                         }
@@ -152,11 +154,12 @@ class CustomeWindow {
         val layoutInflater = LayoutInflater.from(BaseApplication.mContext!!)
         displayView = layoutInflater.inflate(R.layout.floatwindow_layout, null)
         imageView = displayView!!.findViewById(R.id.img_head)
+        img_close = displayView!!.findViewById(R.id.img_close)
 
         displayView!!.setOnTouchListener(FloatingOnTouchListener())
         windowManager!!.addView(displayView, layoutParams)
-        val viewById = displayView!!.findViewById<FrameLayout>(R.id.fl)
-        viewById.setOnClickListener {
+         viewById = displayView!!.findViewById<FrameLayout>(R.id.fl)
+        img_close!!.setOnClickListener {
             NetWork.getService(ImpService::class.java)
                     .GetUserInfo(AuthManager.getInstance().currentUserId)
                     .subscribeOn(Schedulers.io())
@@ -170,7 +173,7 @@ class CustomeWindow {
                                 mydatabean = t
                                 if (mydatabean!!.data != null) {
                                     if (!TextUtils.isEmpty(mydatabean!!.data.now_roomId)) {
-                                        quiteRoom("1",mydatabean!!.data.now_roomId)
+                                        quiteRoom("1", mydatabean!!.data.now_roomId)
                                     }
                                 }
                             }
@@ -181,6 +184,8 @@ class CustomeWindow {
                     })
 
         }
+
+
 
         Glide.with(BaseApplication.mContext!!).load(icon).into(imageView!!)
 
@@ -195,7 +200,7 @@ class CustomeWindow {
 
     }
 
-    private fun quiteRoom(kick: String,newRoomId:String) {
+    private fun quiteRoom(kick: String, newRoomId: String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = AuthManager.getInstance().currentUserId
@@ -220,7 +225,7 @@ class CustomeWindow {
                             override fun onNext(t: CommonBean?) {
 //                                ToastUtils.showToast(t!!.msg)
                                 if (t!!.code == 0) {
-                                    removeUser(newRoomId,AuthManager.getInstance().currentUserId)
+                                    removeUser(newRoomId, AuthManager.getInstance().currentUserId)
                                 }
                             }
 
@@ -253,8 +258,8 @@ class CustomeWindow {
                     override fun onNext(t: CommonBean?) {
                         if (t!!.code == 0) {
                             dismiss()
-                            IMClient.getInstance().quitChatRoom(mydatabean!!.data.now_roomId, null)
-                            RtcClient.getInstance().quitRtcRoom(mydatabean!!.data.now_roomId, null)
+                            IMClient.getInstance().quitChatRoom(roomId, null)
+                            RtcClient.getInstance().quitRtcRoom(roomId, null)
                         }
                     }
 

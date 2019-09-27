@@ -3,6 +3,7 @@ package com.ysxsoft.imtalk.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -16,6 +17,8 @@ import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import kotlinx.android.synthetic.main.title_layout2.*
 import kotlinx.android.synthetic.main.user_levels_layout.*
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -34,7 +37,7 @@ class MyDjActivity : BaseActivity() {
         return R.layout.user_levels_layout
     }
 
-    var flag: String? =null
+    var flag: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         flag = intent.getStringExtra("flag")
@@ -63,14 +66,14 @@ class MyDjActivity : BaseActivity() {
             tv_user_level_tip.setText("当前用户等级：")
         }
         tv1.setOnClickListener {
-            flag="1"
+            flag = "1"
             tv1.isSelected = true
             tv2.isSelected = false
             rqeustData()
             tv_user_level_tip.setText("当前用户等级：")
         }
         tv2.setOnClickListener {
-            flag="2"
+            flag = "2"
             tv1.isSelected = false
             tv2.isSelected = true
             rqeustData()
@@ -91,12 +94,12 @@ class MyDjActivity : BaseActivity() {
 
                     override fun onNext(t: UserLevelBean?) {
                         if (t!!.code == 0) {
-                            tv_level.setText(t.data.user_level_name+t.data.now_level)
+                            tv_level.setText(t.data.user_level_name + t.data.now_level)
                             tv_user_level.setText(t.data.now_level)
-                            tv_cjb.setText("差"+t.data.next_level_gold+"金币升级")
-                            ImageLoadUtil.GlideHeadImageLoad(mContext,t.data.icon,img_head)
-//                            web_content.reload()
-                            web_content.loadDataWithBaseURL(null,t.data.sign_rule, "text/html", "utf-8", null)
+                            tv_cjb.setText("差" + t.data.next_level_gold + "金币升级")
+                            ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_head)
+                            val newContent = getNewContent(t.data.sign_rule)
+                            web_content.loadDataWithBaseURL(null, newContent, "text/html", "utf-8", null)
                         }
                     }
 
@@ -104,11 +107,21 @@ class MyDjActivity : BaseActivity() {
                     }
                 })
     }
+
     private inner class MyWebViewClient : WebViewClient() {
         override// 在WebView中而不在默认浏览器中显示页面
         fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
             view.loadUrl(url)
             return true
         }
+    }
+
+    fun getNewContent(htmltext: String): String {
+        var doc = Jsoup.parse(htmltext);
+        val elements = doc.getElementsByTag("img");
+        for (element in elements) {
+            element.attr("width", "100%").attr("height", "auto");
+        }
+        return doc.toString();
     }
 }

@@ -643,8 +643,14 @@ interface ImpService {
     @POST("group/groupId")
     fun groupId(@Body body: RequestBody): Observable<GroupIdBean>
 
+    @POST("Room/send_dress_up")
+    fun send_dress_up(@Body body: RequestBody): Observable<CommonBean>
+
     @POST("index/system_help")
     fun system_help(): Observable<SystemHelpBean>
+
+    @POST("index/version")
+    fun version(@Body body: RequestBody): Observable<VersionBean>
 
 
 }

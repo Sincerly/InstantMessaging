@@ -9,6 +9,7 @@ import android.webkit.WebViewClient
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.utils.BaseActivity
 import kotlinx.android.synthetic.main.community_norms_layout.*
+import org.jsoup.Jsoup
 
 
 /**
@@ -48,7 +49,7 @@ class ComWebViewActivity: BaseActivity() {
         webSettings.setBlockNetworkImage(false);
 
         web_content.setWebViewClient(MyWebViewClient())
-        web_content.loadDataWithBaseURL(null,url, "text/html", "utf-8", null)
+        web_content.loadDataWithBaseURL(null,getNewContent(url!!), "text/html", "utf-8", null)
     }
 
     private inner class MyWebViewClient : WebViewClient() {
@@ -57,5 +58,13 @@ class ComWebViewActivity: BaseActivity() {
             view.loadUrl(url)
             return true
         }
+    }
+    fun getNewContent(htmltext: String): String {
+        var doc = Jsoup.parse(htmltext);
+        val elements = doc.getElementsByTag("img");
+        for (element in elements) {
+            element.attr("width", "100%").attr("height", "auto");
+        }
+        return doc.toString();
     }
 }

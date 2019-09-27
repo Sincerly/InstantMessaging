@@ -6,6 +6,7 @@ import android.os.Message
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener
@@ -15,6 +16,8 @@ import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.adapter.DressMallAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DressMallBean
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.im.message.PrivateCarMessage
 import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
 import com.ysxsoft.imtalk.impservice.ImpService
@@ -78,7 +81,12 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 showToastMessage("座驾不能为空")
                 return@setOnClickListener
             }
-            BuyData()
+
+            if ("myself".equals(myself)) {
+                BuyData()
+            } else {
+                SendCar()
+            }
         }
 
         if (mSwipeRefreshLayout != null) {
@@ -99,13 +107,13 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         mRecyclerView.addItemDecoration(divider)
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val bean = mDataAdapter!!.dataList.get(position)
-             carPic = bean.pic
+            carPic = bean.pic
             name = bean.name
             auto_id = bean.id.toString()
             tv_money1.setText(bean.gold + "金币")
             tv_day1.setText("/" + bean.days + "天")
             mDataAdapter!!.setSelect(position)
-            CarUtils.playCarPlayOne(activity,bean.gif_pic)
+            CarUtils.playCarPlayOne(activity, bean.gif_pic)
         }
         //设置底部加载颜色
         mRecyclerView.setFooterViewColor(R.color.btn_color, R.color.black, android.R.color.transparent)
@@ -119,19 +127,53 @@ class CarFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 .buyDressUp("1", auto_id!!, SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<CommonBean> {
-                    override fun call(t: CommonBean?) {
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                        Log.d("tag==", e!!.message.toString())
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        showToastMessage(t!!.msg)
+                        if (t!!.code == 0) {
+                            if ("myself".equals(myself)) {
+                                startActivity(MyDressActivity::class.java)
+                            }
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
+    private fun SendCar() {
+        val map = HashMap<String, String>()
+        map.put("type", "1")
+        map.put("auto_id", auto_id.toString())
+        map.put("uid", AuthManager.getInstance().currentUserId)
+        map.put("income_gift_uid", uid!!)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .send_dress_up(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
-                            if ("myself".equals(myself)){
-                                startActivity(MyDressActivity::class.java)
-                            }else{
-                                PrivateCarMessage.sendMessage(uid, "1", name, carPic, nikeName)//赠送头像
-                            }
+                            PrivateHeaderMessage.sendMessage(uid, "1", name, carPic, nikeName)//赠送头像
                             activity!!.onBackPressed()
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
                 })
+
+
     }
 
     @SuppressLint("HandlerLeak")

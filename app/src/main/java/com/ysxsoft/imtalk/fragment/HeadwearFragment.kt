@@ -7,6 +7,7 @@ import android.os.Message
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import com.github.jdsjlzx.ItemDecoration.LuDividerDecoration
 import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener
 import com.github.jdsjlzx.recyclerview.LuRecyclerViewAdapter
@@ -16,6 +17,8 @@ import com.ysxsoft.imtalk.adapter.DressMallAdapter
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.DressMallBean
 import com.ysxsoft.imtalk.bean.SGiftBean
+import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.AppUtil
@@ -77,11 +80,17 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun initView() {
         tv_buy.setOnClickListener {
-            if(TextUtils.isEmpty(auto_id)){
+            if (TextUtils.isEmpty(auto_id)) {
                 showToastMessage("头饰不能为空")
                 return@setOnClickListener
             }
-            BuyData()
+
+            if ("myself".equals(myself)) {
+                BuyData()
+            }else{
+                SendHeadWear()
+            }
+
         }
 
         if (mSwipeRefreshLayout != null) {
@@ -103,7 +112,7 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
         mLuRecyclerViewAdapter!!.setOnItemClickListener { view, position ->
             val bean = mDataAdapter!!.dataList.get(position)
-           name = bean.name
+            name = bean.name
             headwarurl = bean.pic
             auto_id = bean.id.toString()
             tv_money1.setText(bean.gold + "金币")
@@ -111,7 +120,7 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
             mDataAdapter!!.setSelect(position)
 
             val intent = Intent("HEADWEAR")
-            intent.putExtra("headwarurl",headwarurl)
+            intent.putExtra("headwarurl", headwarurl)
             activity!!.sendBroadcast(intent)
         }
 
@@ -127,17 +136,53 @@ class HeadwearFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 .buyDressUp("2", auto_id!!, SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<CommonBean> {
-                    override fun call(t: CommonBean?) {
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                        Log.d("tag",e!!.message.toString())
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        if (t!!.code == 0) {
+                            if ("myself".equals(myself)) {
+                                startActivity(MyDressActivity::class.java)
+                            }
+                        }
+
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+    }
+
+    private fun SendHeadWear() {
+        val map = HashMap<String, String>()
+        map.put("type", "2")
+        map.put("auto_id", auto_id.toString())
+        map.put("uid", AuthManager.getInstance().currentUserId)
+        map.put("income_gift_uid", uid!!)
+        Log.e("SendHeadWear", "Top")
+        val body = RetrofitUtil.createJsonRequest(map)
+        Log.e("SendHeadWear", "bottom")
+        NetWork.getService(ImpService::class.java)
+                .send_dress_up(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                        Log.e("callback", "onError=="+e!!.message.toString())
+                    }
+
+                    override fun onNext(t: CommonBean?) {
+                        Log.e("callback", "onNext=="+t.toString())
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
-                            if ("myself".equals(myself)){
-                                startActivity(MyDressActivity::class.java)
-                            }else{
-                                PrivateHeaderMessage.sendMessage(uid, "1", name, headwarurl, nikeName)//赠送头像
-                            }
+                            PrivateHeaderMessage.sendMessage(uid, "1", name, headwarurl, nikeName)//赠送头像
                             activity!!.onBackPressed()
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

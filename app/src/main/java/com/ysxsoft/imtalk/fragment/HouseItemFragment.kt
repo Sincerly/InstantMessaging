@@ -238,6 +238,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                         helper.getView<TextView>(R.id.tv_Online).text = item.memCount + "人在线"
                     }
                     helper.itemView.setOnClickListener {
+                        val sp = SpUtils.getSp(mContext, "uid")
                         loadingDialog!!.show()
                         activity!!.sendBroadcast(Intent("WINDOW"))
                         NetWork.getService(ImpService::class.java)
@@ -246,6 +247,7 @@ class HouseItemFragment : BaseFragment(), OnBannerListener, SwipeRefreshLayout.O
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(object : Observer<UserInfoBean> {
                                     override fun onError(e: Throwable?) {
+                                        Log.d("","==="+e!!.message.toString())
                                     }
 
                                     override fun onNext(t: UserInfoBean?) {

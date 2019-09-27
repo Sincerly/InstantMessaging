@@ -3,10 +3,8 @@ package com.ysxsoft.imtalk.fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import com.ysxsoft.imtalk.R
-import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.adapter.MyDataFamilyAdapter
 import com.ysxsoft.imtalk.adapter.PhotosAdpater
-import com.ysxsoft.imtalk.adapter.PicturesAdapter
 import com.ysxsoft.imtalk.bean.ContentBean
 import com.ysxsoft.imtalk.bean.MFamilyBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
@@ -14,9 +12,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.ImageLoadUtil
 import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.view.MyFamilyActivity
-import io.rong.imkit.RongIM
 import kotlinx.android.synthetic.main.my_data_fragment.*
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -76,7 +72,7 @@ class MyDataFragment : BaseFragment() {
                             tv_js.setText(t.data.user_desc)
                             val pictures = t.data.picture
                             pictures.add(0, UserInfoBean.DataBean.PictureBean())
-                            val adapter = PhotosAdpater(mContext)
+                            val adapter = PhotosAdpater(mContext,uid!!)
                             val manager = LinearLayoutManager(mContext)
                             manager.orientation = LinearLayoutManager.HORIZONTAL
                             recyclerView.layoutManager = manager

@@ -8,13 +8,13 @@ public class GroupIdBean {
 
     /**
      * code : 0
-     * msg : 获取成功！
-     * data : 11
+     * msg : 成功！
+     * data : {"groupId":12,"is_real":1}
      */
 
     private int code;
     private String msg;
-    private String data;
+    private DataBean data;
 
     public int getCode() {
         return code;
@@ -32,11 +32,37 @@ public class GroupIdBean {
         this.msg = msg;
     }
 
-    public String getData() {
+    public DataBean getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(DataBean data) {
         this.data = data;
+    }
+
+    public static class DataBean {
+        /**
+         * groupId : 12
+         * is_real : 1
+         */
+
+        private String groupId;
+        private int is_real;
+
+        public String getGroupId() {
+            return groupId;
+        }
+
+        public void setGroupId(String groupId) {
+            this.groupId = groupId;
+        }
+
+        public int getIs_real() {
+            return is_real;
+        }
+
+        public void setIs_real(int is_real) {
+            this.is_real = is_real;
+        }
     }
 }

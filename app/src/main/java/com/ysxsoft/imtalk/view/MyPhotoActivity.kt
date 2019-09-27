@@ -53,10 +53,12 @@ class MyPhotoActivity : BaseActivity(), MyPictureAdapter.CheckInterface {
     }
 
     var ismanager: Boolean = true
+    var uid: String? = null
     var mDataAdapter: MyPictureAdapter? = null
     var sectionDelete = StringBuffer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+         uid = intent.getStringExtra("uid")
         tv_title_right.visibility = View.VISIBLE
         tv_title_right.setText("管理")
         setBackVisibily()
@@ -67,7 +69,7 @@ class MyPhotoActivity : BaseActivity(), MyPictureAdapter.CheckInterface {
 
     private fun requestData() {
         NetWork.getService(ImpService::class.java)
-                .GetUserInfo(SpUtils.getSp(mContext, "uid"))
+                .GetUserInfo(uid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<UserInfoBean> {
