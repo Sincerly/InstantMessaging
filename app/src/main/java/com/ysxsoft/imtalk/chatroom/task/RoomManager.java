@@ -614,7 +614,7 @@ public class RoomManager {
     private class RoomMessageListener implements RongIMClient.OnReceiveMessageListener {
         @Override
         public boolean onReceived(final Message message, int i) {
-            Log.e("tag", "onReceived:" + new Gson().toJson(message.getContent()));
+            //Log.e("tag", "onReceived:" + new Gson().toJson(message.getContent()));
             synchronized (roomLock) {
                 Conversation.ConversationType conversationType = message.getConversationType();
                 if (conversationType == Conversation.ConversationType.CHATROOM) {
@@ -901,7 +901,7 @@ public class RoomManager {
                                     RoomPublicGiftMessage msg = new RoomPublicGiftMessage(message.getContent().encode());
                                     String nums = msg.getGoldNums();//判断有没有金币数量
                                     if ("".equals(nums)) {
-                                        Log.e("tag", "收到礼物公屏消息");
+                                        Log.e("tag", "收到礼物公屏消息:"+new Gson().toJson(message.getContent()));
                                         //送礼人昵称，头像，收礼人昵称，头像，礼物图片，礼物数量
                                         RoomPublicGiftMessageBean messageBean = new RoomPublicGiftMessageBean();
                                         messageBean.setSendName(msg.getSendName());
@@ -910,35 +910,46 @@ public class RoomManager {
                                         messageBean.setSlIcon(msg.getSlIcon());
                                         messageBean.setGiftPic(msg.getGiftPic());
                                         messageBean.setGiftNums(msg.getGiftNums());
-                                        roomEventlistener.onGiftMessage(messageBean);
-//                                        if (roomEventlistener != null) {
-//                                            GiftChatMessage giftChatMessage = new GiftChatMessage();
-//                                            //礼物名称
-//                                            giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
-//                                            giftChatMessage.setGiftPic(msg.getGiftPic());
-//                                            giftChatMessage.setGiftNum(msg.getGiftNums());
-//                                            giftChatMessage.setName(msg.getSendName());
-//                                            giftChatMessage.setToName(msg.getSlName());
-//                                            threadManager.runOnUIThread(new Runnable() {
-//                                                @Override
-//                                                public void run() {
-//                                                    Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, giftChatMessage);
-//                                                    roomEventlistener.onMessageEvent(o);//保存消息
-//                                                }
-//                                            });
-//                                        }
+                                        if (roomEventlistener != null) {
+                                            threadManager.runOnUIThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    roomEventlistener.onGiftMessage(messageBean);
+                                                    if(!message.getTargetId().equals(currentRoom.getRoomInfo().getRoom_id())){
+                                                        GiftChatMessage giftChatMessage = new GiftChatMessage();
+                                                        //礼物名称
+                                                        giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
+                                                        giftChatMessage.setGiftPic(msg.getGiftPic());
+                                                        giftChatMessage.setGiftStaticPic(msg.getGiftPic());
+                                                        giftChatMessage.setGiftNum(msg.getGiftNums());
+                                                        giftChatMessage.setName(msg.getSendName());
+                                                        giftChatMessage.setToName(msg.getSlName());
+                                                        Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, giftChatMessage);
+                                                        roomEventlistener.onMessageEvent(o);//保存消息
+                                                    }
+                                                }
+                                            });
+                                        }
                                     } else {
-                                        Log.e("tag", "收到砸金蛋公屏消息");
+                                        Log.e("tag", "收到砸金蛋公屏消息:"+new Gson().toJson(message.getContent()));
                                         //砸金蛋
                                         if (roomEventlistener != null) {
-                                            roomEventlistener.onGoldMessage(msg.getNickname(), msg.getSgName(), "(" + msg.getGoldNums() + "金币)");
-//                                            threadManager.runOnUIThread(new Runnable() {
-//                                                @Override
-//                                                public void run() {
-//                                                    Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, eggChatMessage);
-//                                                    roomEventlistener.onMessageEvent(o);//保存消息
-//                                                }
-//                                            });
+
+                                            threadManager.runOnUIThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    roomEventlistener.onGoldMessage(msg.getNickname(), msg.getSgName(), "(" + msg.getGoldNums() + "金币)");
+                                                    if(!message.getTargetId().equals(currentRoom.getRoomInfo().getRoom_id())){
+                                                        EggChatMessage eggChatMessage = new EggChatMessage();
+                                                        //礼物名称
+                                                        eggChatMessage.setGiftName(msg.getSgName()+"("+msg.getGoldNums()+")");
+                                                        eggChatMessage.setName(msg.getNickname());
+                                                        eggChatMessage.setGiftPrice(msg.getGoldNums());
+                                                        Message o = Message.obtain(message.getTargetId(), Conversation.ConversationType.CHATROOM, eggChatMessage);
+                                                        roomEventlistener.onMessageEvent(o);//保存消息
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 }

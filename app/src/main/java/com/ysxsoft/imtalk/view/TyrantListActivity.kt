@@ -73,7 +73,7 @@ class TyrantListActivity : BaseActivity() {
      * 初始化Adapter
      */
     private fun initAdapter() {
-        mAdapter = TyrantListAdapter(mContext)
+        mAdapter = TyrantListAdapter(mContext, 0)
         recyclerView.layoutManager = LinearLayoutManager(mContext)
         recyclerView.adapter = mAdapter
     }

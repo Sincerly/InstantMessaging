@@ -32,11 +32,13 @@ public class GiftNotifyManager {
     /**
      * 开启滚动
      */
-    public void start() {
-        isRunning = true;
+    public synchronized void start() {
         if (data.size() > 0) {
-            RoomPublicGiftMessageBean d=data.get(0);
-            addView(d);
+            if (!isRunning) {
+                RoomPublicGiftMessageBean d=data.get(0);
+                isRunning = true;
+                addView(d);
+            }
         }
     }
 
@@ -50,18 +52,19 @@ public class GiftNotifyManager {
     public void setData(List<RoomPublicGiftMessageBean> items) {
         this.data.clear();
         this.data.addAll(items);
-        if (!isRunning) {
-            isRunning = true;
-            start();
-        }
+//        if (!isRunning) {
+//            isRunning = true;
+//            start();
+//        }
     }
 
     public void addData(RoomPublicGiftMessageBean item) {
         this.data.add(item);
-        if (!isRunning) {
-            isRunning = true;
-            start();
-        }
+//        if (!isRunning) {
+//            isRunning = true;
+//            start();
+//        }
+        start();
     }
 
     /**
@@ -108,9 +111,10 @@ public class GiftNotifyManager {
                             rootView.removeView(v);
                             data.remove(0);
                             if (data.size() > 0) {
-                                stop();
-                            } else {
+                                isRunning=false;
                                 start();
+                            } else {
+                                isRunning=false;
                             }
                         }
                     }

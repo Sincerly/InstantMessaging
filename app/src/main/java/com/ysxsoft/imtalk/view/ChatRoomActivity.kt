@@ -132,7 +132,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                                 d.giftName = giftName;
                                 d.goldNum = goldNum;
                                 giftEggManager!!.addData(d)
-                                giftEggManager!!.start()
+//                                giftEggManager!!.start()
                             }
                         }
                     }
@@ -165,7 +165,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         if ("1".equals(result.roomInfo.room_tex)){
                             if (giftNotifyManager!! != null) {
                                 giftNotifyManager!!.addData(roomPublicGiftMessageBean)
-                                giftNotifyManager!!.start()
+//                                giftNotifyManager!!.start()
                             }
                         }
                     }
@@ -409,6 +409,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var bgChangBroadCast: BgChangBroadCast? = null
     var giftEggManager: NotifyManager? = null
     var giftNotifyManager: GiftNotifyManager? = null
+    var giftUtils: GiftUtils? = null
     var myBroadcast: MyBroadcast? = null
     var fishBroadcast: FishBroadcast? = null
     var amdinType: Int? = -1
@@ -494,6 +495,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         ShareData()
         giftEggManager = NotifyManager(mContext as Activity?)
         giftNotifyManager = GiftNotifyManager(mContext as Activity?)
+        giftUtils = GiftUtils(mContext as Activity?)
     }
 
     inner class MyBroadcast : BroadcastReceiver() {
@@ -778,7 +780,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
             }
             if (playMusicService != null) {
-                if (playMusicService!!.isRunning) {
+                if (playMusicService!!.isRunning){
                     img_stop.setImageResource(R.mipmap.img_stop)
                 }
             }
@@ -814,7 +816,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                 override fun NextSong() {
                     if (playMusicService != null) {
                         var position = musicbean!!.position
-                        if (position < musicbean!!.list.size) {
+                        if (position <musicbean!!.list.size){
                             playMusicService!!.next()
                         }
                         position++
@@ -822,7 +824,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             position == 0
                             tv_song_name1.setText(musicbean!!.list.get(musicbean!!.position).music_name)
                         } else {
-                            if (position < musicbean!!.list.size) {
+                            if (position <musicbean!!.list.size) {
                                 tv_song_name1.setText(musicbean!!.list.get(position).music_name)
                             }
                         }
@@ -3048,7 +3050,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         message.setCmd(2)//离开房间
         message.targetUserId = uid
         message.targetPosition = -1
-        if (!TextUtils.isEmpty(AuthManager.getInstance().currentUserId)) {
+        if (!TextUtils.isEmpty(AuthManager.getInstance().currentUserId)){
             message.userInfo = io.rong.imlib.model.UserInfo(SpUtils.getSp(mContext, "uid"), nikeName, Uri.parse(icon))
         }
         val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, message)
@@ -3739,29 +3741,29 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     //分发动画结束之后 显示特效
-                                    var svgaImageView = SVGAImageView(mContext)
-                                    svgaImageView.scaleType = ImageView.ScaleType.FIT_XY
-                                    val parser = SVGAParser(mContext)
-                                    //铺满全屏
-                                    val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                                    svgaImageView.layoutParams = layoutParams;
-                                    f.addView(svgaImageView)
-                                    val inputStream = FileInputStream(downloadFile)
-                                    parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
-                                        override fun onComplete(videoItem: SVGAVideoEntity) {
-                                            val s = videoItem.frames / videoItem.FPS
-                                            Log.e("tag", "数据时长:" + s);
-                                            svgaImageView.setVideoItem(videoItem)
-                                            svgaImageView.stepToFrame(0, true)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                //移除特效动画
-                                                f.removeView(svgaImageView)
-                                            }, (s * 1000).toLong())
-                                        }
-
-                                        override fun onError() {
-                                        }
-                                    }, true)
+//                                    var svgaImageView = SVGAImageView(mContext)
+//                                    svgaImageView.scaleType = ImageView.ScaleType.FIT_XY
+//                                    val parser = SVGAParser(mContext)
+//                                    //铺满全屏
+//                                    val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+//                                    svgaImageView.layoutParams = layoutParams;
+//                                    f.addView(svgaImageView)
+//                                    val inputStream = FileInputStream(downloadFile)
+//                                    parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
+//                                        override fun onComplete(videoItem: SVGAVideoEntity) {
+//                                            val s = videoItem.frames / videoItem.FPS
+//                                            Log.e("tag", "数据时长:" + s);
+//                                            svgaImageView.setVideoItem(videoItem)
+//                                            svgaImageView.stepToFrame(0, true)
+//                                            Handler(Looper.getMainLooper()).postDelayed({
+//                                                //移除特效动画
+//                                                f.removeView(svgaImageView)
+//                                            }, (s * 1000).toLong())
+//                                        }
+//                                        override fun onError() {
+//                                        }
+//                                    }, true)
+                                    giftUtils!!.addData(giftImgUrl)
                                 }, (800).toLong())
                             } catch (e: FileNotFoundException) {
                                 e.printStackTrace()
@@ -3811,29 +3813,30 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         //分发动画结束之后 显示特效
-                        var svgaImageView = SVGAImageView(this)
-                        svgaImageView.scaleType = ImageView.ScaleType.FIT_XY
-                        val parser = SVGAParser(this)
-                        //铺满全屏
-                        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                        svgaImageView.layoutParams = layoutParams;
-                        f.addView(svgaImageView)
-                        val inputStream = FileInputStream(downloadFile)
-                        parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
-                            override fun onComplete(videoItem: SVGAVideoEntity) {
-                                val s = videoItem.frames / videoItem.FPS
-                                Log.e("tag", "数据时长:" + s);
-                                svgaImageView.setVideoItem(videoItem)
-                                svgaImageView.stepToFrame(0, true)
-                                Handler(Looper.getMainLooper()).postDelayed({
-                                    //移除特效动画
-                                    f.removeView(svgaImageView)
-                                }, (s * 1000).toLong())
-                            }
-
-                            override fun onError() {
-                            }
-                        }, true)
+//                        var svgaImageView = SVGAImageView(this)
+//                        svgaImageView.scaleType = ImageView.ScaleType.FIT_XY
+//                        val parser = SVGAParser(this)
+//                        //铺满全屏
+//                        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+//                        svgaImageView.layoutParams = layoutParams;
+//                        f.addView(svgaImageView)
+//                        val inputStream = FileInputStream(downloadFile)
+//                        parser.decodeFromInputStream(inputStream, destFileName, object : SVGAParser.ParseCompletion {
+//                            override fun onComplete(videoItem: SVGAVideoEntity) {
+//                                val s = videoItem.frames / videoItem.FPS
+//                                Log.e("tag", "数据时长:" + s);
+//                                svgaImageView.setVideoItem(videoItem)
+//                                svgaImageView.stepToFrame(0, true)
+//                                Handler(Looper.getMainLooper()).postDelayed({
+//                                    //移除特效动画
+//                                    f.removeView(svgaImageView)
+//                                }, (s * 1000).toLong())
+//                            }
+//
+//                            override fun onError() {
+//                            }
+//                        }, true)
+                        giftUtils!!.addData(giftImgUrl)
                     }, (800).toLong())
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()

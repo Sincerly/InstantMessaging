@@ -30,6 +30,7 @@ public class NotifyManager {
     private List<Data> data = new ArrayList<>();
     private boolean isRunning = false;
 
+
     public NotifyManager(Activity context) {
         this.context = context;
     }
@@ -37,11 +38,13 @@ public class NotifyManager {
     /**
      * 开启滚动
      */
-    public void start() {
-        isRunning = true;
+    public synchronized void start() {
         if (data.size() > 0) {
-            Data d = data.get(0);
-            addView(d.getNickName(), d.getGiftName(), d.getGoldNum());
+            if (!isRunning) {
+                Data d = data.get(0);
+                isRunning = true;
+                addView(d.getNickName(), d.getGiftName(), d.getGoldNum());
+            }
         }
     }
 
@@ -55,18 +58,11 @@ public class NotifyManager {
     public void setData(List<Data> items) {
         this.data.clear();
         this.data.addAll(items);
-        if (!isRunning) {
-            isRunning = true;
-            start();
-        }
     }
 
     public void addData(Data item) {
         this.data.add(item);
-        if (!isRunning) {
-            isRunning = true;
-            start();
-        }
+        start();
     }
 
     /**
@@ -116,9 +112,10 @@ public class NotifyManager {
                             rootView.removeView(v);
                             data.remove(0);
                             if (data.size() > 0) {
-                                stop();
-                            } else {
+                                isRunning = false;
                                 start();
+                            } else {
+                                isRunning = false;
                             }
                         }
                     }
@@ -163,9 +160,67 @@ public class NotifyManager {
 
     public void pause() {
         isPaused = true;
+//        if(thread!=null){
+//            thread.pauseThread();
+//        }
     }
 
     public void resume() {
         isPaused = false;
+//        if(thread!=null){
+//            thread.resumeThread();
+//        }
     }
+
+//    public class PlayThread extends Thread {
+//        private final Object lock = new Object();
+//        private boolean pause = false;
+//
+//        /**
+//         * 调用该方法实现线程的暂停
+//         */
+//        public void pauseThread() {
+//            pause = true;
+//        } /* 调用该方法实现恢复线程的运行 */
+//
+//        public void resumeThread() {
+//            pause = false;
+//            synchronized (lock) {
+//                lock.notify();
+//            }
+//        }
+//
+//        public boolean isPause(){
+//            return pause;
+//        }
+//
+//        /**
+//         * 这个方法只能在run 方法中实现，不然会阻塞主线程，导致页面无响应
+//         */
+//        void onPause() {
+//            synchronized (lock) {
+//                try {
+//                    lock.wait();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void run() {
+//            super.run();
+//            while (true) {
+//                while (pause) {
+//                    onPause();
+//                }
+//                if(data.size()>0){
+//                    if(!isRunning){
+//                        isRunning=true;
+//                        startAnim();
+//                    }
+//                }
+//            }
+//        }
+//    }
 }

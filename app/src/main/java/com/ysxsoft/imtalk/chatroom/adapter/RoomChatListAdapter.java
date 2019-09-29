@@ -143,7 +143,7 @@ public class RoomChatListAdapter extends BaseAdapter {
             if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.JOIN) {
                 String carName="";
                 if(memberMessage.getCarName()!=null&&!"".equals(memberMessage.getCarName())){
-                    carName="乘着"+memberMessage.getCarName();
+                    carName="伴着"+memberMessage.getCarName();
                 }
                 viewHolder.messageTv.setText((carName)+context.getString(R.string.chatroom_user_enter));
             }else if (roomMemberAction == RoomMemberChangedMessage.RoomMemberAction.LEAVE) {

@@ -10,6 +10,7 @@ import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -43,12 +44,19 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
 
     @Override
     public View newView(Context context, ViewGroup viewGroup) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_palmessage, (ViewGroup)null);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_rc_pal, (ViewGroup)null);
         ViewHolder holder = new ViewHolder();
+        holder.layoutPal = view.findViewById(R.id.layoutPal);
         holder.message = view.findViewById(R.id.tvContent);
         holder.tvMeili = view.findViewById(R.id.tvMeili);
         holder.tvZuan = view.findViewById(R.id.tvZuan);
         holder.tvNick = view.findViewById(R.id.tvNick);
+
+        holder.layoutPalEnd = view.findViewById(R.id.layoutPalEnd);
+        holder.messageEnd = view.findViewById(R.id.tvContentEnd);
+        holder.tvMeiliEnd = view.findViewById(R.id.tvMeiliEnd);
+        holder.tvZuanEnd = view.findViewById(R.id.tvZuanEnd);
+        holder.tvNickEnd = view.findViewById(R.id.tvNickEnd);
         view.setTag(holder);
         return view;
     }
@@ -84,36 +92,44 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
     @Override
     public void bindView(View v, int i, LobbyTextMessage textMessage, UIMessage data) {
         LobbyTextMessageProvider.ViewHolder holder = (LobbyTextMessageProvider.ViewHolder)v.getTag();
-        if (data.getMessageDirection() == Message.MessageDirection.SEND) {
-            holder.message.setBackgroundResource(R.drawable.icon_mytextmsg_right);
-            holder.tvMeili.setVisibility(View.GONE);
-            holder.tvZuan.setVisibility(View.GONE);
-            holder.tvNick.setVisibility(View.GONE);
-            holder.message.setTextColor(ContextCompat.getColor(MyApplication.mcontext, R.color.white));
-        } else {
-            holder.message.setBackgroundResource(R.drawable.icon_mytextmsg_left);
-            holder.tvMeili.setVisibility(View.VISIBLE);
-            holder.tvZuan.setVisibility(View.VISIBLE);
-            holder.tvNick.setVisibility(View.VISIBLE);
-            holder.message.setTextColor(ContextCompat.getColor(MyApplication.mcontext, R.color.colorAccent));
-            UserInfoBean.DataBean bean = new Gson().fromJson(textMessage.getExtra(), UserInfoBean.DataBean.class);
-            holder.tvNick.setText(bean.getNickname());
 
+        UserInfoBean.DataBean bean = new Gson().fromJson(textMessage.getExtra(), UserInfoBean.DataBean.class);
+        AutoLinkTextView textView;
+        if (data.getMessageDirection() == Message.MessageDirection.SEND) {
+            holder.layoutPal.setVisibility(View.GONE);
+            holder.layoutPalEnd.setVisibility(View.VISIBLE);
+            holder.messageEnd.setBackgroundResource(R.drawable.icon_mytextmsg_right);
+            holder.messageEnd.setTextColor(ContextCompat.getColor(MyApplication.mcontext, R.color.white));
+            textView= holder.messageEnd;
+            holder.tvNickEnd.setText(bean.getNickname());
+            holder.tvNickEnd.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, bean.getSex().equals("1") ? R.mipmap.icon_nan : R.mipmap.icon_nv, 0);
             int[] array = GradeIconUtils.Companion.charmIcon(bean.getCharm_level());
-//            holder.tvMeili.setCompoundDrawables(ContextCompat.getDrawable(MyApplication.mcontext, array[0]), null, null, null);
+            holder.tvMeiliEnd.setCompoundDrawablesWithIntrinsicBounds(array[0], 0, 0, 0);
+            holder.tvMeiliEnd.setTextColor(ContextCompat.getColor(MyApplication.mcontext, array[1]));
+            holder.tvMeiliEnd.setText(String.valueOf(bean.getCharm_level()));
+
+            int[] grade = GradeIconUtils.Companion.gradeIcon(bean.getCharm_level());
+            holder.tvZuanEnd.setCompoundDrawablesWithIntrinsicBounds(grade[0], 0, 0, 0);
+            holder.tvZuanEnd.setTextColor(ContextCompat.getColor(MyApplication.mcontext, grade[1]));
+            holder.tvZuanEnd.setText(String.valueOf(bean.getUser_level()));
+        } else {
+            holder.layoutPal.setVisibility(View.VISIBLE);
+            holder.layoutPalEnd.setVisibility(View.GONE);
+            holder.message.setBackgroundResource(R.drawable.icon_mytextmsg_left);
+            holder.message.setTextColor(ContextCompat.getColor(MyApplication.mcontext, R.color.colorAccent));
+            textView= holder.message;
+            holder.tvNick.setText(bean.getNickname());
+            holder.tvNick.setCompoundDrawablesRelativeWithIntrinsicBounds(bean.getSex().equals("1") ? R.mipmap.icon_nan : R.mipmap.icon_nv, 0, 0, 0);
+            int[] array = GradeIconUtils.Companion.charmIcon(bean.getCharm_level());
             holder.tvMeili.setCompoundDrawablesWithIntrinsicBounds(array[0], 0, 0, 0);
             holder.tvMeili.setTextColor(ContextCompat.getColor(MyApplication.mcontext, array[1]));
             holder.tvMeili.setText(String.valueOf(bean.getCharm_level()));
 
             int[] grade = GradeIconUtils.Companion.gradeIcon(bean.getCharm_level());
-//            holder.tvZuan.setCompoundDrawables(ContextCompat.getDrawable(MyApplication.mcontext, grade[0]), null, null, null);
             holder.tvZuan.setCompoundDrawablesWithIntrinsicBounds(grade[0], 0, 0, 0);
             holder.tvZuan.setTextColor(ContextCompat.getColor(MyApplication.mcontext, grade[1]));
             holder.tvZuan.setText(String.valueOf(bean.getUser_level()));
         }
-
-
-        final AutoLinkTextView textView = holder.message;
         if (textMessage.getContent() != null) {
             SpannableStringBuilder spannable = new SpannableStringBuilder(textMessage.getContent());
             SpannableStringBuilder spannable1 = AndroidEmoji.replaceEmojiWithText(spannable);
@@ -126,7 +142,7 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
             }
         }
 
-        holder.message.setMovementMethod(new LinkTextViewMovementMethod(link -> {
+        textView.setMovementMethod(new LinkTextViewMovementMethod(link -> {
             RongIM.ConversationBehaviorListener listener = RongContext.getInstance().getConversationBehaviorListener();
             RongIM.ConversationClickListener clickListener = RongContext.getInstance().getConversationClickListener();
             boolean result = false;
@@ -153,10 +169,17 @@ public class LobbyTextMessageProvider extends IContainerItemProvider.MessageProv
 
 
     private static class ViewHolder {
+        LinearLayout layoutPal;
         AutoLinkTextView message;
         TextView tvNick;
         TextView tvZuan;
         TextView tvMeili;
+
+        LinearLayout layoutPalEnd;
+        AutoLinkTextView messageEnd;
+        TextView tvNickEnd;
+        TextView tvZuanEnd;
+        TextView tvMeiliEnd;
 
         boolean longClick;
 

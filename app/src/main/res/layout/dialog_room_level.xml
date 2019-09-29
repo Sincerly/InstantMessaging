@@ -64,7 +64,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/include1" />
+        app:layout_constraintTop_toBottomOf="@id/include1"
+        android:background="@color/white"
+        />
 
 
 </android.support.constraint.ConstraintLayout>
