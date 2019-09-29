@@ -72,6 +72,7 @@ class PalMessageAdapter(mContext: Context) : ListBaseAdapter<Message>(mContext){
             tvZuan?.setTextColor(ContextCompat.getColor(mContext, grade[1]))
             tvZuan?.text = extra.user_level.toString()
             tvNick?.text = extra.nickname
+            tvNick?.setCompoundDrawablesRelativeWithIntrinsicBounds(if (extra.sex == "1") R.mipmap.icon_nan else R.mipmap.icon_nv, 0, 0, 0)
         }
     }
 

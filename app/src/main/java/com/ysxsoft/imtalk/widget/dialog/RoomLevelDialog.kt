@@ -71,6 +71,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
             }
             override fun onTabSelected(p0: TabLayout.Tab?) {
                 flagTop = p0!!.position
+                flagBottom = tabBottom.selectedTabPosition
                 getList()
             }
 
@@ -94,8 +95,8 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
      * 初始化adapter
      */
     private fun initAdapter(){
-        mAdapter1 = SupperStarAdapter(context)
-        mAdapter2 = TyrantListAdapter(context)
+        mAdapter1 = SupperStarAdapter(context, 1)
+        mAdapter2 = TyrantListAdapter(context, 1)
         recyclerView.layoutManager = LinearLayoutManager(context)
         mAdapter1.setOnSupperStarListener(object :SupperStarAdapter.OnSupperStarListener{
             override fun onClick(position: Int) {
@@ -239,6 +240,8 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         if (t.data.size > 3) {
                             mAdapter2.setDataList(t.data)
                             recyclerView.adapter = mAdapter2
+                        }else{
+                            mAdapter2.setDataList(ArrayList())
                         }
                     }else{//无数据
                         setTopThreeSupperStar(ArrayList())
@@ -261,6 +264,8 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         if (t.data.size > 3) {
                             mAdapter1.setDataList(t.data)
                             recyclerView.adapter = mAdapter1
+                        }else{
+                            mAdapter1.setDataList(ArrayList())
                         }
                     }else{//无数据
                         setTopThreeSupperStar(ArrayList())
@@ -302,6 +307,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop1Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop1Id.text = ttid
+                        tvTop1.text = data[i].award_gold
                     }
                 1 ->
                     if (data.size >= 2) {
@@ -309,7 +315,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop2Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop2Id.text = ttid
-                        tvTop2.text = "距前一名"+ data[i].next_user
+                        tvTop2.text = data[i].award_gold
                     }
                 2 ->
                     if (data.size >= 3) {
@@ -317,7 +323,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop3Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop3Id.text = ttid
-                        tvTop3.text = "距前一名"+ data[i].next_user
+                        tvTop3.text = data[i].award_gold
                     }
             }
         }
@@ -336,6 +342,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop1Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop1Id.text = ttid
+                        tvTop1.text = data[i].award_gold
                         ivTop1.setOnClickListener {
                             val giveDialog = GiveDialog(context,data[i].uid.toString(), roomid)
                             var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
@@ -395,7 +402,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop2Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop2Id.text = ttid
-                        tvTop2.text = "距前一名"+ data[i].next_user
+                        tvTop2.text = data[i].award_gold
                         ivTop2.setOnClickListener {
                             val giveDialog = GiveDialog(context,data[i].uid.toString(), roomid)
                             var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)
@@ -455,7 +462,7 @@ class RoomLevelDialog( context : Context, roomId : String) : BottomSheetDialog(c
                         tvTop3Name.text = data[i].nickname
                         val ttid = "ID:"+ data[i].tt_id
                         tvTop3Id.text = ttid
-                        tvTop3.text = "距前一名"+ data[i].next_user
+                        tvTop3.text = data[i].award_gold
                         ivTop3.setOnClickListener {
                             val giveDialog = GiveDialog(context,data[i].uid.toString(), roomid)
                             var findNikeName = giveDialog.findViewById<TextView>(R.id.tv_nikeName)

@@ -2,57 +2,58 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/layoutPal"
+    android:id="@+id/layoutPalEnd"
     android:orientation="vertical"
+    android:gravity="end"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         >
         <TextView
-            android:id="@+id/tvZuan"
-            android:layout_width="wrap_content"
-            android:layout_height="16dp"
-            android:background="@drawable/shape_solid_colorff_oval"
-            android:textSize="11sp"
-            android:textColor="@color/white"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:drawableStart="@mipmap/icon_zuan"
-            android:drawablePadding="5dp"
-            android:gravity="center_vertical"
-            />
-        <TextView
-            android:id="@+id/tvMeili"
-            android:layout_width="wrap_content"
-            android:layout_height="16dp"
-            android:layout_marginStart="5dp"
-            android:background="@drawable/shape_solid_colorff_oval"
-            android:textSize="11sp"
-            android:textColor="@color/white"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:drawableStart="@mipmap/icon_zuan"
-            android:drawablePadding="5dp"
-            android:gravity="center_vertical"
-            />
-        <TextView
-            android:id="@+id/tvNick"
+            android:id="@+id/tvNickEnd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:textSize="12sp"
             android:textColor="@color/color989898"
-            android:drawableStart="@mipmap/icon_nan"
+            android:drawableEnd="@mipmap/icon_nan"
             android:drawablePadding="4dp"
+            />
+        <TextView
+            android:id="@+id/tvMeiliEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/shape_solid_colorff_oval"
+            android:textSize="11sp"
+            android:textColor="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:drawableStart="@mipmap/icon_zuan"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            />
+        <TextView
+            android:id="@+id/tvZuanEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:background="@drawable/shape_solid_colorff_oval"
+            android:textSize="11sp"
+            android:textColor="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:drawableStart="@mipmap/icon_zuan"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
             />
     </LinearLayout>
 
     <io.rong.imkit.widget.AutoLinkTextView
-        android:id="@+id/tvContent"
+        android:id="@+id/tvContentEnd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

@@ -2,12 +2,15 @@ package com.ysxsoft.imtalk.utils
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.os.Process
 import android.support.multidex.MultiDex
 import android.util.Log
+import android.view.View
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash
 import com.umeng.commonsdk.UMConfigure
 import com.umeng.socialize.PlatformConfig
@@ -25,20 +28,18 @@ import com.ysxsoft.imtalk.im.message.PrivateGiftMessage
 import com.ysxsoft.imtalk.im.message.PrivateHeaderMessage
 import com.ysxsoft.imtalk.im.provider.*
 import com.ysxsoft.imtalk.rong.MyExtensionModule
+import com.ysxsoft.imtalk.view.MyDataActivity
 import com.ysxsoft.imtalk.widget.SinglePointLogin
 import com.ysxsoft.imtalk.widget.dialog.OnLineDialog
-import io.rong.imkit.DefaultExtensionModule
-import io.rong.imkit.IExtensionModule
-import io.rong.imkit.RongExtensionManager
-import io.rong.imkit.RongIM
+import io.rong.imkit.*
+import io.rong.imkit.model.UIMessage
+import io.rong.imkit.widget.provider.MessageItemLongClickAction
 import io.rong.imlib.RongIMClient
+import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Group
 import io.rong.imlib.model.Message
 import io.rong.imlib.model.UserInfo
-import io.rong.message.ImageMessage
-import io.rong.message.RichContentMessage
-import io.rong.message.TextMessage
-import io.rong.message.VoiceMessage
+import io.rong.message.*
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import org.litepal.LitePal
@@ -112,7 +113,40 @@ class BaseApplication : MyApplication() {
                 }
             }
         })
+        //会话页面头像点击事件
+        RongIM.setConversationClickListener(conversationClickListener)
+
         initMessageAndTemplate()
+    }
+
+    /**
+     * 聊天页面内部点击（头像，信息点击事件）
+     */
+    private val conversationClickListener = object : RongIM.ConversationClickListener {
+        override fun onUserPortraitClick(context: Context, conversationType: Conversation.ConversationType, userInfo: UserInfo, groupid: String): Boolean {
+            //用户头像点击事件
+            MyDataActivity.startMyDataActivity(context,userInfo.userId,if(userInfo.userId == AuthManager.getInstance().currentUserId) "myself" else "")
+            return true
+        }
+
+        override fun onUserPortraitLongClick(context: Context, conversationType: Conversation.ConversationType, userInfo: UserInfo, s: String): Boolean {
+            //用户头像长按点击事件
+            return false
+        }
+
+        override fun onMessageClick(context: Context, view: View, message: Message): Boolean {
+            //消息点击事件
+            return false
+        }
+
+        override fun onMessageLinkClick(context: Context, s: String, message: Message): Boolean {
+            //消息重发？
+            return false
+        }
+
+        override fun onMessageLongClick(context: Context, view: View, message: Message): Boolean {//消息长按点击事件
+            return false
+        }
     }
 
     fun initMessageAndTemplate() {
