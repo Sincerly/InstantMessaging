@@ -1,6 +1,5 @@
 package com.ysxsoft.imtalk.fragment
 
-import android.content.Context
 import android.text.TextUtils
 import android.view.View
 import com.google.gson.Gson
@@ -14,13 +13,9 @@ import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.*
-import com.ysxsoft.imtalk.widget.dialog.DatePickerDialog
-import io.rong.callkit.util.SPUtils
 import kotlinx.android.synthetic.main.fm_my.*
 import kotlinx.android.synthetic.main.include_my_top.*
 import kotlinx.android.synthetic.main.title_layout2.*
-import org.litepal.LitePal
-import org.litepal.extension.findAll
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -86,6 +81,9 @@ class MyFragment : BaseFragment() {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             dataBean = t.data
+                            if (!TextUtils.isEmpty(t.data.user_ts_pic)){
+                                ImageLoadUtil.GlideGoodsImageLoad(mContext,t.data.user_ts_pic,img_head_wear)
+                            }
                             //保存整个个人信息到本地
                             SharedPreferencesUtils.saveInfo(mContext, Gson().toJson(dataBean))
                             val info = UserInfo()

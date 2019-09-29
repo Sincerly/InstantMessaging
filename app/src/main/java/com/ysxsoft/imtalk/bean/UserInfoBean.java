@@ -76,6 +76,25 @@ public class UserInfoBean {
         private List<PictureBean> picture;
         private String user_zj_name;//座驾名称
         private String user_zj_pic;//座驾图片
+        private String user_ts_name;//t头饰名称
+
+        public String getUser_ts_name() {
+            return user_ts_name;
+        }
+
+        public void setUser_ts_name(String user_ts_name) {
+            this.user_ts_name = user_ts_name;
+        }
+
+        public String getUser_ts_pic() {
+            return user_ts_pic;
+        }
+
+        public void setUser_ts_pic(String user_ts_pic) {
+            this.user_ts_pic = user_ts_pic;
+        }
+
+        private String user_ts_pic;//t头饰图片
 
         public String getUser_zj_name() {
             return user_zj_name == null ? "" : user_zj_name;

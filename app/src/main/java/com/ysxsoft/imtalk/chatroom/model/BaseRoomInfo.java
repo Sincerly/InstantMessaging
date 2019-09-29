@@ -47,6 +47,16 @@ public class BaseRoomInfo {
         private String is_wheat;
         private String is_oc_wheat;
 
+        public String getRoom_tex() {
+            return room_tex;
+        }
+
+        public void setRoom_tex(String room_tex) {
+            this.room_tex = room_tex;
+        }
+
+        private String room_tex;
+
         public String getUser_ts() {
             return user_ts;
         }
