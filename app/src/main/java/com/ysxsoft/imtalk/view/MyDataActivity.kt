@@ -10,6 +10,8 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import com.ysxsoft.imtalk.R
+import com.ysxsoft.imtalk.R.id.*
+import com.ysxsoft.imtalk.R.mipmap.myself
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.FouceOnBean
 import com.ysxsoft.imtalk.bean.RoomLockBean
@@ -185,8 +187,15 @@ class MyDataActivity : BaseActivity() {
                             tv_id.setText("ID:" + t.data.tt_id)
                             tv_fance.setText(t.data.fans.toString())
                             tv_foucs.setText(t.data.gzrs.toString())
+
+                            val charmIcon = GradeIconUtils.charmIcon(t.data.charm_level)
+                            img_mei.setImageResource(charmIcon[0])
+                            tv_mei.setText(t.data.charm_level.toString())
+                            tv_mei.setTextColor(charmIcon[1])
+                            val ints = GradeIconUtils.gradeIcon(t.data.user_level)
                             tv_zs.setText(t.data.user_level.toString())
-                            tv_m.setText("魅" + t.data.charm_level.toString())
+                            img_zs.setImageResource(ints[0])
+                            tv_zs.setTextColor(ints[1])
                             when (t.data.sex) {
                                 "1" -> {
                                     img_sex.setImageResource(R.mipmap.img_boy)

@@ -34,10 +34,10 @@ class RegisterActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            if (!AppUtil.checkPhoneNum(et_phone.text.toString().trim())) {
-                showToastMessage("手机号输入不正确")
-                return@setOnClickListener
-            }
+//            if (!AppUtil.checkPhoneNum(et_phone.text.toString().trim())) {
+//                showToastMessage("手机号输入不正确")
+//                return@setOnClickListener
+//            }
             CountDownTimeHelper(60, tv_get_code)
             SendMsg(et_phone.text.toString().trim())
         }

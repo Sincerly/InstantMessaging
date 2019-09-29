@@ -4,7 +4,9 @@ import com.ysxsoft.imtalk.R
 
 class GradeIconUtils {
 
-
+    /**
+     * 魅力等级
+     */
     companion object{
         fun charmIcon( grade : Int) : IntArray{
             val array = intArrayOf(0,0)
@@ -52,6 +54,10 @@ class GradeIconUtils {
             }
             return array
         }
+
+        /**
+         * 用户等级
+         */
         fun gradeIcon(grade : Int) : IntArray{
             val array = intArrayOf(0,0)
             when(grade){

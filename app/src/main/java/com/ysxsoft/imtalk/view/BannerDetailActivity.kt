@@ -11,6 +11,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import kotlinx.android.synthetic.main.community_norms_layout.*
+import org.jsoup.Jsoup
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -50,7 +51,7 @@ class BannerDetailActivity:BaseActivity(){
 
                     override fun onNext(t: BannerDetailBean?) {
                         if (t!!.code==0) {
-                            web_content.loadDataWithBaseURL(null, t.data.content, "text/html", "utf-8", null)
+                            web_content.loadDataWithBaseURL(null,getNewContent(t.data.content) , "text/html", "utf-8", null)
                         }
                     }
 
@@ -64,5 +65,13 @@ class BannerDetailActivity:BaseActivity(){
             view.loadUrl(url)
             return true
         }
+    }
+    fun getNewContent(htmltext: String): String {
+        var doc = Jsoup.parse(htmltext);
+        val elements = doc.getElementsByTag("img");
+        for (element in elements) {
+            element.attr("width", "100%").attr("height", "auto");
+        }
+        return doc.toString();
     }
 }
