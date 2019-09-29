@@ -99,6 +99,7 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<UserInfoBean> {
                     override fun onError(e: Throwable?) {
+                        e!!.printStackTrace()
                     }
 
                     override fun onNext(t: UserInfoBean?) {
