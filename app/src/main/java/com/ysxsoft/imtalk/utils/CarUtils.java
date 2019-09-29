@@ -58,7 +58,6 @@ public class CarUtils {
             if (!downloadFile.exists()) {
                 //文件不存在进行下载
                 downloadGift(activity,carUrl,new OnDownLoadComplteListener(){
-
                     @Override
                     public void complete(String path) {
                         activity.runOnUiThread(new Runnable() {
