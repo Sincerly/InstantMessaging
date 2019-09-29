@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.ysxsoft.imtalk.R
@@ -14,7 +15,10 @@ import com.ysxsoft.imtalk.utils.displayUrl
 import com.ysxsoft.imtalk.utils.displayUrlCyclo
 import com.ysxsoft.imtalk.view.BankCardEditActivity
 
-class SupperStarAdapter(mContext:Context) :ListBaseAdapter<SupperStarBean.DataBean>(mContext) {
+class SupperStarAdapter(mContext:Context, type : Int) :ListBaseAdapter<SupperStarBean.DataBean>(mContext) {
+
+    private val flag = type
+
     override val layoutId: Int
         get() = R.layout.item_tyrant
 
@@ -33,10 +37,22 @@ class SupperStarAdapter(mContext:Context) :ListBaseAdapter<SupperStarBean.DataBe
         holder.getView<TextView>(R.id.tvId)!!.text = "ID："+bean.tt_id
         // 钻
         holder.getView<TextView>(R.id.tvNumb)!!.text = bean.now_level.toString()
-        // 数量
-        holder.getView<TextView>(R.id.tvSize)!!.text = bean.next_user
-        // 距离上一名差距
-        holder.getView<TextView>(R.id.tvGap)!!.text = "距离上一名"
+
+        if (flag == 0){//房外榜
+            holder.getView<TextView>(R.id.tvSize)!!.visibility = View.VISIBLE
+            holder.getView<TextView>(R.id.tvGap)!!.visibility = View.VISIBLE
+            holder.getView<TextView>(R.id.tvDialogNumb)!!.visibility = View.GONE
+            // 数量
+            holder.getView<TextView>(R.id.tvSize)!!.text = bean.next_user
+            // 距离上一名差距
+            holder.getView<TextView>(R.id.tvGap)!!.text = "距离上一名"
+        }else{//房内榜
+            holder.getView<TextView>(R.id.tvSize)!!.visibility = View.GONE
+            holder.getView<TextView>(R.id.tvGap)!!.visibility = View.GONE
+            holder.getView<TextView>(R.id.tvDialogNumb)!!.visibility = View.VISIBLE
+            holder.getView<TextView>(R.id.tvDialogNumb)!!.text = bean.award_gold
+        }
+
         holder.itemView.setOnClickListener {
             if (onSupperStarListener!=null){
                 onSupperStarListener!!.onClick(position+3)

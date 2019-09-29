@@ -80,7 +80,7 @@ class SupperStarActivity : BaseActivity() {
      * 初始化Adapter
      */
     private fun initAdapter() {
-        mAdapter = SupperStarAdapter(mContext)
+        mAdapter = SupperStarAdapter(mContext, 0)
         recyclerView.layoutManager = LinearLayoutManager(mContext)
         recyclerView.adapter = mAdapter
     }
