@@ -13,6 +13,7 @@ import com.ysxsoft.imtalk.chatroom.im.message.RoomAdminChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomBgChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomDestroyNotifyMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomEmjMessage;
+import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftAnnotationChangeMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomGiftMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomIsActiveMessage;
 import com.ysxsoft.imtalk.chatroom.im.message.RoomIsLockMessage;
@@ -85,6 +86,7 @@ public class IMClient {
             RongIMClient.registerMessageType(MicPositionGiftValueMessage.class);//房间礼物值是否显示
             RongIMClient.registerMessageType(RoomIsLockMessage.class);//房间是否加锁  是否纯净模式  是否开启公屏
             RongIMClient.registerMessageType(RoomAdminChangeMessage.class);//设置 或移除管理员
+            RongIMClient.registerMessageType(RoomGiftAnnotationChangeMessage.class);//房间礼物特效改变
 
             RongIMClient.registerMessageType(RoomPublicGiftMessage.class);//礼物公屏幕消息
             RongIMClient.registerMessageType(GiftChatMessage.class);//礼物小屏消息

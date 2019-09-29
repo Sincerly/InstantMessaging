@@ -56,7 +56,7 @@ class BaseApplication : MyApplication() {
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
-        CustomActivityOnCrash.install(this);
+//        CustomActivityOnCrash.install(this);
         UMConfigure.init(this, "5d650e274ca3578df70008cb", "umeng", UMConfigure.DEVICE_TYPE_PHONE, "");//58edcfeb310c93091c000be2 5965ee00734be40b580001a0
 
         LitePal.initialize(this)//初始化LitePal数据库
