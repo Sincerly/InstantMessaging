@@ -473,7 +473,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         EventBus.getDefault().register(this);
         setLightStatusBar(false)
         initStatusBar(topView)
-        setTitle("这是哈哈哈的房间")
+//        setTitle("")
         requestMyData()
         initView()
 //        initRoom(room_id!!)

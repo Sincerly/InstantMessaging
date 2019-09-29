@@ -16,6 +16,7 @@
             android:id="@+id/img_logo"
             android:layout_width="81dp"
             android:layout_height="81dp"
+            android:scaleType="centerCrop"
             android:layout_gravity="center" />
 
 
