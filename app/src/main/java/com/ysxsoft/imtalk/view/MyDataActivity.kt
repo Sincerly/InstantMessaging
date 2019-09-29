@@ -513,13 +513,15 @@ class MyDataActivity : BaseActivity() {
                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                     override fun onAttached(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
+                        if ("room".equals(room)){
+                            sendBroadcast(Intent("FINSH"))
+                        }
                     }
 
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
-                        sendBroadcast(Intent("FINSH"))
-                        finish()
                         ChatRoomActivity.starChatRoomActivity(mContext, roomId, bean!!.nickname, bean!!.icon, "")
+                        finish()
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {
