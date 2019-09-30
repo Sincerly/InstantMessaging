@@ -139,10 +139,12 @@ class FamilyFindFragment : BaseFragment() {
         }
 
         ll_notice.setOnClickListener {
-            NoticeActivity.starNoticeActivity(mContext, "1")
+//            NoticeActivity.starNoticeActivity(mContext, "1")
+            PalLobbyActivity.intentPalLobbyActivity(PalLobbyGrade.groupId,1)
         }
         tv_marque_title.setItemOnClickListener { data, position ->
-            NoticeActivity.starNoticeActivity(mContext, "1")
+//            NoticeActivity.starNoticeActivity(mContext, "1")
+            PalLobbyActivity.intentPalLobbyActivity(PalLobbyGrade.groupId,1)
         }
         //交友大厅
         tv_look.setOnClickListener {
@@ -157,7 +159,7 @@ class FamilyFindFragment : BaseFragment() {
     private fun intoPalLobby(){
         PalLobbyGrade.getGroupId(object : PalLobbyGradeListener{
             override fun getGroupId(groupId: String) {
-                PalLobbyActivity.intentPalLobbyActivity(PalLobbyGrade.groupId)
+                PalLobbyActivity.intentPalLobbyActivity(PalLobbyGrade.groupId,0)
             }
         })
     }

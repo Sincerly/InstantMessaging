@@ -25,13 +25,15 @@ import kotlinx.android.synthetic.main.fragment_house.img_right
 import kotlinx.android.synthetic.main.notice_title_layout.*
 
 private const val ARG_GROUPID = "arg_groupid"
+private const val TYPE = "type"
 
 class PalLobbyActivity : BaseActivity() {
 
     companion object{
-        fun intentPalLobbyActivity( groupid : String){
+        fun intentPalLobbyActivity( groupid : String,type:Int){
             val bundle = Bundle()
             bundle.putString(ARG_GROUPID, groupid)
+            bundle.putInt(TYPE, type)
             val intent = Intent(MyApplication.mcontext, PalLobbyActivity::class.java)
             intent.putExtras(bundle)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -40,6 +42,7 @@ class PalLobbyActivity : BaseActivity() {
     }
 
     private lateinit var groupId : String
+    private  var type =0
     private var titles = arrayListOf("交友大厅", "系统公告")
 
     override fun getLayout(): Int {
@@ -49,6 +52,7 @@ class PalLobbyActivity : BaseActivity() {
     override fun initUi() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR//黑色
         groupId = intent.extras?.getString(ARG_GROUPID, "")!!
+        type = intent.extras?.getInt(TYPE, 0)!!
         toolBar.setNavigationOnClickListener { finish() }
         ivHelp.setOnClickListener {
             HelpPopuwindows(mContext, R.layout.pop_layout, ivHelp)
@@ -65,6 +69,7 @@ class PalLobbyActivity : BaseActivity() {
         val fgVpAdapter = FgVpAdapter(supportFragmentManager, informfragments)
         viewPager.adapter = fgVpAdapter
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabTop.getTabLayout()))
+        viewPager.currentItem=type
         tabTop.setupWithViewPager(viewPager)
     }
 

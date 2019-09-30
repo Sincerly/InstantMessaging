@@ -398,6 +398,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     private var handler: Handler? = null
     var room_id: String? = null
     var nikeName: String? = null
+    var iswheat: String? = null
     var icon: String? = null
     var identical: String? = null
     var roomManager: RoomManager? = null
@@ -561,6 +562,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                     override fun onNext(t: IsAdminBean?) {
                         if (t!!.code == 0) {
                             amdinType = t.data.is_admin.toInt()
+                             iswheat = t.data.is_wheat
                             initRoom(room_id!!)
                         }
                     }
@@ -838,6 +840,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             voiceDialog!!.show()
         }
 
+        if (TextUtils.isEmpty(iswheat)) {
+            tv_music.visibility=View.GONE
+        }else{
+            tv_music.visibility=View.VISIBLE
+        }
         img_send_msg.setOnClickListener {
             ll_isShow.visibility = View.GONE
             ll_send.visibility = View.VISIBLE
