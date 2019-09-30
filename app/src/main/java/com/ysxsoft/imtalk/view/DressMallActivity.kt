@@ -103,6 +103,10 @@ class DressMallActivity : BaseActivity() {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_head)
+                            if (!TextUtils.isEmpty(t.data.user_ts_pic)){
+                                ImageLoadUtil.GlideGoodsImageLoad(mContext,t.data.user_ts_pic,img_head_wear)
+                            }
+
                         }
                     }
 

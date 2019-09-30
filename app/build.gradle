@@ -33,7 +33,11 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    signingConfigs {
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+        signingConfigs {
         debug {
             storeFile file('ysxkey.jks')
             storePassword "111111"

@@ -29,6 +29,7 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_add_room.*
+import kotlinx.android.synthetic.main.activity_add_room.view.*
 import kotlinx.android.synthetic.main.room_tag_layout.*
 import kotlinx.android.synthetic.main.title_layout.*
 import rx.android.schedulers.AndroidSchedulers
@@ -54,10 +55,11 @@ class AddRoomActivity : BaseActivity() {
     var room_id: String? = null
     var room_name: String? = null
     var room_pwd: String? = null
-    var is_lock:Int? = 0
-    var room_gift_tx:Int?  = 0
-    var room_is_fair :Int? = 0
-    var room_pure:Int?  = 0
+    var is_lock: Int? = 0
+    var room_gift_tx: Int? = 0
+    var room_is_fair: Int? = 0
+    var room_pure: Int? = 0
+    var room_tex: Int? = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         room_id = intent.getStringExtra("room_id")
@@ -74,13 +76,14 @@ class AddRoomActivity : BaseActivity() {
         RoomManager.getInstance().getRoomDetailInfo(room_id, object : ResultCallback<DetailRoomInfo> {
             override fun onSuccess(roomDetailInfo: DetailRoomInfo?) {
                 if (roomDetailInfo != null) {
-                    if(!TextUtils.isEmpty(roomDetailInfo.roomInfo.is_lock)){
-                        is_lock=roomDetailInfo.roomInfo.is_lock.toInt()
+                    if (!TextUtils.isEmpty(roomDetailInfo.roomInfo.is_lock)) {
+                        is_lock = roomDetailInfo.roomInfo.is_lock.toInt()
                     }
-                    room_gift_tx=roomDetailInfo.roomInfo.room_gift_tx.toInt()
-                    room_is_fair=roomDetailInfo.roomInfo.room_is_fair.toInt()
-                    room_pure=roomDetailInfo.roomInfo.room_pure.toInt()
-                    room_pwd=roomDetailInfo.roomInfo.lock_pwd
+                    room_gift_tx = roomDetailInfo.roomInfo.room_gift_tx.toInt()
+                    room_is_fair = roomDetailInfo.roomInfo.room_is_fair.toInt()
+                    room_pure = roomDetailInfo.roomInfo.room_pure.toInt()
+                    room_pwd = roomDetailInfo.roomInfo.lock_pwd
+                    room_tex = roomDetailInfo.roomInfo.room_tex.toInt()
 
                     tv_fj_bq.setText(roomDetailInfo.roomInfo.room_label)
                     if ("0".equals(roomDetailInfo.roomInfo.is_lock)) {//上锁
@@ -106,6 +109,12 @@ class AddRoomActivity : BaseActivity() {
                         switch_ms.isChecked = false
                     } else {
                         switch_ms.isChecked = true
+                    }
+
+                     if ("2".equals(roomDetailInfo.roomInfo.room_tex)) {//房间礼物特效
+                         switch_gift.isChecked = false
+                    } else {
+                         switch_gift.isChecked = true
                     }
                 }
             }
@@ -172,10 +181,18 @@ class AddRoomActivity : BaseActivity() {
             startActivityForResult(intent, 0)
         }
 
+        switch_gift.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
+            if (isChecked) {
+                room_tex=1
+            }else{
+                room_tex=2
+            }
+        }
+
         //房间礼物特效
         switch_tx.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
             if (isChecked) {
-                room_gift_tx =1
+                room_gift_tx = 1
             } else {
                 room_gift_tx = 0
             }
@@ -219,6 +236,7 @@ class AddRoomActivity : BaseActivity() {
         paramsMap.put("room_gift_tx", room_gift_tx.toString())
         paramsMap.put("room_is_fair", room_is_fair.toString())
         paramsMap.put("room_pure", room_pure.toString())
+        paramsMap.put("room_tex", room_tex.toString())
         val body = RetrofitUtil.createJsonRequest(paramsMap)
         NetWork.getService(ImpService::class.java)
                 .setRoomInfo(body)
@@ -348,9 +366,9 @@ class AddRoomActivity : BaseActivity() {
                             })
 
                             val lockMessage = RoomIsLockMessage()
-                            lockMessage.isLock=is_lock.toString()
-                            lockMessage.isFair=room_is_fair.toString()
-                            lockMessage.isPure=room_pure.toString()
+                            lockMessage.isLock = is_lock.toString()
+                            lockMessage.isFair = room_is_fair.toString()
+                            lockMessage.isPure = room_pure.toString()
                             val obtain = Message.obtain(room_id, Conversation.ConversationType.CHATROOM, lockMessage)
                             RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                                 override fun onAttached(p0: Message?) {
@@ -365,7 +383,6 @@ class AddRoomActivity : BaseActivity() {
                                     Log.d("tag", p0!!.content.toString())
                                 }
                             });
-
 
                             finish()
                         }

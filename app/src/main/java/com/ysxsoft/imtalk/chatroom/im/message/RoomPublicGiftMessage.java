@@ -33,6 +33,7 @@ public class RoomPublicGiftMessage extends MessageContent {
     private String nickname;//昵称
     private String sgName;//礼物名称
     private String goldNums;//金币数量
+    private String roomId;//房间id
 
     public RoomPublicGiftMessage(byte[] data) {
         String jsonStr = null;
@@ -53,6 +54,7 @@ public class RoomPublicGiftMessage extends MessageContent {
             setNickname(jsonObj.optString("nickname"));
             setSgName(jsonObj.optString("sg_name"));
             setGoldNums(jsonObj.optString("gold_nums"));
+            setRoomId(jsonObj.optString("room_id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -130,6 +132,14 @@ public class RoomPublicGiftMessage extends MessageContent {
         this.giftNums = giftNums;
     }
 
+    public String getRoomId() {
+        return roomId == null ? "" : roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
     @Override
     public byte[] encode() {
         JSONObject jsonObj = new JSONObject();
@@ -144,6 +154,7 @@ public class RoomPublicGiftMessage extends MessageContent {
             jsonObj.put("nickname", nickname);
             jsonObj.put("sg_name", sgName);
             jsonObj.put("gold_nums", goldNums);
+            jsonObj.put("room_id", roomId);
             byte[] bytes = jsonObj.toString().getBytes("UTF-8");
             return bytes;
         } catch (UnsupportedEncodingException e) {
@@ -173,6 +184,7 @@ public class RoomPublicGiftMessage extends MessageContent {
         dest.writeString(this.nickname);
         dest.writeString(this.sgName);
         dest.writeString(this.goldNums);
+        dest.writeString(this.roomId);
     }
 
     protected RoomPublicGiftMessage(Parcel in) {
@@ -185,6 +197,7 @@ public class RoomPublicGiftMessage extends MessageContent {
         this.nickname=in.readString();
         this.sgName=in.readString();
         this.goldNums=in.readString();
+        this.roomId=in.readString();
     }
 
     public static final Creator<RoomPublicGiftMessage> CREATOR = new Creator<RoomPublicGiftMessage>() {

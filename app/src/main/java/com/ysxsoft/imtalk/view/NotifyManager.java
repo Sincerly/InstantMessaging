@@ -92,6 +92,7 @@ public class NotifyManager {
         int halfWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth() / 2;
         int maxWidth = AppUtil.INSTANCE.getScreenWidth(context) + rootView.getWidth() * 3 / 2;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.topMargin=DisplayUtils.dp2px(context,24);
         v.setLayoutParams(layoutParams);
 
         v.setX(halfWidth);//首先设定在屏幕外边

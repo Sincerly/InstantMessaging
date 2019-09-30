@@ -35,6 +35,7 @@ import com.opensource.svgaplayer.SVGAImageView
 import com.opensource.svgaplayer.SVGAParser
 import com.opensource.svgaplayer.SVGAVideoEntity
 import com.umeng.socialize.ShareAction
+import com.umeng.socialize.UMShareAPI
 import com.umeng.socialize.UMShareListener
 import com.umeng.socialize.bean.SHARE_MEDIA
 import com.umeng.socialize.media.UMImage
@@ -107,22 +108,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onGoldMessage(nickname: String?, giftName: String?, goldNum: String?) {
 
         if (!supportFragmentManager.isDestroyed) {
-            if (giftEggManager!! != null) {
-                val d = NotifyManager.Data()
-                d.nickName = nickname;
-                d.giftName = giftName;
-                d.goldNum = goldNum;
-                giftEggManager!!.addData(d)
-            }
-        }
-    }
-
-    override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
-        //送礼物超过一定公屏消息
-        if (!supportFragmentManager.isDestroyed) {
-            if (giftNotifyManager!! != null) {
-                giftNotifyManager!!.addData(roomPublicGiftMessageBean)
-            }
+//            if (giftEggManager!! != null) {
+//                val d = NotifyManager.Data()
+//                d.nickName = nickname;
+//                d.giftName = giftName;
+//                d.goldNum = goldNum;
+//                giftEggManager!!.addData(d)
+//                giftEggManager!!.start()
+//            }
             roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
                 override fun onSuccess(result: DetailRoomInfo?) {
                     if (result != null) {
@@ -131,6 +124,49 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         } else {
                             tv_room_manager.setText(result.roomInfo.gifts)
                             UpdataTips(result.micPositions!!, true)
+                        }
+                        if ("1".equals(result.roomInfo.room_tex)) {
+                            if (giftEggManager!! != null) {
+                                val d = NotifyManager.Data()
+                                d.nickName = nickname;
+                                d.giftName = giftName;
+                                d.goldNum = goldNum;
+                                giftEggManager!!.addData(d)
+//                                giftEggManager!!.start()
+                            }
+                        }
+                    }
+                }
+
+                override fun onFail(errorCode: Int) {
+
+                }
+            })
+        }
+    }
+
+    override fun onGiftMessage(roomPublicGiftMessageBean: RoomPublicGiftMessageBean?) {
+        //送礼物超过一定公屏消息
+        if (!supportFragmentManager.isDestroyed) {
+//            if (giftNotifyManager!! != null) {
+//                giftNotifyManager!!.addData(roomPublicGiftMessageBean)
+//                giftNotifyManager!!.start()
+//            }
+            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                override fun onSuccess(result: DetailRoomInfo?) {
+                    if (result != null) {
+                        if ("0".equals(result.roomInfo.room_gift_tx)) {
+                            UpdataTips(result.micPositions!!, false)
+                        } else {
+                            tv_room_manager.setText(result.roomInfo.gifts)
+                            UpdataTips(result.micPositions!!, true)
+                        }
+
+                        if ("1".equals(result.roomInfo.room_tex)){
+                            if (giftNotifyManager!! != null) {
+                                giftNotifyManager!!.addData(roomPublicGiftMessageBean)
+//                                giftNotifyManager!!.start()
+                            }
                         }
                     }
                 }
@@ -192,7 +228,27 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     override fun onRoomGift(p: Int, toP: List<Int>, giftUrl: String, staticUrl: String) {
         //房间动画
         if (!supportFragmentManager.isDestroyed) {
-            showPositionGift(p, toP, giftUrl, staticUrl)
+//            showPositionGift(p, toP, giftUrl, staticUrl)
+
+            roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                override fun onSuccess(result: DetailRoomInfo?) {
+                    if (result != null) {
+                        if ("0".equals(result.roomInfo.room_gift_tx)) {
+                            UpdataTips(result.micPositions!!, false)
+                        } else {
+                            tv_room_manager.setText(result.roomInfo.gifts)
+                            UpdataTips(result.micPositions!!, true)
+                        }
+                        if ("1".equals(result.roomInfo.room_tex)){
+                            showPositionGift(p, toP, giftUrl, staticUrl)
+                        }
+                    }
+                }
+
+                override fun onFail(errorCode: Int) {
+
+                }
+            })
         }
     }
 
@@ -355,6 +411,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
     var giftNotifyManager: GiftNotifyManager? = null
     var giftUtils: GiftUtils? = null
     var myBroadcast: MyBroadcast? = null
+    var fishBroadcast: FishBroadcast? = null
     var amdinType: Int? = -1
     var isStop: Boolean = false
 
@@ -416,7 +473,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         EventBus.getDefault().register(this);
         setLightStatusBar(false)
         initStatusBar(topView)
-        setTitle("这是哈哈哈的房间")
+//        setTitle("")
         requestMyData()
         initView()
 //        initRoom(room_id!!)
@@ -425,11 +482,16 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         bgChangBroadCast = BgChangBroadCast()
         val intentFilter = IntentFilter("BGCHANG")
         val intentFilter1 = IntentFilter("TEXTMESSAGE")
+        val fishFilter = IntentFilter("FINSH")
         registerReceiver(bgChangBroadCast, intentFilter)
         if (myBroadcast == null) {
             myBroadcast = MyBroadcast()
         }
+        if (fishBroadcast == null) {
+            fishBroadcast = FishBroadcast()
+        }
         registerReceiver(myBroadcast, intentFilter1)
+        registerReceiver(fishBroadcast, fishFilter)
         ShareData()
         giftEggManager = NotifyManager(mContext as Activity?)
         giftNotifyManager = GiftNotifyManager(mContext as Activity?)
@@ -440,6 +502,14 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         override fun onReceive(context: Context?, intent: Intent?) {
             if ("TEXTMESSAGE".equals(intent!!.action)) {
                 tv_point.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    inner class FishBroadcast : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if ("FINSH".equals(intent!!.action)) {
+                finish()
             }
         }
     }
@@ -509,9 +579,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             img_w_lock.visibility = View.VISIBLE
         }
         if ("0".equals(fair)) {//是否开启公屏
-            chatroom_list_chat.visibility = View.VISIBLE
-        } else {
             chatroom_list_chat.visibility = View.GONE
+        } else {
+            chatroom_list_chat.visibility = View.VISIBLE
         }
         if ("0".equals(pure)) {//纯净模式
             img_gold_egg.visibility = View.VISIBLE
@@ -781,7 +851,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         tv_send.setOnClickListener {
-            if (!"0".equals(fair)) {
+            if ("0".equals(fair)) {
                 showToastMessage("当前为公屏模式")
                 return@setOnClickListener
             }
@@ -950,7 +1020,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         setMicSeaViewList()
         // 默认麦克不可用
         enableUseMic(false)
-        defaultMarginBottom = DisplayUtils.dp2px(this, 10)
+        defaultMarginBottom = DisplayUtils.dp2px(this, 20)
 
         //启用软件弹出监听
         enableKeyboardStateListener(true)
@@ -971,7 +1041,20 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             }
 
             override fun onClck(targetPosition: Int, toPosition: List<Int>, pic: String, dataList: List<RoomMicListBean.DataBean>, gifPic: String, gifName: String, gifNum: String, targetUserId: String, targetUserName: String, data: MutableList<GiftSendBean.DataBean>) {
-                showPositionGift(targetPosition, toPosition, gifPic, pic)
+                roomManager!!.getRoomDetailInfo1(room_id, object : ResultCallback<DetailRoomInfo> {
+                    override fun onSuccess(result: DetailRoomInfo?) {
+                        if (result != null) {
+                            if ("1".equals(result.roomInfo.room_tex)){
+                                showPositionGift(targetPosition, toPosition, gifPic, pic)
+                            }
+                        }
+                    }
+
+                    override fun onFail(errorCode: Int) {
+
+                    }
+                })
+
                 if ("".equals(targetUserId)) {
                     //全麦赠送/ 多人
                     for (bean in dataList) {
@@ -3074,6 +3157,8 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if (!Settings.canDrawOverlays(this)) {
                 showToastMessage("授权失败")
@@ -3390,9 +3475,9 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         img_w_lock.visibility = View.VISIBLE
                     }
                     if ("0".equals(fair)) {//是否开启公屏
-                        chatroom_list_chat.visibility = View.VISIBLE
-                    } else {
                         chatroom_list_chat.visibility = View.GONE
+                    } else {
+                        chatroom_list_chat.visibility = View.VISIBLE
                     }
                     if ("0".equals(pure)) {//纯净模式
                         img_gold_egg.visibility = View.VISIBLE
@@ -3414,6 +3499,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         unregisterReceiver(headsetPlugReceiver)
         unregisterReceiver(bgChangBroadCast)
         unregisterReceiver(myBroadcast)
+        unregisterReceiver(fishBroadcast)
         if (audioManager != null) {
             audioManager!!.setMode(AudioManager.MODE_NORMAL)
         }
@@ -4055,13 +4141,15 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         override fun onCancel(p0: SHARE_MEDIA?) {
-            showToastMessage("分享取消了")
+            Log.d("tag",p0!!.name.toString())
         }
 
         override fun onError(p0: SHARE_MEDIA?, p1: Throwable?) {
-        }
+            Log.d("tag",p0!!.name.toString()+"===="+p1!!.message.toString())
+    }
 
         override fun onStart(p0: SHARE_MEDIA?) {
+            Log.d("tag",p0!!.name.toString())
         }
     }
 

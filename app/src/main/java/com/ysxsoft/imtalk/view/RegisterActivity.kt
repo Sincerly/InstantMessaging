@@ -83,6 +83,10 @@ class RegisterActivity : BaseActivity() {
         ll_login.setOnClickListener {
             finish()
         }
+
+        tv_rules.setOnClickListener {
+            startActivity(UserRulesActivity::class.java)
+        }
     }
 
     private fun saveData() {

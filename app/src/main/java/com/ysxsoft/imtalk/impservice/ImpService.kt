@@ -649,6 +649,9 @@ interface ImpService {
     @POST("index/system_help")
     fun system_help(): Observable<SystemHelpBean>
 
+    @POST("index/user_xy")
+    fun user_xy(): Observable<UserXyBean>
+
     @POST("index/version")
     fun version(@Body body: RequestBody): Observable<VersionBean>
 

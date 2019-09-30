@@ -159,6 +159,9 @@ class MyDataActivity : BaseActivity() {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             mybean = t.data
+                            if (!TextUtils.isEmpty(t.data.user_ts_pic)){
+                               ImageLoadUtil.GlideGoodsImageLoad(mContext,t.data.user_ts_pic,img_head_wear)
+                            }
                         }
                     }
 
@@ -182,6 +185,9 @@ class MyDataActivity : BaseActivity() {
                         if (t!!.code == 0) {
                             bean = t.data
                             initView()
+                            if (!TextUtils.isEmpty(t.data.user_ts_pic)){
+                                ImageLoadUtil.GlideGoodsImageLoad(mContext,t.data.user_ts_pic,img_head_wear)
+                            }
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_head)
                             tv_nikeName.setText(t.data.nickname)
                             tv_id.setText("ID:" + t.data.tt_id)
@@ -295,7 +301,7 @@ class MyDataActivity : BaseActivity() {
             } else {
                 if (!TextUtils.isEmpty(mybean!!.now_roomId)){
                     if (!TextUtils.isEmpty(bean!!.roomId)){
-                        quiteRoom(AuthManager.getInstance().currentUserId, "1")
+                        quiteRoom(AuthManager.getInstance().currentUserId, "1",mybean!!.now_roomId)
                     }else{
                         showToastMessage("Ta没有房间")
                     }
@@ -396,13 +402,13 @@ class MyDataActivity : BaseActivity() {
     /**
      * 我 退出房间
      */
-    private fun quiteRoom(uid: String, kick: String) {
+    private fun quiteRoom(uid: String, kick: String,newRoomId:String) {
         val message = RoomMemberChangedMessage()
         message.setCmd(2)//离开房间
         message.targetUserId = uid
         message.targetPosition = -1
         message.userInfo = io.rong.imlib.model.UserInfo(AuthManager.getInstance().currentUserId, mybean!!.nickname, Uri.parse(mybean!!.icon))
-        val obtain = Message.obtain(bean!!.now_roomId, Conversation.ConversationType.CHATROOM, message)
+        val obtain = Message.obtain(newRoomId, Conversation.ConversationType.CHATROOM, message)
 
         RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
             override fun onAttached(p0: Message?) {
@@ -411,7 +417,7 @@ class MyDataActivity : BaseActivity() {
 
             override fun onSuccess(p0: Message?) {
                 NetWork.getService(ImpService::class.java)
-                        .tCRoom(uid, kick, bean!!.now_roomId)
+                        .tCRoom(uid, kick, newRoomId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(object : Observer<CommonBean> {
@@ -421,11 +427,9 @@ class MyDataActivity : BaseActivity() {
                             override fun onNext(t: CommonBean?) {
                                 showToastMessage(t!!.msg)
                                 if (t.code == 0) {
-                                    IMClient.getInstance().quitChatRoom(bean!!.now_roomId, null)
-                                    RtcClient.getInstance().quitRtcRoom(bean!!.now_roomId, null)
-//                                    joinChatRoom(bean!!.roomId)
+                                    IMClient.getInstance().quitChatRoom(newRoomId, null)
+                                    RtcClient.getInstance().quitRtcRoom(newRoomId, null)
                                     roomLock(bean!!.roomId.toString())
-//                                    finish()
                                 }
                             }
 
@@ -509,11 +513,15 @@ class MyDataActivity : BaseActivity() {
                 RongIMClient.getInstance().sendMessage(obtain, null, null, object : IRongCallback.ISendMessageCallback {
                     override fun onAttached(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
+                        if ("room".equals(room)){
+                            sendBroadcast(Intent("FINSH"))
+                        }
                     }
 
                     override fun onSuccess(p0: Message?) {
                         Log.d("tag", p0!!.content.toString())
                         ChatRoomActivity.starChatRoomActivity(mContext, roomId, bean!!.nickname, bean!!.icon, "")
+                        finish()
                     }
 
                     override fun onError(p0: Message?, p1: RongIMClient.ErrorCode?) {

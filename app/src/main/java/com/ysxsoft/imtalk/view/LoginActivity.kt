@@ -86,6 +86,10 @@ class LoginActivity : BaseActivity() {
 
             saveData()
         }
+
+        tv_rules.setOnClickListener {
+            startActivity(UserRulesActivity::class.java)
+        }
     }
 
     override fun onResume() {

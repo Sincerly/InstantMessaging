@@ -157,4 +157,6 @@ public interface RoomEventListener {
      */
     void setManager(String uid,String cmd);
 
+//    void onRoomGiftAnnotation();
+
 }

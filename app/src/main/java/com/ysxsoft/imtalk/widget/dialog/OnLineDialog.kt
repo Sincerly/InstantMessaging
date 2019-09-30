@@ -60,6 +60,7 @@ class OnLineDialog(var mContext: Context) : ABSDialog(mContext) {
                 })
 
         tv_ok.setOnClickListener {
+            mContext.sendBroadcast(Intent("WINDOW"))
             var instance = ActivityPageManager.getInstance();
             instance!!.finishAllActivity();
             SpUtils.deleteSp(mContext)

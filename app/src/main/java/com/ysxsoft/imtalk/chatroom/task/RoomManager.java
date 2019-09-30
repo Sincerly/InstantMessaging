@@ -915,7 +915,7 @@ public class RoomManager {
                                                 @Override
                                                 public void run() {
                                                     roomEventlistener.onGiftMessage(messageBean);
-                                                    if(!message.getTargetId().equals(currentRoom.getRoomInfo().getRoom_id())){
+                                                    if(msg.getRoomId()!=null&&!msg.getRoomId().equals(currentRoom.getRoomInfo().getRoom_id())){
                                                         GiftChatMessage giftChatMessage = new GiftChatMessage();
                                                         //礼物名称
                                                         giftChatMessage.setGiftName("");//TODO：Sincerly 缺少礼物名字
@@ -939,7 +939,7 @@ public class RoomManager {
                                                 @Override
                                                 public void run() {
                                                     roomEventlistener.onGoldMessage(msg.getNickname(), msg.getSgName(), "(" + msg.getGoldNums() + "金币)");
-                                                    if(!message.getTargetId().equals(currentRoom.getRoomInfo().getRoom_id())){
+                                                    if(msg.getRoomId()!=null&&!msg.getRoomId().equals(currentRoom.getRoomInfo().getRoom_id())){
                                                         EggChatMessage eggChatMessage = new EggChatMessage();
                                                         //礼物名称
                                                         eggChatMessage.setGiftName(msg.getSgName()+"("+msg.getGoldNums()+")");
