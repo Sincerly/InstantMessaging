@@ -54,7 +54,7 @@
             android:text="68"
             android:textColor="@color/white"
             android:textSize="13sp"
-            android:background="@drawable/shape_solid_colorcc_oval"
+            android:background="@drawable/shape_solid_coloreb_oval"
             android:drawableStart="@mipmap/icon_zuan"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"

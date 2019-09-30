@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.view
 
 import android.support.design.widget.TabLayout
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.ysxsoft.imtalk.R
@@ -141,6 +142,9 @@ class TyrantListActivity : BaseActivity() {
                         tvNo1Content.visibility = View.VISIBLE
                         tvNo1ID.text = ttid
                         tvNo1Zuan.text = data[i].now_level.toString()
+                        val numb = GradeIconUtils.gradeIcon(data[i].now_level)
+                        tvNo1Zuan.setCompoundDrawablesRelativeWithIntrinsicBounds(numb[0], 0, 0, 0)
+                        tvNo1Zuan.setTextColor(ContextCompat.getColor(mContext, numb[1]))
 
                     }
                 1 ->
@@ -153,6 +157,9 @@ class TyrantListActivity : BaseActivity() {
                         tvNo2Content.visibility = View.VISIBLE
                         tvNo2Zuan.text = data[i].now_level.toString()
                         tvNo2Content.text = "距前一名" + data[i].next_user
+                        val numb = GradeIconUtils.gradeIcon(data[i].now_level)
+                        tvNo2Zuan.setCompoundDrawablesRelativeWithIntrinsicBounds(numb[0], 0, 0, 0)
+                        tvNo2Zuan.setTextColor(ContextCompat.getColor(mContext, numb[1]))
                     }
                 2 ->
                     if (data.size >= 3) {
@@ -164,6 +171,9 @@ class TyrantListActivity : BaseActivity() {
                         tvNo3Content.visibility = View.VISIBLE
                         tvNo3Zuan.text = data[i].now_level.toString()
                         tvNo3Content.text = "距前一名" + data[i].next_user
+                        val numb = GradeIconUtils.gradeIcon(data[i].now_level)
+                        tvNo3Zuan.setCompoundDrawablesRelativeWithIntrinsicBounds(numb[0], 0, 0, 0)
+                        tvNo3Zuan.setTextColor(ContextCompat.getColor(mContext, numb[1]))
                     }
             }
         }

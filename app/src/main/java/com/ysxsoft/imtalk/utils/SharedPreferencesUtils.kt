@@ -47,6 +47,13 @@ object SharedPreferencesUtils {
     fun getInfo(context: Context): String {
         return get(context).getString("userInfo", "")
     }
+    fun saveGroupId(context: Context, value: String) {
+        save(context, "groupId", value)
+    }
+
+    fun getGroupId(context: Context): String {
+        return get(context).getString("groupId", "")
+    }
 
 
 }
