@@ -1,6 +1,7 @@
 package com.ysxsoft.imtalk.adapter
 
 import android.content.Context
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,6 +11,7 @@ import com.ysxsoft.imtalk.bean.TyrantListBean
 import com.ysxsoft.imtalk.bean.UserBankListBean
 import com.ysxsoft.imtalk.com.ListBaseAdapter
 import com.ysxsoft.imtalk.com.SuperViewHolder
+import com.ysxsoft.imtalk.utils.GradeIconUtils
 import com.ysxsoft.imtalk.utils.displayResCyclo
 import com.ysxsoft.imtalk.utils.displayUrl
 import com.ysxsoft.imtalk.utils.displayUrlCyclo
@@ -27,7 +29,7 @@ class TyrantListAdapter(mContext:Context, type : Int) :ListBaseAdapter<TyrantLis
     }
 
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
-        val bean = mDataList.get(position+3)
+        val bean = mDataList[position+3]
         //排名
         holder.getView<TextView>(R.id.tvNo)!!.text = (position+4).toString()
         //头像圆形
@@ -37,7 +39,11 @@ class TyrantListAdapter(mContext:Context, type : Int) :ListBaseAdapter<TyrantLis
         // ID
         holder.getView<TextView>(R.id.tvId)!!.text = "ID："+ bean.tt_id
         // 钻
-        holder.getView<TextView>(R.id.tvNumb)!!.text = bean.now_level.toString()
+        val tvNumb =  holder.getView<TextView>(R.id.tvNumb)
+        val numb = GradeIconUtils.gradeIcon(bean.now_level)
+        tvNumb!!.text = bean.now_level.toString()
+        tvNumb.setCompoundDrawablesRelativeWithIntrinsicBounds(numb[0], 0, 0, 0)
+        tvNumb.setTextColor(ContextCompat.getColor(mContext, numb[1]))
 
         if (flag == 0){//房外榜
             holder.getView<TextView>(R.id.tvSize)!!.visibility = View.VISIBLE

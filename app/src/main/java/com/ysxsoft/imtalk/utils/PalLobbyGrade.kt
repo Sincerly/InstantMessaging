@@ -37,13 +37,19 @@ object PalLobbyGrade {
                 .subscribe(object : Observer<GroupIdBean> {
                     override fun onError(e: Throwable?) {
                         Log.e("onError", "onError")
+                        groupId = SharedPreferencesUtils.getGroupId(MyApplication.mcontext)
+                        requestGroupData(listener)//继续请求更新获取groupId
 //                        ToastUtils.showToast(MyApplication.mcontext, "获取交友大厅信息失败！！")
                     }
 
                     override fun onNext(t: GroupIdBean?) {
                         if (t!!.code == 0) {
                             groupId = t.data.groupId
+                            SharedPreferencesUtils.saveGroupId(MyApplication.mcontext, groupId)
                             listener?.getGroupId(groupId)
+                        }else{
+                            groupId = SharedPreferencesUtils.getGroupId(MyApplication.mcontext)
+                            requestGroupData(listener)//继续请求更新获取groupId
                         }
                     }
 
