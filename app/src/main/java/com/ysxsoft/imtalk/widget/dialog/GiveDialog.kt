@@ -2,6 +2,7 @@ package com.ysxsoft.imtalk.widget.dialog
 
 import android.content.Context
 import android.content.Intent
+import android.text.TextUtils
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.RoomMwUserBean
 import com.ysxsoft.imtalk.bean.UserInfo
@@ -76,6 +77,10 @@ class GiveDialog : ABSDialog {
     override fun initView() {
         img_head.setOnClickListener {
 //            MyDataActivity.startMyDataActivity(this@GiveDialog.context,uid!!,"")
+            if (RoomManager.getInstance().currentRoomInfo==null){
+                return@setOnClickListener
+            }
+
             val intent = Intent(this@GiveDialog.context, MyDataActivity::class.java)
             if (uid!!.equals(RoomManager.getInstance().currentRoomInfo!!.roomInfo.uid)){//点击的是房主头像
                 intent.putExtra("uid",uid)

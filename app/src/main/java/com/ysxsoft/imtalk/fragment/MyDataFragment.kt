@@ -40,7 +40,8 @@ class MyDataFragment : BaseFragment() {
         requestData()
         JzData()
     }
-    var Jz_id:String?=null
+
+    var Jz_id: String? = null
     private fun JzData() {
         NetWork.getService(ImpService::class.java)
                 .mFamily(uid!!)
@@ -49,7 +50,7 @@ class MyDataFragment : BaseFragment() {
                 .subscribe(object : Action1<MFamilyBean> {
                     override fun call(t: MFamilyBean?) {
                         if (t!!.code == 0) {
-                             Jz_id = t.data.id
+                            Jz_id = t.data.id
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.fmy_pic, img_head)
                             tv_familly_name.setText(t.data.fmy_name)
                             tv_jz_num.setText("家族ID：" + t.data.fmy_sn)
@@ -71,8 +72,10 @@ class MyDataFragment : BaseFragment() {
                         if (t!!.code == 0) {
                             tv_js.setText(t.data.user_desc)
                             val pictures = t.data.picture
-                            pictures.add(0, UserInfoBean.DataBean.PictureBean())
-                            val adapter = PhotosAdpater(mContext,uid!!)
+                            if (TextUtils.equals(myself, "myself")) {
+                                pictures.add(0, UserInfoBean.DataBean.PictureBean())
+                            }
+                            val adapter = PhotosAdpater(mContext, uid!!, myself!!)
                             val manager = LinearLayoutManager(mContext)
                             manager.orientation = LinearLayoutManager.HORIZONTAL
                             recyclerView.layoutManager = manager
@@ -89,11 +92,11 @@ class MyDataFragment : BaseFragment() {
 
     private fun initView() {
         cl.setOnClickListener {
-            if (TextUtils.isEmpty(Jz_id)){
+            if (TextUtils.isEmpty(Jz_id)) {
                 showToastMessage("您暂未加入任何家族")
                 return@setOnClickListener
             }
-            MyFamilyActivity.startMyFamilyActivity(mContext,uid!!,"3")
+            MyFamilyActivity.startMyFamilyActivity(mContext, uid!!, "3")
         }
 
         val lists = listOf(ContentBean("测试1"), ContentBean("测试2"), ContentBean("测试3"), ContentBean("测试4"), ContentBean("测试4"),

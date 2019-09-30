@@ -38,6 +38,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:appComponentFactory">
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
         <activity
             android:name=".view.PalLobbyActivity"
             android:screenOrientation="portrait"
@@ -87,23 +88,40 @@
         </activity>
         <activity android:name=".view.AddRoomActivity" /> <!-- 新建房间 -->
         <!-- 登录 -->
-        <activity android:name=".view.LoginActivity" /> <!-- 忘记密码 -->
-        <activity android:name=".view.ForgetPswActivity" /> <!-- 注册 -->
-        <activity android:name=".view.RegisterActivity" /> <!-- 设置 -->
-        <activity android:name=".view.SettingActivity" /> <!-- 帮助 -->
-        <activity android:name=".view.HelpActivity" /> <!-- 绑定手机 -->
-        <activity android:name=".view.BindPhoneActivity" /> <!-- 绑定支付宝账号 -->
-        <activity android:name=".view.BindZfbActivity" /> <!-- 黑名单 -->
-        <activity android:name=".view.BlackListActivity" /> <!-- 我要反馈 -->
-        <activity android:name=".view.WyfkActivity" /> <!-- 实名认证 -->
-        <activity android:name=".view.SmrzActivity" /> <!-- 邀请好友 -->
-        <activity android:name=".view.InviteFriendActivity" /> <!-- 我的邀请列表 -->
-        <activity android:name=".view.InviteListActivity" /> <!-- 我的等级 -->
-        <activity android:name=".view.MyDjActivity" /> <!-- 我的钱包 -->
-        <activity android:name=".view.MoneyBagActivity" /> <!-- 我的家族-家族成员列表 -->
-        <activity android:name=".view.FramilyMemberListActivity" /> <!-- 我的家族 -->
-        <activity android:name=".view.MyFamilyActivity" /> <!-- 我的银行卡-编辑 -->
-        <activity android:name=".view.BankCardEditActivity" /> <!-- 我的银行卡-列表 -->
+        <activity android:name=".view.LoginActivity" />
+        <!-- 忘记密码 -->
+        <activity android:name=".view.ForgetPswActivity" />
+        <!-- 注册 -->
+        <activity android:name=".view.RegisterActivity" />
+        <!-- 设置 -->
+        <activity android:name=".view.SettingActivity" />
+        <!-- 帮助 -->
+        <activity android:name=".view.HelpActivity" />
+        <!-- 绑定手机 -->
+        <activity android:name=".view.BindPhoneActivity" />
+        <!-- 绑定支付宝账号 -->
+        <activity android:name=".view.BindZfbActivity" />
+        <!-- 黑名单 -->
+        <activity android:name=".view.BlackListActivity" />
+        <!-- 我要反馈 -->
+        <activity android:name=".view.WyfkActivity" />
+        <!-- 实名认证 -->
+        <activity android:name=".view.SmrzActivity" />
+        <!-- 邀请好友 -->
+        <activity android:name=".view.InviteFriendActivity" />
+        <!-- 我的邀请列表 -->
+        <activity android:name=".view.InviteListActivity" />
+        <!-- 我的等级 -->
+        <activity android:name=".view.MyDjActivity" />
+        <!-- 我的钱包 -->
+        <activity android:name=".view.MoneyBagActivity" />
+        <!-- 我的家族-家族成员列表 -->
+        <activity android:name=".view.FramilyMemberListActivity" />
+        <!-- 我的家族 -->
+        <activity android:name=".view.MyFamilyActivity" />
+        <!-- 我的银行卡-编辑 -->
+        <activity android:name=".view.BankCardEditActivity" />
+        <!-- 我的银行卡-列表 -->
         <activity android:name=".view.BankCardListActivity" />
         <activity android:name=".view.CommunityNormsActivity" />
         <activity android:name=".view.ContactOfficialsActivity" />
@@ -154,7 +172,8 @@
         <service
             android:name=".appservice.PlayMusicService"
             android:enabled="true"
-            android:exported="true" /> <!-- 融云广播接收器 -->
+            android:exported="true" />
+        <!-- 融云广播接收器 -->
         <receiver
             android:name=".im.SealNotificationReceiver"
             android:exported="true">

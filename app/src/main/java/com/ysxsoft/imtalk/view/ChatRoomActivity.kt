@@ -4141,15 +4141,15 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
         }
 
         override fun onCancel(p0: SHARE_MEDIA?) {
-            Log.d("tag",p0!!.name.toString())
+            Log.e("tag===onCancel",p0!!.name.toString())
         }
 
         override fun onError(p0: SHARE_MEDIA?, p1: Throwable?) {
-            Log.d("tag",p0!!.name.toString()+"===="+p1!!.message.toString())
+            Log.e("tag====onError",p0!!.name.toString()+"===="+p1!!.message.toString())
     }
 
         override fun onStart(p0: SHARE_MEDIA?) {
-            Log.d("tag",p0!!.name.toString())
+            Log.e("tag====onStart",p0!!.name.toString())
         }
     }
 

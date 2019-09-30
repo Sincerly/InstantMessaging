@@ -20,8 +20,8 @@
 
             <FrameLayout
                 android:id="@+id/fl_img_bg"
-                android:layout_width="95dp"
-                android:layout_height="95dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center">
 
                 <com.ysxsoft.imtalk.widget.CircleImageView

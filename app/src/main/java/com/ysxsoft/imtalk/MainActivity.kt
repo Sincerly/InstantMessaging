@@ -10,10 +10,8 @@ import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.widget.LinearLayoutManager
 import com.luck.picture.lib.permissions.RxPermissions
 import com.ysxsoft.imtalk.fragment.*
-import com.ysxsoft.imtalk.widget.dialog.QDDialog
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
@@ -30,7 +28,6 @@ import com.ysxsoft.imtalk.chatroom.rtc.RtcClient
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
-import com.ysxsoft.imtalk.view.LoginActivity
 import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
@@ -59,6 +56,7 @@ class MainActivity : BaseActivity() {
                 Manifest.permission.SYSTEM_ALERT_WINDOW,
                 Manifest.permission.GET_ACCOUNTS,
                 Manifest.permission.WRITE_APN_SETTINGS,
+                Manifest.permission.WRITE_SETTINGS,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION)

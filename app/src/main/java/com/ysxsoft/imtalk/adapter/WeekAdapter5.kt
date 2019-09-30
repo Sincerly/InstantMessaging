@@ -31,7 +31,7 @@ class WeekAdapter5(mContext:Context) :ListBaseAdapter<WeekStarBean.DataBean.Last
 
     override fun onBindItemHolder(holder: SuperViewHolder, position: Int) {
         if (mDataList.isNotEmpty()) {
-            val bean = mDataList[if (position - 1 > 0) position - 1 else position]
+            val bean = mDataList[if (position - 1 >= 0) position - 1 else position]
             val tvTitle = holder.getView<TextView>(R.id.tvTitle)
             val tvContent = holder.getView<TextView>(R.id.tvContent)
             if (position == 0) {
