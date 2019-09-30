@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginBottom="30dp"
         tools:text="在这清冷的世界，独自舞，舞尽一生的风雅。然而，思念它太猖狂，如此轻易的攻陷了精心设计的坚强。" />
 
     <TextView

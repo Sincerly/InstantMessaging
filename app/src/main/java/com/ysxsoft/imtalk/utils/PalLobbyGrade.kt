@@ -37,7 +37,7 @@ object PalLobbyGrade {
                 .subscribe(object : Observer<GroupIdBean> {
                     override fun onError(e: Throwable?) {
                         Log.e("onError", "onError")
-                        ToastUtils.showToast(MyApplication.mcontext, "获取交友大厅信息失败！！")
+//                        ToastUtils.showToast(MyApplication.mcontext, "获取交友大厅信息失败！！")
                     }
 
                     override fun onNext(t: GroupIdBean?) {

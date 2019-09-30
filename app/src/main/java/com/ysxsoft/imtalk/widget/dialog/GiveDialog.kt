@@ -80,7 +80,7 @@ class GiveDialog : ABSDialog {
             if (RoomManager.getInstance().currentRoomInfo==null){
                 return@setOnClickListener
             }
-
+            dismiss()
             val intent = Intent(this@GiveDialog.context, MyDataActivity::class.java)
             if (uid!!.equals(RoomManager.getInstance().currentRoomInfo!!.roomInfo.uid)){//点击的是房主头像
                 intent.putExtra("uid",uid)
@@ -98,23 +98,27 @@ class GiveDialog : ABSDialog {
             dismiss()
         }
         tv_give_gift.setOnClickListener {
-            dismiss()
-            if (giveClickListener != null) {
-                giveClickListener!!.clickGiveGift(bean!!.uid.toString(),bean!!.nickname)
+            if (bean!=null){
+                dismiss()
+                if (giveClickListener != null) {
+                    giveClickListener!!.clickGiveGift(bean!!.uid.toString(),bean!!.nickname)
+                }
             }
         }
         tv_private_chat.setOnClickListener {
-            dismiss()
-            if (giveClickListener != null) {
-                giveClickListener!!.clickPrivateChat()
+            if (bean!=null) {
+                dismiss()
+                if (giveClickListener != null) {
+                    giveClickListener!!.clickPrivateChat()
+                }
+                val info = UserInfo()
+                info.uid = bean!!.uid.toString()
+                info.icon = bean!!.icon
+                info.nikeName = bean!!.nickname
+                info.sex = bean!!.sex
+                info.zsl = bean!!.user_level
+                info.save()
             }
-            val info = UserInfo()
-            info.uid = bean!!.uid.toString()
-            info.icon = bean!!.icon
-            info.nikeName = bean!!.nickname
-            info.sex = bean!!.sex
-            info.zsl = bean!!.user_level
-            info.save()
         }
         tv_give_zb.setOnClickListener {
             dismiss()
