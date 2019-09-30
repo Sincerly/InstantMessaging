@@ -563,6 +563,11 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                         if (t!!.code == 0) {
                             amdinType = t.data.is_admin.toInt()
                              iswheat = t.data.is_wheat
+                            if (TextUtils.isEmpty(iswheat)) {
+                                tv_music.visibility=View.GONE
+                            }else{
+                                tv_music.visibility=View.VISIBLE
+                            }
                             initRoom(room_id!!)
                         }
                     }
@@ -840,11 +845,33 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             voiceDialog!!.show()
         }
 
-        if (TextUtils.isEmpty(iswheat)) {
-            tv_music.visibility=View.GONE
-        }else{
-            tv_music.visibility=View.VISIBLE
-        }
+        val map = HashMap<String, String>()
+        map.put("room_id", room_id!!)
+        map.put("uid", AuthManager.getInstance().currentUserId)
+        val body = RetrofitUtil.createJsonRequest(map)
+        NetWork.getService(ImpService::class.java)
+                .isAdmin(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<IsAdminBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: IsAdminBean?) {
+                        if (t!!.code == 0) {
+                            if (TextUtils.isEmpty(t.data.is_wheat)) {
+                                tv_music.visibility=View.GONE
+                            }else{
+                                tv_music.visibility=View.VISIBLE
+                            }
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
+
+
         img_send_msg.setOnClickListener {
             ll_isShow.visibility = View.GONE
             ll_send.visibility = View.VISIBLE
