@@ -6,21 +6,22 @@ package com.ysxsoft.imtalk.bean;
  */
 public class VersionBean {
 
+
     /**
-     * code : 1
+     * code : 0
      * msg : 获取成功！
-     * data : {"id":"1","vercode":"1","version":"v1.1.0","path":"http://chitchat.rhhhyy.com/admin.php/api/index/version","content":"版本更新","type":"1","add_time":"2019-07-01"}
+     * data : {"id":1,"vercode":"2","version":"1.0.1","path":"http://chitchat.rhhhyy.com/apks/1.0.1release.apk","content":"版本更新","type":1,"add_time":"2019-09-30"}
      */
 
-    private String code;
+    private int code;
     private String msg;
     private DataBean data;
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(int code) {
         this.code = code;
     }
 
@@ -43,27 +44,27 @@ public class VersionBean {
     public static class DataBean {
         /**
          * id : 1
-         * vercode : 1
-         * version : v1.1.0
-         * path : http://chitchat.rhhhyy.com/admin.php/api/index/version
+         * vercode : 2
+         * version : 1.0.1
+         * path : http://chitchat.rhhhyy.com/apks/1.0.1release.apk
          * content : 版本更新
          * type : 1
-         * add_time : 2019-07-01
+         * add_time : 2019-09-30
          */
 
-        private String id;
+        private int id;
         private String vercode;
         private String version;
         private String path;
         private String content;
-        private String type;
+        private int type;
         private String add_time;
 
-        public String getId() {
+        public int getId() {
             return id;
         }
 
-        public void setId(String id) {
+        public void setId(int id) {
             this.id = id;
         }
 
@@ -99,11 +100,11 @@ public class VersionBean {
             this.content = content;
         }
 
-        public String getType() {
+        public int getType() {
             return type;
         }
 
-        public void setType(String type) {
+        public void setType(int type) {
             this.type = type;
         }
 

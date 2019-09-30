@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.google.gson.JsonObject
 import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.appservice.PlayMusicService
 import com.ysxsoft.imtalk.bean.CommonBean
@@ -165,11 +166,8 @@ class SettingActivity : BaseActivity() {
     private var dialog: UpdataDialog? = null
     private var proBar: ProgressBar? = null
     private fun UpdataVersion() {
-        val map = HashMap<String, String>()
-        map.put("type", "1")//1 安卓；2 IOS
-        val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
-                .version(body)
+                .version("1")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<VersionBean> {
@@ -177,7 +175,8 @@ class SettingActivity : BaseActivity() {
                     }
 
                     override fun onNext(t: VersionBean?) {
-                        if ("0".equals(t!!.code)) {
+                        Log.e("tag==","onNext=="+t.toString())
+                        if (t!!.code==0) {
                             val versionName = AppUtil.getVersionName(mContext)
                             val i = VersionUtils.compareVersion(versionName, t.data.version)
                             // 0代表相等，1代表version1大于version2，-1代表version1小于version2

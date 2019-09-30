@@ -1,5 +1,6 @@
 package com.ysxsoft.imtalk.impservice
 
+import com.google.gson.JsonObject
 import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.com.RoomStarBean
 import okhttp3.MultipartBody
@@ -651,9 +652,9 @@ interface ImpService {
 
     @POST("index/user_xy")
     fun user_xy(): Observable<UserXyBean>
-
+    @FormUrlEncoded
     @POST("index/version")
-    fun version(@Body body: RequestBody): Observable<VersionBean>
+    fun version(@Field("type") type: String): Observable<VersionBean>
 
 
 }
