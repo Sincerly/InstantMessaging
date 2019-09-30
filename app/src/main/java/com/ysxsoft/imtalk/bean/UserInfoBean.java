@@ -1,5 +1,6 @@
 package com.ysxsoft.imtalk.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,56 +78,8 @@ public class UserInfoBean {
         private String user_zj_name;//座驾名称
         private String user_zj_pic;//座驾图片
 
-        public String getUser_zj_name() {
-            return user_zj_name == null ? "" : user_zj_name;
-        }
-
-        public void setUser_zj_name(String user_zj_name) {
-            this.user_zj_name = user_zj_name;
-        }
-
-        public String getUser_zj_pic() {
-            return user_zj_pic == null ? "" : user_zj_pic;
-        }
-
-        public void setUser_zj_pic(String user_zj_pic) {
-            this.user_zj_pic = user_zj_pic;
-        }
-
-        public String getMoney() {
-            return money;
-        }
-
-        public void setMoney(String money) {
-            this.money = money;
-        }
-
-        public String getDiamond() {
-            return diamond;
-        }
-
-        public void setDiamond(String diamond) {
-            this.diamond = diamond;
-        }
-
-        public String getRoomId() {
-            return roomId;
-        }
-
-        public void setRoomId(String roomId) {
-            this.roomId = roomId;
-        }
-
-        public String getNow_roomId() {
-            return now_roomId;
-        }
-
-        public void setNow_roomId(String now_roomId) {
-            this.now_roomId = now_roomId;
-        }
-
         public String getUid() {
-            return uid;
+            return uid == null ? "" : uid;
         }
 
         public void setUid(String uid) {
@@ -134,7 +87,7 @@ public class UserInfoBean {
         }
 
         public String getIcon() {
-            return icon;
+            return icon == null ? "" : icon;
         }
 
         public void setIcon(String icon) {
@@ -142,7 +95,7 @@ public class UserInfoBean {
         }
 
         public String getNickname() {
-            return nickname;
+            return nickname == null ? "" : nickname;
         }
 
         public void setNickname(String nickname) {
@@ -150,7 +103,7 @@ public class UserInfoBean {
         }
 
         public String getSex() {
-            return sex;
+            return sex == null ? "" : sex;
         }
 
         public void setSex(String sex) {
@@ -158,7 +111,7 @@ public class UserInfoBean {
         }
 
         public String getTt_id() {
-            return tt_id;
+            return tt_id == null ? "" : tt_id;
         }
 
         public void setTt_id(String tt_id) {
@@ -166,7 +119,7 @@ public class UserInfoBean {
         }
 
         public String getDate_birth() {
-            return date_birth;
+            return date_birth == null ? "" : date_birth;
         }
 
         public void setDate_birth(String date_birth) {
@@ -174,11 +127,43 @@ public class UserInfoBean {
         }
 
         public String getUser_desc() {
-            return user_desc;
+            return user_desc == null ? "" : user_desc;
         }
 
         public void setUser_desc(String user_desc) {
             this.user_desc = user_desc;
+        }
+
+        public String getRoomId() {
+            return roomId == null ? "" : roomId;
+        }
+
+        public void setRoomId(String roomId) {
+            this.roomId = roomId;
+        }
+
+        public String getMoney() {
+            return money == null ? "" : money;
+        }
+
+        public void setMoney(String money) {
+            this.money = money;
+        }
+
+        public String getDiamond() {
+            return diamond == null ? "" : diamond;
+        }
+
+        public void setDiamond(String diamond) {
+            this.diamond = diamond;
+        }
+
+        public String getNow_roomId() {
+            return now_roomId == null ? "" : now_roomId;
+        }
+
+        public void setNow_roomId(String now_roomId) {
+            this.now_roomId = now_roomId;
         }
 
         public int getFans() {
@@ -214,11 +199,30 @@ public class UserInfoBean {
         }
 
         public List<PictureBean> getPicture() {
+            if (picture == null) {
+                return new ArrayList<>();
+            }
             return picture;
         }
 
         public void setPicture(List<PictureBean> picture) {
             this.picture = picture;
+        }
+
+        public String getUser_zj_name() {
+            return user_zj_name == null ? "" : user_zj_name;
+        }
+
+        public void setUser_zj_name(String user_zj_name) {
+            this.user_zj_name = user_zj_name;
+        }
+
+        public String getUser_zj_pic() {
+            return user_zj_pic == null ? "" : user_zj_pic;
+        }
+
+        public void setUser_zj_pic(String user_zj_pic) {
+            this.user_zj_pic = user_zj_pic;
         }
 
         public static class PictureBean {
@@ -233,14 +237,6 @@ public class UserInfoBean {
             private String photo;
             private boolean isChoosed;
 
-            public boolean isChoosed() {
-                return isChoosed;
-            }
-
-            public void setChoosed(boolean choosed) {
-                isChoosed = choosed;
-            }
-
             public int getId() {
                 return id;
             }
@@ -250,7 +246,7 @@ public class UserInfoBean {
             }
 
             public String getUser_picture_id() {
-                return user_picture_id;
+                return user_picture_id == null ? "" : user_picture_id;
             }
 
             public void setUser_picture_id(String user_picture_id) {
@@ -258,11 +254,19 @@ public class UserInfoBean {
             }
 
             public String getPhoto() {
-                return photo;
+                return photo == null ? "" : photo;
             }
 
             public void setPhoto(String photo) {
                 this.photo = photo;
+            }
+
+            public boolean isChoosed() {
+                return isChoosed;
+            }
+
+            public void setChoosed(boolean choosed) {
+                isChoosed = choosed;
             }
         }
     }
