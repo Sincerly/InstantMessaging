@@ -167,7 +167,13 @@ class GiftBagDialog : ABSDialog {
                     override fun onNext(t: GiftSendBean?) {
                         isRequested=false;
                         if (t!!.code == 0) {
-                            dismiss()
+                            //dismiss()
+                            if(tv1.isSelected){
+                                GiftData()
+                            }else{
+                                bageData()
+                            }
+                            userInfo()
                             if (onGiftListener != null) {
                                 val data = ArrayList<Int>()
                                 var fromPosition = -1;//默认不在麦位上
@@ -228,7 +234,6 @@ class GiftBagDialog : ABSDialog {
                                         }
                                     }
                                 }
-                                t.data
 
                                 onGiftListener!!.onClck(fromPosition, data, pic!!, micPositons!!, gifurl!!, gifname!!, gift_num!!,targetUserId,targetUserName,t!!.data)
                             }

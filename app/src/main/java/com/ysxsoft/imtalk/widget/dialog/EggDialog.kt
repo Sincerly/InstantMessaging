@@ -162,13 +162,9 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                     gifDrawable!!.start(); //开始播放
                                     gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                     gifDrawable!!.reset()
-                                    Thread(object : Runnable {
-                                        override fun run() {
-                                            if (onEggOpenListener != null) {
-                                                onEggOpenListener!!.onEggOpened(showPics, map)
-                                            }
-                                        }
-                                    }).start()
+                                    if (onEggOpenListener != null) {
+                                        onEggOpenListener!!.onEggOpened(showPics, map)
+                                    }
 //                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
 //                                        showAnim(t!!.data[0].aw_pic)
 //                                        ZdData()
@@ -183,13 +179,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
-                                Thread(object : Runnable {
-                                    override fun run() {
-                                        if (onEggOpenListener != null) {
-                                            onEggOpenListener!!.onEggOpened(showPics, map)
-                                        }
-                                    }
-                                }).start()                             //砸1次
+                                if (onEggOpenListener != null) {
+                                    onEggOpenListener!!.onEggOpened(showPics, map)
+                                }
+                                //砸1次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     showAnim(t!!.data[0].aw_pic)
                                 }, 3000)
@@ -198,13 +191,9 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
-                                Thread(object : Runnable {
-                                    override fun run() {
-                                        if (onEggOpenListener != null) {
-                                            onEggOpenListener!!.onEggOpened(showPics, map)
-                                        }
-                                    }
-                                }).start()
+                                if (onEggOpenListener != null) {
+                                    onEggOpenListener!!.onEggOpened(showPics, map)
+                                }
                                 //砸10次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     for (bean in showPics) {
@@ -216,13 +205,9 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 gifDrawable!!.start(); //开始播放
                                 gifDrawable!!.setLoopCount(1); //设置播放的次数，播放完了就自动停止
                                 gifDrawable!!.reset()
-                                Thread(object : Runnable {
-                                    override fun run() {
-                                        if (onEggOpenListener != null) {
-                                            onEggOpenListener!!.onEggOpened(showPics, map)
-                                        }
-                                    }
-                                }).start()
+                                if (onEggOpenListener != null) {
+                                    onEggOpenListener!!.onEggOpened(showPics, map)
+                                }
                                 //砸蛋100次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     //跳转到列表
