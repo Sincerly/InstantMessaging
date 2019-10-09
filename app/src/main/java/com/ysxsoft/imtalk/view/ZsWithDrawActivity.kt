@@ -142,6 +142,10 @@ class ZsWithDrawActivity : BaseActivity() {
     }
 
     private fun BankData() {
+        if (TextUtils.isEmpty(bank_id)){
+            showToastMessage("银行卡不能为空")
+            return
+        }
         NetWork.getService(ImpService::class.java)
                 .TxBank(SpUtils.getSp(mContext, "uid"), ed_money.text.toString().trim(), "2", bank_id!!)
                 .subscribeOn(Schedulers.io())
