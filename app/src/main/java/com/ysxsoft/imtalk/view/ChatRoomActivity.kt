@@ -912,6 +912,7 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
             val eggDialog = EggDialog(mContext)
             eggDialog.setOnEggOpenListener(object : EggDialog.OnEggOpenListener {
                 override fun onEggOpened(data: List<EggBean.DataBean>, map: HashMap<String, ArrayList<EggBean.DataBean>>) {
+                    runOnUiThread {
                     //创建消息
                     for (item in data) {
                         val msg = EggChatMessage()
@@ -952,7 +953,6 @@ class ChatRoomActivity : BaseActivity(), RoomEventListener {
                             }
                         }, 300)
                     }
-                    runOnUiThread {
                         chatListAdapter!!.notifyDataSetChanged()
                         chatroom_list_chat.smoothScrollToPosition(chatListAdapter!!.count)
                     }
