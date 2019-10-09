@@ -20,6 +20,7 @@ import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import kotlinx.android.synthetic.main.wining_record_dialog_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -132,8 +133,11 @@ class WithDrawRecodeActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListe
                 .TxRecord(SpUtils.getSp(mContext,"uid"),page.toString())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<RefundListBean>{
-                    override fun call(t: RefundListBean?) {
+                .subscribe(object : Observer<RefundListBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RefundListBean?) {
                         if (t!!.code==0){
                             showData(t)
                             mDataAdapter!!.addAll(t.data)
@@ -145,6 +149,9 @@ class WithDrawRecodeActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListe
                         }else{
                             mSwipeRefreshLayout!!.setRefreshing(false)
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

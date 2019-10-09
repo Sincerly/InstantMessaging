@@ -10,6 +10,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import kotlinx.android.synthetic.main.community_norms_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -42,12 +43,19 @@ class SignRulesActivity : BaseActivity() {
                 .SignRule()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<SignRuleBean>{
-                    override fun call(t: SignRuleBean?) {
+                .subscribe(object :Observer<SignRuleBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: SignRuleBean?) {
                         if (t!!.code==0){
                             web_content.loadDataWithBaseURL(null, t.getData().sign_rule, "text/html", "utf-8", null)
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
     }
 

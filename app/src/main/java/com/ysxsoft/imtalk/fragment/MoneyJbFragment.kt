@@ -21,6 +21,7 @@ import com.ysxsoft.imtalk.utils.SpUtils
 import com.ysxsoft.imtalk.view.ExchangeJBActivity
 import com.ysxsoft.imtalk.view.JbWithDrawActivity
 import kotlinx.android.synthetic.main.fm_money_jb.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -174,8 +175,11 @@ class MoneyJbFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 .record_detail1(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<JbRecordDetailBean> {
-                    override fun call(t: JbRecordDetailBean?) {
+                .subscribe(object : Observer<JbRecordDetailBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: JbRecordDetailBean?) {
                         if (t!!.code == 0) {
                             tv_moeny.setText(t.data.moneys)
                             showData(t)
@@ -188,6 +192,9 @@ class MoneyJbFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         } else {
                             mSwipeRefreshLayout!!.setRefreshing(false)
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

@@ -57,8 +57,11 @@ class SharingMusicFragment : BaseFragment() {
                 .musicList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<MusicListBean> {
-                    override fun call(t: MusicListBean?) {
+                .subscribe(object : Observer<MusicListBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: MusicListBean?) {
                         if (t!!.code == 0) {
                             datas = t.data
                             adapter = SharingMusicAdapter(mContext)
@@ -76,6 +79,9 @@ class SharingMusicFragment : BaseFragment() {
                                 }
                             })
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 

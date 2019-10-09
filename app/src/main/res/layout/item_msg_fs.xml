@@ -41,7 +41,7 @@
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/tv_name"
             android:drawablePadding="10dp"
-            android:src="@mipmap/img_boy" />
+            tools:src="@mipmap/img_boy" />
 
 
         <LinearLayout

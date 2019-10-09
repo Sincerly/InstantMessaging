@@ -12,10 +12,7 @@ import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.RoomMemListBean
 import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
-import com.ysxsoft.imtalk.utils.BaseActivity
-import com.ysxsoft.imtalk.utils.ImageLoadUtil
-import com.ysxsoft.imtalk.utils.NetWork
-import com.ysxsoft.imtalk.utils.displayResCyclo
+import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.CircleImageView
 import kotlinx.android.synthetic.main.activity_online_list.*
 import kotlinx.android.synthetic.main.include_onlyrecyclerview.*
@@ -80,7 +77,13 @@ class OnlineListActivity : BaseActivity() {
                                     } else {
                                         helper.getView<ImageView>(R.id.ivSex)!!.setImageResource(R.mipmap.img_girl)
                                     }
+                                    val charmIcon = GradeIconUtils.charmIcon(item.ml_level.toInt())
+                                    helper.getView<ImageView>(R.id.img_mei)!!.setImageResource(charmIcon[0])
+                                    helper.getView<TextView>(R.id.tvTag1).setTextColor(charmIcon[1])
                                     helper.getView<TextView>(R.id.tvTag1)!!.text = item.ml_level
+                                    val gradeIcon = GradeIconUtils.gradeIcon(item.user_level.toInt())
+                                    helper.getView<ImageView>(R.id.img_zs)!!.setImageResource(gradeIcon[0])
+                                    helper.getView<TextView>(R.id.tvTag2)!!.setTextColor(gradeIcon[1])
                                     helper.getView<TextView>(R.id.tvTag2)!!.text = item.user_level
 
                                     when (item.role) {

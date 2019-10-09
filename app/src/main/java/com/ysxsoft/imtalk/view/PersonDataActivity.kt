@@ -16,6 +16,7 @@ import com.ysxsoft.imtalk.R
 import com.ysxsoft.imtalk.bean.CommonBean
 import com.ysxsoft.imtalk.bean.UploadFileBean
 import com.ysxsoft.imtalk.bean.UserInfoBean
+import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.widget.dialog.NickNameDialog
@@ -24,6 +25,8 @@ import kotlinx.android.synthetic.main.person_data_layout.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.litepal.LitePal
+import org.litepal.extension.find
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -126,9 +129,15 @@ class PersonDataActivity : BaseActivity() {
                 .Brith(SpUtils.getSp(mContext,"uid"),birth)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<CommonBean>{
-                    override fun call(t: CommonBean?) {
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 
@@ -139,9 +148,15 @@ class PersonDataActivity : BaseActivity() {
                 .NikeName(SpUtils.getSp(mContext,"uid"),name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<CommonBean>{
-                    override fun call(t: CommonBean?) {
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 

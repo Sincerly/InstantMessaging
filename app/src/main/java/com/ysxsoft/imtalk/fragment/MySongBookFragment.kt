@@ -67,8 +67,11 @@ class MySongBookFragment : BaseFragment() {
                 .RoomMusicList(roomId!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<RoomMusicListBean> {
-                    override fun call(t: RoomMusicListBean?) {
+                .subscribe(object : Observer<RoomMusicListBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RoomMusicListBean?) {
                         if (t!!.code == 0) {
                             lists = t.data as ArrayList<RoomMusicListBean.DataBean>?
                             if (lists == null || lists!!.size <= 0) {
@@ -81,6 +84,9 @@ class MySongBookFragment : BaseFragment() {
                             tv_sum_song.setText("共" + lists!!.size + "首歌")
                             initAdapter()
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 

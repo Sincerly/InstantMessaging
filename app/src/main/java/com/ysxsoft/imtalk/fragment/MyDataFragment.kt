@@ -47,8 +47,11 @@ class MyDataFragment : BaseFragment() {
                 .mFamily(uid!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<MFamilyBean> {
-                    override fun call(t: MFamilyBean?) {
+                .subscribe(object : Observer<MFamilyBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: MFamilyBean?) {
                         if (t!!.code == 0) {
                             Jz_id = t.data.id
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.fmy_pic, img_head)
@@ -56,6 +59,10 @@ class MyDataFragment : BaseFragment() {
                             tv_jz_num.setText("家族ID：" + t.data.fmy_sn)
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
     }
 

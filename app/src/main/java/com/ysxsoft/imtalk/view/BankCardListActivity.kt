@@ -133,13 +133,20 @@ class BankCardListActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListene
                 .DelBankInfo(SpUtils.getSp(mContext,"uid"),bank_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<CommonBean>{
-                    override fun call(t: CommonBean?) {
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code==0){
                             onRefresh()
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
 
     }

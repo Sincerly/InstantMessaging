@@ -16,6 +16,8 @@ import com.ysxsoft.imtalk.view.*
 import kotlinx.android.synthetic.main.fm_my.*
 import kotlinx.android.synthetic.main.include_my_top.*
 import kotlinx.android.synthetic.main.title_layout2.*
+import org.litepal.LitePal
+import org.litepal.extension.find
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -33,32 +35,33 @@ class MyFragment : BaseFragment() {
     private var fm_id: String? = null
     private var is_fmy: String? = null
     private var bean: GetRealInfoBean.DataBean? = null
-    private var dataBean:UserInfoBean.DataBean?=null
+    private var dataBean: UserInfoBean.DataBean? = null
     override fun onResume() {
         super.onResume()
         initStatusBar(topView)
-        img_back.visibility=View.GONE
+        img_back.visibility = View.GONE
         img_back.setImageResource(R.mipmap.sign_white)
         setTitle("我的")
         initView()
         requestData()
         getData()
     }
+
     private fun getData() {
         val map = HashMap<String, String>()
-        map.put("uid",AuthManager.getInstance().currentUserId)
+        map.put("uid", AuthManager.getInstance().currentUserId)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .get_real_info(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<GetRealInfoBean>{
+                .subscribe(object : Observer<GetRealInfoBean> {
                     override fun onError(e: Throwable?) {
 
                     }
 
                     override fun onNext(t: GetRealInfoBean?) {
-                        if("0".equals(t!!.code)){
+                        if ("0".equals(t!!.code)) {
                             bean = t.data
                         }
                     }
@@ -81,18 +84,25 @@ class MyFragment : BaseFragment() {
                     override fun onNext(t: UserInfoBean?) {
                         if (t!!.code == 0) {
                             dataBean = t.data
-                            if (!TextUtils.isEmpty(t.data.user_ts_pic)){
-                                ImageLoadUtil.GlideGoodsImageLoad(mContext,t.data.user_ts_pic,img_head_wear)
+                            if (!TextUtils.isEmpty(t.data.user_ts_pic)) {
+                                ImageLoadUtil.GlideGoodsImageLoad(mContext, t.data.user_ts_pic, img_head_wear)
                             }
                             //保存整个个人信息到本地
                             SharedPreferencesUtils.saveInfo(mContext, Gson().toJson(dataBean))
+
+                            val find = LitePal.where("uid=?", AuthManager.getInstance().currentUserId).find<com.ysxsoft.imtalk.bean.UserInfo>()
+                            if (find.size > 0) {
+                                val userInfo = find.get(0)
+                                userInfo.delete()
+                            }
                             val info = UserInfo()
                             info.uid = t.data.uid
                             info.icon = t.data.icon
                             info.nikeName = t.data.nickname
                             info.sex = t.data.sex
                             info.zsl = t.data.user_level.toString()
-                            val save = info.save()
+                            info.save()
+
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_logo)
                             tv_nick.setText(t.data.nickname)
                             tv_id.setText("ID:" + t.data.tt_id)
@@ -100,14 +110,14 @@ class MyFragment : BaseFragment() {
                             tv_foucs_on.setText(t.data.gzrs.toString())
                             tv_level.setText(t.data.user_level.toString())
                             tv_mlz.setText(t.data.charm_level.toString())
-                            if (t.data.sex.equals("1")){
+                            if (t.data.sex.equals("1")) {
                                 img_sex.setImageResource(R.mipmap.img_boy)
-                            }else{
+                            } else {
                                 img_sex.setImageResource(R.mipmap.img_girl)
                             }
 
-                            SharedPreferencesUtils.saveCarName(mContext,dataBean!!.user_zj_name);//保存座驾名称
-                            SharedPreferencesUtils.saveCarPic(mContext,dataBean!!.user_zj_pic)//保存座驾图片
+                            SharedPreferencesUtils.saveCarName(mContext, dataBean!!.user_zj_name);//保存座驾名称
+                            SharedPreferencesUtils.saveCarPic(mContext, dataBean!!.user_zj_pic)//保存座驾图片
                         }
                     }
 
@@ -129,12 +139,12 @@ class MyFragment : BaseFragment() {
 //            dialog.show()
         }
         ll_fans.setOnClickListener {
-//            startActivity(FansActivity::class.java)
-            FansActivity.startFansActivity(mContext,AuthManager.getInstance().currentUserId)
+            //            startActivity(FansActivity::class.java)
+            FansActivity.startFansActivity(mContext, AuthManager.getInstance().currentUserId)
         }
         tv_foucs_on.setOnClickListener {
-//            startActivity(FouceOnActivity::class.java)
-            FouceOnActivity.startFouceOnActivity(mContext,AuthManager.getInstance().currentUserId)
+            //            startActivity(FouceOnActivity::class.java)
+            FouceOnActivity.startFouceOnActivity(mContext, AuthManager.getInstance().currentUserId)
         }
 
         img_logo.setOnClickListener {
@@ -147,14 +157,14 @@ class MyFragment : BaseFragment() {
         }
         //装扮商城
         tv2.setOnClickListener {
-//            startActivity(DressMallActivity::class.java)
-            DressMallActivity.startDressMallActivity(mContext,AuthManager.getInstance().currentUserId,"myself",dataBean!!.nickname)
+            //            startActivity(DressMallActivity::class.java)
+            DressMallActivity.startDressMallActivity(mContext, AuthManager.getInstance().currentUserId, "myself", dataBean!!.nickname)
         }
         //实名认证
         tv3.setOnClickListener {
-            if (bean!!.is_real==0){
+            if (bean!!.is_real == 0) {
                 startActivity(SmrzActivity::class.java)
-            }else{
+            } else {
                 showToastMessage("已认证")
             }
         }
@@ -165,17 +175,17 @@ class MyFragment : BaseFragment() {
         }
         //我的等级
         tv5.setOnClickListener {
-//            startActivity(MyDjActivity::class.java)
+            //            startActivity(MyDjActivity::class.java)
             MyDjActivity.starMyDjActivity(mContext, "1")
         }
-        tv6.visibility=View.GONE
+        tv6.visibility = View.GONE
         //我的邀请
         tv6.setOnClickListener {
             startActivity(InviteFriendActivity::class.java)
         }
         //设置
         tv7.setOnClickListener {
-            if (dataBean!=null&&!TextUtils.isEmpty(dataBean!!.nickname)) {
+            if (dataBean != null && !TextUtils.isEmpty(dataBean!!.nickname)) {
                 SettingActivity.startSettingActivity(mContext, dataBean!!.now_roomId, dataBean!!.nickname, dataBean!!.icon)
             }
 //            startActivity(SettingActivity::class.java)
@@ -193,8 +203,11 @@ class MyFragment : BaseFragment() {
                 .mFamily(SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<MFamilyBean> {
-                    override fun call(t: MFamilyBean?) {
+                .subscribe(object : Observer<MFamilyBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: MFamilyBean?) {
                         if (t!!.code == 0) {
                             fm_id = t.data.id
                             is_fmy = t.data.is_fmy
@@ -203,6 +216,10 @@ class MyFragment : BaseFragment() {
                             showToastMessage("您暂未加入任何家族")
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
     }
 }

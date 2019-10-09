@@ -25,6 +25,7 @@ import io.rong.imkit.RongIM
 import kotlinx.android.synthetic.main.activity_my_family.*
 import kotlinx.android.synthetic.main.fm_msg21.*
 import org.litepal.LitePal
+import org.litepal.extension.find
 import org.litepal.extension.findAll
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -147,6 +148,11 @@ class Msg21Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         if (t!!.code == 0) {
                             showData(t)
                             for (bean in t.data) {
+                                val find = LitePal.where("uid=?", bean.fs_id).find<com.ysxsoft.imtalk.bean.UserInfo>()
+                                if (find.size>0){
+                                    val userInfo = find.get(0)
+                                    userInfo.delete()
+                                }
                                 val info = UserInfo()
                                 info.uid = bean.fs_id
                                 info.icon = bean.icon

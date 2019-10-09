@@ -153,14 +153,15 @@ class HomeFragment : BaseFragment(), OnBannerListener {
 
                     override fun onNext(t: HomeRoomListBean?) {
                         if (t!!.code == 0) {
-                            tv1.setText(t.data.get(0).cname)
-                            tv2.setText(t.data.get(1).cname)
                             if (t.data.size > 0) {
                                 when (t.data.size) {
                                     1 -> {
+                                        tv1.setText(t.data.get(0).cname)
                                         roomLists0 = t.data.get(0).roomList
                                     }
                                     2 -> {
+                                        tv1.setText(t.data.get(0).cname)
+                                        tv2.setText(t.data.get(1).cname)
                                         roomLists0 = t.data.get(0).roomList
                                         roomLists1 = t.data.get(1).roomList
                                     }
@@ -563,8 +564,11 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                 .getRealInfo(SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<RealInfoBean> {
-                    override fun call(t: RealInfoBean?) {
+                .subscribe(object : Observer<RealInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RealInfoBean?) {
                         if ("0".equals(t!!.code)) {
                             when (t.data.is_real) {
                                 0 -> {
@@ -578,6 +582,10 @@ class HomeFragment : BaseFragment(), OnBannerListener {
                             }
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
     }
 

@@ -89,8 +89,11 @@ class HouseFragment : BaseFragment() {
                 .getRealInfo(SpUtils.getSp(mContext, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<RealInfoBean> {
-                    override fun call(t: RealInfoBean?) {
+                .subscribe(object : Observer<RealInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RealInfoBean?) {
                         if ("0".equals(t!!.code)) {
                             when (t.data.is_real) {
                                 0 -> {
@@ -104,6 +107,10 @@ class HouseFragment : BaseFragment() {
                             }
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
     }
 

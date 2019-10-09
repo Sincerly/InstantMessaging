@@ -79,49 +79,77 @@
         app:layout_constraintLeft_toRightOf="@id/ivAvatar"
         app:layout_constraintTop_toBottomOf="@+id/tvNick" />
 
-    <TextView
-        android:id="@+id/tvTag1"
+
+
+
+    <LinearLayout
+        android:id="@+id/ll_mei"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/cccccc_shape"
         android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/shape_solid_colorcc_oval"
-        android:drawableLeft="@mipmap/icon_mei"
-        android:drawablePadding="4dp"
-        android:drawableStart="@mipmap/icon_mei"
-        android:gravity="center_vertical"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
-        android:singleLine="true"
-        android:text="大张伟"
-        android:textColor="@color/white"
-        android:textSize="10sp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/tvTag"
-        app:layout_constraintTop_toBottomOf="@+id/tvNick" />
+        app:layout_constraintTop_toBottomOf="@+id/tvNick">
 
-    <TextView
-        android:id="@+id/tvTag2"
+        <ImageView
+            android:id="@+id/img_mei"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:src="@mipmap/img_w_masonry" />
+
+        <TextView
+            android:id="@+id/tvTag1"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            tools:text="12" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_zs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/cccccc_shape"
+        android:gravity="center"
         android:layout_marginBottom="10dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/shape_solid_colorcc_oval"
-        android:drawableLeft="@mipmap/icon_grade"
-        android:drawablePadding="4dp"
-        android:drawableStart="@mipmap/icon_grade"
-        android:gravity="center_vertical"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
-        android:singleLine="true"
-        android:text="大张伟"
-        android:textColor="@color/white"
-        android:textSize="10sp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tvTag1"
-        app:layout_constraintTop_toBottomOf="@+id/tvNick" />
+        app:layout_constraintStart_toEndOf="@+id/ll_mei"
+        app:layout_constraintTop_toBottomOf="@+id/tvNick">
+
+        <ImageView
+            android:id="@+id/img_zs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:src="@mipmap/img_w_masonry" />
+
+        <TextView
+            android:id="@+id/tvTag2"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_marginRight="5dp"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            tools:text="12" />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

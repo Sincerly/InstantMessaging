@@ -17,6 +17,7 @@ import com.ysxsoft.imtalk.utils.BaseFragment
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import kotlinx.android.synthetic.main.fm_msg21.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -120,8 +121,11 @@ class Msg22Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 .fansList(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<FansListBean> {
-                    override fun call(t: FansListBean?) {
+                .subscribe(object : Observer<FansListBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: FansListBean?) {
                         if (t!!.code==0){
                             showData(t)
                             mDataAdapter!!.addAll(t.data)
@@ -134,6 +138,9 @@ class Msg22Fragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             mSwipeRefreshLayout.isRefreshing = false
                             mRecyclerView.setRefreshing(false)//同时调用LuRecyclerView的setRefreshing方法
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 
