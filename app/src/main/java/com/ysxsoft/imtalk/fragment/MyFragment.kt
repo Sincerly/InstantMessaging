@@ -1,5 +1,6 @@
 package com.ysxsoft.imtalk.fragment
 
+import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import com.google.gson.Gson
@@ -13,6 +14,7 @@ import com.ysxsoft.imtalk.chatroom.task.AuthManager
 import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.*
 import com.ysxsoft.imtalk.view.*
+import io.rong.imkit.userInfoCache.RongUserInfoManager
 import kotlinx.android.synthetic.main.fm_my.*
 import kotlinx.android.synthetic.main.include_my_top.*
 import kotlinx.android.synthetic.main.title_layout2.*
@@ -102,7 +104,7 @@ class MyFragment : BaseFragment() {
                             info.sex = t.data.sex
                             info.zsl = t.data.user_level.toString()
                             info.save()
-
+                            RongUserInfoManager.getInstance().setUserInfo(io.rong.imlib.model.UserInfo(t.data.uid,t.data.nickname, Uri.parse(t.data.icon)))
                             ImageLoadUtil.GlideHeadImageLoad(mContext, t.data.icon, img_logo)
                             tv_nick.setText(t.data.nickname)
                             tv_id.setText("ID:" + t.data.tt_id)
