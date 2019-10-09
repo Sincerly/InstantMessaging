@@ -115,9 +115,7 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Action1<EggBean> {
                     override fun call(t: EggBean?) {
-                        isRequest = false;
                         ToastUtils.showToast(this@EggDialog.context, t!!.msg)
-
                         var map = HashMap<String, ArrayList<EggBean.DataBean>>()
                         var showPics = ArrayList<EggBean.DataBean>()
                         for (item in t.data) {
@@ -165,10 +163,6 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                     if (onEggOpenListener != null) {
                                         onEggOpenListener!!.onEggOpened(showPics, map)
                                     }
-//                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
-//                                        showAnim(t!!.data[0].aw_pic)
-//                                        ZdData()
-//                                    }, 3000)
                                     val msg = handler.obtainMessage()
                                     msg.obj = t!!.data[0].aw_pic
                                     msg.what = 0x01
@@ -184,6 +178,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 }
                                 //砸1次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                        //动画结束后才能进行砸下一次
+                                        isRequest=false;
+                                    },700);
                                     showAnim(t!!.data[0].aw_pic)
                                 }, 3000)
                             } else if ("2".equals(type)) {
@@ -196,6 +194,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 }
                                 //砸10次
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                        //动画结束后才能进行砸下一次
+                                        isRequest=false;
+                                    },700);
                                     for (bean in showPics) {
                                         showAnim(bean!!.sg_pic)
                                     }
@@ -212,6 +214,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                                     //跳转到列表
 //                                    WiningRecordDialog(mContext).show()
+                                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                                        //动画结束后才能进行砸下一次
+                                        isRequest=false;
+                                    },700);
                                     for (bean in showPics) {
                                         showAnim(bean!!.sg_pic)
                                     }
@@ -229,7 +235,10 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                 0x01 -> {
                     val a = msg.obj as String
                     showAnim(a)
-                    ZdData()
+                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                        //动画结束后才能进行砸下一次
+                        ZdData()
+                    },700);
                 }
             }
         }
@@ -302,15 +311,21 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                             adapter.addAll(t.data.zjd_times)
                             adapter.setOnItemClickListener(object : TimesAdapter.OnItemClickListener {
                                 override fun onClick(position: Int) {
-                                    if("4".equals(adapter.dataList.get(position).type)){
-                                        handler.removeCallbacksAndMessages(null)
-                                    }else{
-                                        handler.removeCallbacksAndMessages(null)
-                                    }
-                                    gifDrawable!!.stop()
-                                    gifDrawable!!.seekTo(0)
-                                    type = adapter.dataList.get(position).type
-                                    adapter.setSelect(position)
+                                        if ("4".equals(type)) {
+                                            handler.removeCallbacksAndMessages(null)
+                                            isRequest=false;
+                                        }
+                                        if(!isRequest){
+                                            if("4".equals(adapter.dataList.get(position).type)){
+                                                handler.removeCallbacksAndMessages(null)
+                                            }else{
+                                                handler.removeCallbacksAndMessages(null)
+                                            }
+                                            gifDrawable!!.stop()
+                                            gifDrawable!!.seekTo(0)
+                                            type = adapter.dataList.get(position).type
+                                            adapter.setSelect(position)
+                                        }
                                 }
                             })
                             tv_jb.setText(t.data.money)
@@ -320,7 +335,6 @@ class EggDialog(var mContext: Context) : ABSDialog(mContext) {
                     override fun onCompleted() {
                     }
                 })
-
     }
 
     private fun getMoney(mContext: Context) {
