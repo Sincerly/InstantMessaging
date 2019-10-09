@@ -24,6 +24,7 @@ import com.ysxsoft.imtalk.view.WithDrawRecodeActivity
 import com.ysxsoft.imtalk.view.ZsWithDrawActivity
 import kotlinx.android.synthetic.main.fm_money_zs.*
 import kotlinx.android.synthetic.main.room_tag_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -182,8 +183,11 @@ class MoneyZsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 .record_detail(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<RecordDetailBean> {
-                    override fun call(t: RecordDetailBean?) {
+                .subscribe(object : Observer<RecordDetailBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RecordDetailBean?) {
                         if (t!!.code == 0) {
                             tv_moeny.setText(t.data.diamond)
                             showData(t)
@@ -196,6 +200,9 @@ class MoneyZsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         }else{
                             mSwipeRefreshLayout!!.setRefreshing(false)
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

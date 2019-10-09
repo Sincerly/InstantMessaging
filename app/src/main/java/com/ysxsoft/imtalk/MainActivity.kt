@@ -18,9 +18,7 @@ import java.util.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
-import com.ysxsoft.imtalk.bean.CommonBean
-import com.ysxsoft.imtalk.bean.QdSignListBean
-import com.ysxsoft.imtalk.bean.UserInfoBean
+import com.ysxsoft.imtalk.bean.*
 import com.ysxsoft.imtalk.chatroom.im.IMClient
 import com.ysxsoft.imtalk.chatroom.im.message.RoomMemberChangedMessage
 import com.ysxsoft.imtalk.chatroom.net.retrofit.RetrofitUtil
@@ -32,7 +30,9 @@ import io.rong.imlib.IRongCallback
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
+import kotlinx.android.synthetic.main.room_tag_layout.*
 import org.litepal.LitePal
+import org.litepal.extension.find
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -90,6 +90,43 @@ class MainActivity : BaseActivity() {
 //                        }
 //                    }
 //                })
+        getData()
+    }
+
+    private fun getData() {
+        val map = HashMap<String, String>()
+        map.put("uid", SpUtils.getSp(mContext, "uid"))
+        map.put("type", "3")
+        NetWork.getService(ImpService::class.java)
+                .fansList(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<FansListBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: FansListBean?) {
+                        if (t!!.code == 0) {
+                            for (bean in t.data) {
+                                val find = LitePal.where("uid=?", bean.fs_id).find<com.ysxsoft.imtalk.bean.UserInfo>()
+                                if (find.size>0){
+                                    val userInfo = find.get(0)
+                                    userInfo.delete()
+                                }
+                                val info = UserInfo()
+                                info.uid = bean.fs_id
+                                info.icon = bean.icon
+                                info.nikeName = bean.nickname
+                                info.sex = bean.sex
+                                info.zsl = bean.th_level
+                                info.save()
+                            }
+                        }
+                    }
+
+                    override fun onCompleted() {
+                    }
+                })
     }
 
     var dataBean: UserInfoBean.DataBean? = null
@@ -195,9 +232,9 @@ class MainActivity : BaseActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (isBack) {
                 sendBroadcast(Intent("WINDOW"))
-                if (dataBean!=null){
-                    if (!TextUtils.isEmpty(dataBean!!.now_roomId)){
-                        quiteRoom(AuthManager.getInstance().currentUserId,"1")
+                if (dataBean != null) {
+                    if (!TextUtils.isEmpty(dataBean!!.now_roomId)) {
+                        quiteRoom(AuthManager.getInstance().currentUserId, "1")
                     }
                 }
                 finish()
@@ -244,7 +281,7 @@ class MainActivity : BaseActivity() {
                                 if (t.code == 0) {
                                     IMClient.getInstance().quitChatRoom(dataBean!!.now_roomId, null)
                                     RtcClient.getInstance().quitRtcRoom(dataBean!!.now_roomId, null)
-                                    removeUser(dataBean!!.now_roomId!!,AuthManager.getInstance().currentUserId)
+                                    removeUser(dataBean!!.now_roomId!!, AuthManager.getInstance().currentUserId)
 //                                    val intent = Intent(mContext, PlayMusicService::class.java)
 //                                    stopService(intent)
 
@@ -262,21 +299,21 @@ class MainActivity : BaseActivity() {
         });
     }
 
-    fun removeUser(roomId:String,uid:String){
+    fun removeUser(roomId: String, uid: String) {
         val map = HashMap<String, String>()
-        map.put("room_id",roomId)
-        map.put("uid",uid)
+        map.put("room_id", roomId)
+        map.put("uid", uid)
         val body = RetrofitUtil.createJsonRequest(map)
         NetWork.getService(ImpService::class.java)
                 .remove_user(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Observer<CommonBean>{
+                .subscribe(object : Observer<CommonBean> {
                     override fun onError(e: Throwable?) {
                     }
 
                     override fun onNext(t: CommonBean?) {
-                        if (t!!.code==0){
+                        if (t!!.code == 0) {
 
                         }
                     }

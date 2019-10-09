@@ -89,12 +89,18 @@ class BindPhoneActivity : BaseActivity() {
                 .bind_mobile(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<CommonBean>{
-                    override fun call(t: CommonBean?) {
+                .subscribe(object :Observer<CommonBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code==0){
                             finish()
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
 

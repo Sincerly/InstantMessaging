@@ -83,8 +83,12 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                 .ReportList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<ReportListBean> {
-                    override fun call(t: ReportListBean?) {
+                .subscribe(object : Observer<ReportListBean> {
+                    override fun onError(e: Throwable?) {
+
+                    }
+
+                    override fun onNext(t: ReportListBean?) {
                         if (t!!.code == 0) {
                             adapter = ReportAdapter(mContext)
                             recyclerView.layoutManager = LinearLayoutManager(mContext)
@@ -92,6 +96,10 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                             adapter!!.addAll(t.data)
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
     }
 
@@ -226,13 +234,20 @@ class ReportActivity : BaseActivity(), ReportAdapter.CheckInterface {
                             .UploadFile(body)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(object : Action1<UploadFileBean> {
-                                override fun call(t: UploadFileBean?) {
+                            .subscribe(object : Observer<UploadFileBean> {
+                                override fun onError(e: Throwable?) {
+                                }
+
+                                override fun onNext(t: UploadFileBean?) {
                                     if (t!!.code == 0) {
                                         val imgId1 = t.data.id
                                         Ids.add(imgId1.toString())
                                     }
                                 }
+
+                                override fun onCompleted() {
+                                }
+
                             })
                     ClearCache()
                 }

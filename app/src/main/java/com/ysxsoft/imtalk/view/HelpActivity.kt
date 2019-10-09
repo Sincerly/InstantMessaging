@@ -11,6 +11,7 @@ import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import kotlinx.android.synthetic.main.activity_help.*
 import kotlinx.android.synthetic.main.title_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -35,14 +36,20 @@ class HelpActivity : BaseActivity() {
                 .BaseSetHelp("4")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<HelpBean>{
-                    override fun call(t: HelpBean?) {
+                .subscribe(object :Observer<HelpBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: HelpBean?) {
                         if (t!!.code==0){
                             val adapter = HelpAdapter(mContext)
                             recyclerView.layoutManager=LinearLayoutManager(mContext)
                             recyclerView.adapter=adapter
                             adapter.addAll(t.data)
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

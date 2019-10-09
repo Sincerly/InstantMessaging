@@ -131,6 +131,11 @@ class Msg1Fragment : BaseFragment() {
                     override fun onNext(t: SysMessageBean?) {
                         if (t!!.code == 0) {
                             for (bean in t.data.userInfo) {
+                                val find = LitePal.where("uid=?", bean.id.toString()).find<com.ysxsoft.imtalk.bean.UserInfo>()
+                                if (find.size>0){
+                                    val userInfo = find.get(0)
+                                    userInfo.delete()
+                                }
                                 var tempUser = UserInfo()
                                 tempUser.uid = "" + bean.id             //UID
                                 tempUser.nikeName = bean.nickname   //昵称

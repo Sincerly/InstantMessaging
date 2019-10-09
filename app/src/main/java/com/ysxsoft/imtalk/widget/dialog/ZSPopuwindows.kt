@@ -20,6 +20,7 @@ import com.ysxsoft.imtalk.impservice.ImpService
 import com.ysxsoft.imtalk.utils.BaseApplication.Companion.mContext
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.ToastUtils
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -55,8 +56,11 @@ class ZSPopuwindows : PopupWindow {
                 .giftTimes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object :Action1<GiftTimesBean>{
-                    override fun call(t: GiftTimesBean?) {
+                .subscribe(object :Observer<GiftTimesBean>{
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: GiftTimesBean?) {
                         if ("0".equals(t!!.code)){
                             val adapter = GiftTimesAdapter(mContext)
                             recyclerView.layoutManager=LinearLayoutManager(mContext)
@@ -74,6 +78,9 @@ class ZSPopuwindows : PopupWindow {
                                 }
                             })
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

@@ -90,12 +90,18 @@ class SmrzActivity : BaseActivity() {
                 .realName(SpUtils.getSp(mContext, "uid"), et_name.text.toString().trim(), et_id.text.toString().trim())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<CommonBean> {
-                    override fun call(t: CommonBean?) {
+                .subscribe(object : Observer<CommonBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: CommonBean?) {
                         showToastMessage(t!!.msg)
                         if (t.code == 0) {
                             finish()
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

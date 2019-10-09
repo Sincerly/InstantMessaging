@@ -37,6 +37,7 @@ import io.rong.message.TextMessage
 import org.greenrobot.eventbus.EventBus
 import org.litepal.LitePal
 import org.litepal.extension.find
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -113,12 +114,18 @@ class PalLobbyFragment : ConversationFragment() {
                 .getRealInfo(SpUtils.getSp(activity as Context, "uid"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<RealInfoBean> {
-                    override fun call(t: RealInfoBean?) {
+                .subscribe(object : Observer<RealInfoBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: RealInfoBean?) {
                         if ("0".equals(t!!.code)) {
                             code = t.data.is_real
                             listener.getCode(code)
                         }
+                    }
+
+                    override fun onCompleted() {
                     }
                 })
     }

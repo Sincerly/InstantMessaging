@@ -20,6 +20,7 @@ import com.ysxsoft.imtalk.utils.BaseActivity
 import com.ysxsoft.imtalk.utils.NetWork
 import com.ysxsoft.imtalk.utils.SpUtils
 import kotlinx.android.synthetic.main.fans_layout.*
+import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -137,8 +138,11 @@ class FouceOnActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                 .fansList(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Action1<FansListBean> {
-                    override fun call(t: FansListBean?) {
+                .subscribe(object : Observer<FansListBean> {
+                    override fun onError(e: Throwable?) {
+                    }
+
+                    override fun onNext(t: FansListBean?) {
                         if (t!!.code==0){
                             showData(t)
                             mDataAdapter!!.addAll(t.data)
@@ -152,6 +156,10 @@ class FouceOnActivity : BaseActivity(), SwipeRefreshLayout.OnRefreshListener {
                             mRecyclerView.setRefreshing(false)//同时调用LuRecyclerView的setRefreshing方法
                         }
                     }
+
+                    override fun onCompleted() {
+                    }
+
                 })
 
 
