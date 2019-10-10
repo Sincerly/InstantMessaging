@@ -42,8 +42,8 @@ class MsgChatListAdapter(mContext: Context) : ListBaseAdapter<Conversation>(mCon
             } else {
                 tv_zsl!!.visibility = View.VISIBLE
                 iv_sex!!.visibility = View.VISIBLE
-                tv_zsl.setText(beans.get(0).zsl)
-                when (beans.get(0).sex) {
+                tv_zsl.setText(beans.get(beans.size-1).zsl)
+                when (beans.get(beans.size-1).sex) {
                     "1" -> {
                         iv_sex.setImageResource(R.mipmap.img_boy)
                     }
