@@ -77,6 +77,7 @@
             android:id="@+id/img_head"
             android:layout_width="70dp"
             android:layout_height="70dp"
+            android:layout_marginBottom="2dp"
             android:src="@mipmap/img_normal_head"
             app:layout_constraintBottom_toBottomOf="@id/img_head_img"
             app:layout_constraintLeft_toLeftOf="@id/img_head_img"
