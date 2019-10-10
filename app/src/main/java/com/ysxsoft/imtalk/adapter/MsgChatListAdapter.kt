@@ -32,8 +32,8 @@ class MsgChatListAdapter(mContext: Context) : ListBaseAdapter<Conversation>(mCon
         val bean = mDataList.get(position)
         val beans = LitePal.where("uid=?", bean.targetId).find<com.ysxsoft.imtalk.bean.UserInfo>()
         if (beans.size > 0) {
-            ImageLoadUtil.GlideHeadImageLoad(mContext, beans.get(0).icon.toString(), holder.getView<CircleImageView>(R.id.img_head)!!)
-            holder.getView<TextView>(R.id.tv_nikeName)!!.setText(beans.get(0).nikeName)
+            ImageLoadUtil.GlideHeadImageLoad(mContext, beans.get(beans.size-1).icon.toString(), holder.getView<CircleImageView>(R.id.img_head)!!)
+            holder.getView<TextView>(R.id.tv_nikeName)!!.setText(beans.get(beans.size-1).nikeName)
             var tv_zsl = holder.getView<TextView>(R.id.tv_zs_num)
             var iv_sex = holder.getView<ImageView>(R.id.img_sex)
             if (beans[0].isSys!!) {
